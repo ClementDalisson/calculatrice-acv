@@ -4,9 +4,10 @@
 
 /* ── State ── */
 let state = {
-  main: 'perso',
+  main: 'home',
   section: 'catalogue',
   subSection: 'catalogue',
+  entrepriseDonutChart: null,
   selectedIds: [],
   filterCat: 'all',
   detailId: null,
@@ -218,7 +219,9 @@ function goToMain(main) {
   const subnav = document.getElementById('subnav');
   if (subnav) subnav.style.display = main === 'perso' ? '' : 'none';
 
-  if (main === 'perso') {
+  if (main === 'home') {
+    showOnly('home');
+  } else if (main === 'perso') {
     goTo(state.subSection || 'catalogue');
   } else if (main === 'organisation') {
     showOnly('entreprise');
@@ -1123,112 +1126,240 @@ function calcEntreprise() {
     return;
   }
 
-  const pefTotal = calcPEF_entreprise(totals);
   const pefS1 = calcPEF_entreprise(byScope[1]);
   const pefS2 = calcPEF_entreprise(byScope[2]);
   const pefS3 = calcPEF_entreprise(byScope[3]);
 
   const resultsDiv = document.getElementById('entreprise-results');
   resultsDiv.style.display = 'block';
-  resultsDiv.innerHTML = renderEntrepriseResults(totals, byScope, pefTotal, pefS1, pefS2, pefS3);
+  resultsDiv.innerHTML = renderEntrepriseResults(totals, byScope, pefS1, pefS2, pefS3);
+  renderEntrepriseDonut(totals);
   resultsDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-function renderEntrepriseResults(totals, byScope, pefTotal, pefS1, pefS2, pefS3) {
+function renderEntrepriseResults(totals, byScope, pefS1, pefS2, pefS3) {
+  // Compute damage category scores and percentages
+  const catData = Object.entries(DAMAGE_CATEGORIES).map(([key, cat]) => {
+    const score = cat.indicators.reduce((sum, ind) => {
+      const v = totals[ind];
+      if (v == null) return sum;
+      return sum + (v / EF31[ind].norm) * (EF31[ind].weight / 100) * 1000;
+    }, 0);
+    return { key, cat, score: Math.max(0, score) };
+  });
+  const catTotal = catData.reduce((sum, c) => sum + c.score, 0);
+  catData.forEach(c => { c.pct = catTotal > 0 ? Math.round(c.score / catTotal * 100) : 0; });
+
+  const dominant = catData.reduce((a, b) => a.score > b.score ? a : b);
+  const gwpT = (totals.GWP || 0) / 1000;
+  const gwpFlights = Math.round(gwpT / 0.7); // ~0.7 t CO2 par vol Paris-NY
+
+  // Scope breakdown (% of total PEF score)
   const scopeTotal = pefS1.score + pefS2.score + pefS3.score;
-  const pct = s => scopeTotal > 0 ? Math.round(s.score / scopeTotal * 100) : 0;
+  const scopePct = s => scopeTotal > 0 ? Math.round(s.score / scopeTotal * 100) : 0;
+
+  // Inputs summary for hypotheses
+  const inputLines = Object.entries(FE_ENTREPRISE)
+    .filter(([key]) => {
+      const inp = document.getElementById(`inp-${key}`);
+      return inp && parseFloat(inp.value) > 0;
+    })
+    .map(([key, fe]) => {
+      const qty = parseFloat(document.getElementById(`inp-${key}`).value);
+      const gwpContrib = (fe.GWP || 0) * qty;
+      return `<tr><td>${fe.label}</td><td style="text-align:right">${qty.toLocaleString('fr-FR')} ${fe.unit}</td><td style="text-align:right;color:var(--climat)">${gwpContrib < 1 ? gwpContrib.toFixed(3) : gwpContrib.toFixed(1)} kg CO₂</td><td style="text-align:center"><span class="scope-badge scope${fe.scope}" style="font-size:0.68rem">S${fe.scope}</span></td></tr>`;
+    }).join('');
 
   return `
     <div class="entreprise-results-inner">
-      <h3>📊 Résultats — Score environnemental EF3.1</h3>
 
-      <div class="result-score-grid">
-        <div class="result-score-total">
-          <div class="score-val">${pefTotal.score.toFixed(1)} <span>mPt</span></div>
-          <div class="score-label">Score environnemental total</div>
-          <div class="score-sub">${pefTotal.completude}% des indicateurs disponibles</div>
+      <!-- Titre -->
+      <div class="result-header">
+        <h3>Profil d'impact de votre organisation</h3>
+        <p class="result-subtitle">Répartition relative des impacts environnementaux selon la méthode EF3.1 (Commission Européenne)</p>
+      </div>
+
+      <!-- Chart + résumé -->
+      <div class="result-main-layout">
+        <div class="result-donut-wrap">
+          <canvas id="entreprise-donut-chart"></canvas>
         </div>
+        <div class="result-summary-panel">
+          <div class="result-impact-legend">
+            ${catData.map(c => `
+              <div class="result-legend-item">
+                <span class="legend-dot" style="background:${c.cat.color}"></span>
+                <span class="legend-label">${c.cat.label}</span>
+                <span class="legend-pct" style="color:${c.cat.color}">${c.pct}%</span>
+              </div>`).join('')}
+          </div>
+          <div class="result-dominant-block">
+            <div class="dominant-label">Impact dominant</div>
+            <div class="dominant-value" style="color:${dominant.cat.color}">${dominant.cat.label}</div>
+            <div class="dominant-pct">${dominant.pct}% du profil d'impact</div>
+          </div>
+          <div class="result-gwp-block">
+            <div class="gwp-label">🌡️ Équivalent carbone total</div>
+            <div class="gwp-value">${gwpT < 1 ? (gwpT * 1000).toFixed(0) + ' kg' : gwpT.toFixed(1) + ' t'} CO₂ eq.</div>
+            ${gwpFlights > 0 ? `<div class="gwp-analogy">≈ ${gwpFlights} vol${gwpFlights > 1 ? 's' : ''} Paris–New York</div>` : ''}
+          </div>
+        </div>
+      </div>
+
+      <!-- Répartition par scope -->
+      <div class="result-scope-section">
+        <h4>Contribution par scope (Bilan Carbone®)</h4>
         <div class="result-scope-bars">
           ${[
-            {label:'Scope 1', pef:pefS1, cls:'scope1'},
-            {label:'Scope 2', pef:pefS2, cls:'scope2'},
-            {label:'Scope 3', pef:pefS3, cls:'scope3'},
+            {label:'Scope 1 — Émissions directes', pef:pefS1, cls:'scope1'},
+            {label:'Scope 2 — Énergie achetée', pef:pefS2, cls:'scope2'},
+            {label:'Scope 3 — Chaîne de valeur', pef:pefS3, cls:'scope3'},
           ].map(s => `
             <div class="scope-bar-row">
               <span class="scope-bar-label ${s.cls}">${s.label}</span>
-              <div class="scope-bar-track">
-                <div class="scope-bar-fill ${s.cls}" style="width:${pct(s.pef)}%"></div>
-              </div>
-              <span class="scope-bar-val">${s.pef.score.toFixed(1)} mPt (${pct(s.pef)}%)</span>
-            </div>
-          `).join('')}
+              <div class="scope-bar-track"><div class="scope-bar-fill ${s.cls}" style="width:${scopePct(s.pef)}%"></div></div>
+              <span class="scope-bar-val">${scopePct(s.pef)}%</span>
+            </div>`).join('')}
         </div>
       </div>
 
-      <h4 style="margin-top:1.5rem">Détail par catégorie de dommage</h4>
-      <div class="damage-grid">
-        ${Object.entries(DAMAGE_CATEGORIES).map(([key, cat]) => {
-          const catScore = cat.indicators.reduce((sum, ind) => {
-            const v = totals[ind];
-            if (v == null) return sum;
-            return sum + (v / EF31[ind].norm) * (EF31[ind].weight / 100) * 1000;
-          }, 0);
-          return `
-            <div class="damage-card" style="border-left:4px solid ${cat.color}">
-              <div class="damage-label">${cat.label}</div>
-              <div class="damage-score" style="color:${cat.color}">${catScore.toFixed(2)} mPt</div>
-            </div>
-          `;
-        }).join('')}
+      <!-- Repères indicatifs -->
+      <div class="result-benchmark">
+        <div class="benchmark-icon">📐</div>
+        <div class="benchmark-content">
+          <strong>Repères indicatifs</strong>
+          <p>Ces résultats donnent une première estimation de votre profil d'impact relatif. Un référentiel sectoriel (PME françaises par secteur d'activité) est en cours de construction pour contextualiser ces données face au budget environnemental annuel d'organisations comparables.</p>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem">Pour un Bilan Carbone® certifié et contextualisé : <a href="mailto:clement.dalisson@gmail.com" style="color:var(--eco)">clement.dalisson@gmail.com</a></p>
+        </div>
       </div>
 
-      <h4 style="margin-top:1.5rem">16 indicateurs EF3.1 détaillés</h4>
-      <div class="indicators-table">
-        <table>
-          <thead>
-            <tr>
-              <th>Indicateur</th><th>Scope 1</th><th>Scope 2</th><th>Scope 3</th><th>Total</th><th>Unité</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Object.entries(EF31).map(([key, meta]) => {
-              const v1 = byScope[1][key] || 0;
-              const v2 = byScope[2][key] || 0;
-              const v3 = byScope[3][key] || 0;
-              const tot = totals[key] || 0;
-              const fmtV = v => v === 0 ? '—' : v.toExponential(2);
-              return `
-                <tr>
-                  <td><strong>${meta.label}</strong></td>
-                  <td class="scope1-text">${fmtV(v1)}</td>
-                  <td class="scope2-text">${fmtV(v2)}</td>
-                  <td class="scope3-text">${fmtV(v3)}</td>
-                  <td><strong>${fmtV(tot)}</strong></td>
-                  <td style="color:#888;font-size:0.75rem">${meta.unit}</td>
-                </tr>
-              `;
-            }).join('')}
-          </tbody>
-        </table>
+      <!-- Hypothèses de calcul -->
+      <details class="result-hypotheses">
+        <summary>🔍 Hypothèses de calcul — d'où viennent ces résultats ?</summary>
+        <div class="hypotheses-inner">
+          <p class="hyp-intro">Chaque résultat est calculé en multipliant vos <strong>données d'activité</strong> (quantités saisies) par des <strong>facteurs d'émission EF3.1</strong> issus de bases de données officielles européennes.</p>
+
+          <div class="hyp-formula">
+            Impact = Quantité × Facteur d'émission (EF3.1)
+          </div>
+
+          <h5>Données saisies et contributions CO₂</h5>
+          <div style="overflow-x:auto">
+            <table class="hyp-table">
+              <thead><tr><th>Poste d'émission</th><th>Quantité</th><th>CO₂ eq.</th><th>Scope</th></tr></thead>
+              <tbody>${inputLines || '<tr><td colspan="4" style="text-align:center;color:var(--gray-400)">—</td></tr>'}</tbody>
+            </table>
+          </div>
+
+          <h5 style="margin-top:1rem">Sources des facteurs d'émission</h5>
+          <ul class="hyp-sources">
+            <li><strong>Scope 1 (gaz, fioul, diesel)</strong> — Facteurs EF3.1 Commission Européenne 2021, complétés par BASE-IMPACTS v3.0 (INRAE)</li>
+            <li><strong>Scope 2 (électricité France)</strong> — Facteur d'émission réseau français RTE 2023 (0,080 kg CO₂/kWh), pondéré selon mix EF3.1</li>
+            <li><strong>Scope 3 — Transport aérien</strong> — Facteurs ADEME 2023, sans forçage radiatif (×2 recommandé pour impact réel)</li>
+            <li><strong>Scope 3 — Achats &amp; équipements</strong> — Ecobalyse v8.5 (ADEME) et Ecoinvent 3.9</li>
+            <li><strong>Scope 3 — Services externalisés</strong> — Méthode input-output EXIOBASE 3.9.4 (France 2019) — ordres de grandeur, non certifiés</li>
+          </ul>
+
+          <div class="hyp-warning">
+            ⚠️ Cet outil est à visée pédagogique. Les facteurs services (IT, conseil, nettoyage) sont des estimations macro-économiques, non des données primaires fournisseurs. Pour un diagnostic certifié Bilan Carbone®, des données spécifiques sont nécessaires.
+          </div>
+        </div>
+      </details>
+
+      <!-- Vue détaillée (optionnelle) -->
+      <div class="result-detail-section">
+        <button class="result-detail-toggle-btn" onclick="toggleEntrepriseDetail()">
+          <span id="detail-toggle-label">📋 Voir le détail des 16 indicateurs EF3.1</span>
+        </button>
+        <div id="entreprise-detail-view" style="display:none">
+          <div class="indicators-table" style="margin-top:1rem">
+            <table>
+              <thead>
+                <tr><th>Indicateur</th><th>Scope 1</th><th>Scope 2</th><th>Scope 3</th><th>Total</th><th>Unité</th></tr>
+              </thead>
+              <tbody>
+                ${Object.entries(EF31).map(([key, meta]) => {
+                  const v1 = byScope[1][key] || 0;
+                  const v2 = byScope[2][key] || 0;
+                  const v3 = byScope[3][key] || 0;
+                  const tot = totals[key] || 0;
+                  const fmtV = v => v === 0 ? '—' : v.toExponential(2);
+                  return `<tr>
+                    <td><strong>${meta.label}</strong></td>
+                    <td class="scope1-text">${fmtV(v1)}</td>
+                    <td class="scope2-text">${fmtV(v2)}</td>
+                    <td class="scope3-text">${fmtV(v3)}</td>
+                    <td><strong>${fmtV(tot)}</strong></td>
+                    <td style="color:#888;font-size:0.75rem">${meta.unit}</td>
+                  </tr>`;
+                }).join('')}
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
-      <div class="result-gwp-highlight">
-        <span>🌡️ GWP total :</span>
-        <strong>${(totals.GWP || 0).toFixed(1)} kg CO₂ eq.</strong>
-        <span style="color:#888;font-size:0.85rem">= ${((totals.GWP||0)/1000).toFixed(2)} t CO₂ eq.</span>
-      </div>
-
-      <p style="font-size:0.78rem;color:#888;margin-top:1rem;text-align:center">
-        Outil pédagogique — Pour un Bilan Carbone® certifié adapté à votre organisation :
-        <a href="mailto:clement.dalisson@gmail.com" style="color:#2D5016;font-weight:bold">clement.dalisson@gmail.com</a>
-      </p>
     </div>
   `;
 }
 
-function updateEntreprisePreview() {
-  // Peut être étendu pour preview temps réel
+function renderEntrepriseDonut(totals) {
+  if (state.entrepriseDonutChart) {
+    state.entrepriseDonutChart.destroy();
+    state.entrepriseDonutChart = null;
+  }
+  const ctx = document.getElementById('entreprise-donut-chart');
+  if (!ctx) return;
+
+  const catData = Object.entries(DAMAGE_CATEGORIES).map(([key, cat]) => {
+    const score = cat.indicators.reduce((sum, ind) => {
+      const v = totals[ind];
+      if (v == null) return sum;
+      return sum + (v / EF31[ind].norm) * (EF31[ind].weight / 100) * 1000;
+    }, 0);
+    return { label: cat.label, score: Math.max(0, score), color: cat.color };
+  });
+  const total = catData.reduce((s, c) => s + c.score, 0);
+  const pcts = catData.map(c => total > 0 ? Math.round(c.score / total * 100) : 0);
+
+  state.entrepriseDonutChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: catData.map(c => c.label),
+      datasets: [{
+        data: pcts,
+        backgroundColor: catData.map(c => c.color + 'CC'),
+        borderColor: catData.map(c => c.color),
+        borderWidth: 2,
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      cutout: '60%',
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label} : ${ctx.parsed}%`
+          }
+        }
+      }
+    }
+  });
 }
+
+function toggleEntrepriseDetail() {
+  const view = document.getElementById('entreprise-detail-view');
+  const label = document.getElementById('detail-toggle-label');
+  if (!view) return;
+  const open = view.style.display === 'none';
+  view.style.display = open ? 'block' : 'none';
+  label.textContent = open ? '📋 Masquer le détail des 16 indicateurs' : '📋 Voir le détail des 16 indicateurs EF3.1';
+}
+
+function updateEntreprisePreview() {}
 
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', () => {
@@ -1261,7 +1392,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Escape') closeDetail();
   });
 
+  // Brand → home
+  const brand = document.querySelector('.nav-brand');
+  if (brand) brand.addEventListener('click', () => goToMain('home'));
+
   renderCatalogue();
   updateNavBadge();
-  goToMain('perso');
+  goToMain('home');
 });

@@ -3,27 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- SEO primaire -->
-  <title>Calculatrice ACV Multi-Critères EF3.1 | Clément Dalisson — Ingénieur Environnement</title>
-  <meta name="description" content="Calculez l'impact environnemental de vos objets et activités selon les 16 indicateurs EF3.1 (Commission Européenne). Outil pédagogique gratuit par Clément Dalisson, ingénieur environnement certifié Bilan Carbone® (CentraleSupélec, Sciences Po Paris).">
-  <meta name="keywords" content="ACV, analyse cycle de vie, EF3.1, bilan carbone, impact environnemental, calculatrice ACV, empreinte carbone, multi-critères, PEF, facteurs émission, ingénieur environnement">
+  <title>Dalisson Environnement — Analyse d'impact environnemental EF3.1</title>
+  <meta name="description" content="Dalisson Environnement — Conseil et outils d'analyse d'impact environnemental multi-critères. Calculatrice ACV EF3.1, Bilan Carbone®, ACV simplifiées. Clément Dalisson, ingénieur environnement certifié BCM2.">
+  <meta name="keywords" content="ACV, analyse cycle de vie, EF3.1, bilan carbone, impact environnemental, calculatrice ACV, empreinte carbone, multi-critères, PEF, ingénieur environnement, Dalisson Environnement">
   <meta name="author" content="Clément Dalisson">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://clementdalisson.github.io/calculatrice-acv/">
-
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://clementdalisson.github.io/calculatrice-acv/">
-  <meta property="og:title" content="Calculatrice ACV Multi-Critères EF3.1">
-  <meta property="og:description" content="Explorez les 16 indicateurs environnementaux EF3.1 pour des objets du quotidien et des activités d'entreprise. Outil gratuit par Clément Dalisson, ingénieur environnement.">
-  <meta property="og:site_name" content="Calculatrice ACV — Clément Dalisson">
-
-  <!-- Twitter Card -->
+  <meta property="og:title" content="Dalisson Environnement — Calculatrice ACV EF3.1">
+  <meta property="og:description" content="Outils d'analyse d'impact environnemental multi-critères EF3.1. Calculatrice personnelle et organisation.">
+  <meta property="og:site_name" content="Dalisson Environnement">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Calculatrice ACV Multi-Critères EF3.1">
-  <meta name="twitter:description" content="16 indicateurs EF3.1 : climat, écosystèmes, santé, ressources. Objets du quotidien + mode entreprise.">
-
-  <!-- Schema.org -->
+  <meta name="twitter:title" content="Dalisson Environnement — Calculatrice ACV EF3.1">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -33,74 +25,176 @@
         "@id": "https://clementdalisson.github.io/#person",
         "name": "Clément Dalisson",
         "jobTitle": "Ingénieur Environnement",
-        "description": "Ingénieur CentraleSupélec, Master Sciences Po Paris en Politique Environnementale, certifié Bilan Carbone® BCM2 (Institut de Formation Carbone). Expert en analyse multi-critères EF3.1 et ACV simplifiées.",
         "email": "clement.dalisson@gmail.com",
         "alumniOf": [
           {"@type": "CollegeOrUniversity", "name": "CentraleSupélec"},
           {"@type": "CollegeOrUniversity", "name": "Sciences Po Paris"}
-        ],
-        "hasCredential": {
-          "@type": "EducationalOccupationalCredential",
-          "name": "Certification Bilan Carbone® BCM2",
-          "credentialCategory": "certification",
-          "recognizedBy": {"@type": "Organization", "name": "Institut de Formation Carbone"}
-        }
+        ]
       },
       {
         "@type": "WebApplication",
-        "name": "Calculatrice ACV Multi-Critères EF3.1",
+        "name": "Dalisson Environnement — Calculatrice ACV EF3.1",
         "url": "https://clementdalisson.github.io/calculatrice-acv/",
-        "description": "Calculatrice d'impacts environnementaux selon les 16 indicateurs de la méthode EF3.1 (Commission Européenne, 2021). Couvre objets grand public et activités d'entreprise (scopes 1, 2, 3).",
         "author": {"@id": "https://clementdalisson.github.io/#person"},
         "applicationCategory": "EnvironmentalCalculator",
-        "operatingSystem": "Web",
-        "isAccessibleForFree": true,
-        "keywords": "ACV, EF3.1, bilan carbone, analyse cycle de vie, impact environnemental"
+        "isAccessibleForFree": true
       }
     ]
   }
   </script>
-
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- ── Navigation principale (3 onglets) ─────────────────────────────────── -->
+<!-- ── Navigation principale ─────────────────────────────────────────────── -->
 <nav>
-  <div class="nav-brand">🌍 Calculatrice ACV</div>
+  <button class="nav-brand" onclick="goToMain('home')">🌿 Dalisson Environnement</button>
   <div class="nav-links">
-    <button class="nav-link active" data-main="perso">🌍 Calculatrice personnelle</button>
+    <button class="nav-link" data-main="perso">🌍 Calculatrice personnelle</button>
     <button class="nav-link" data-main="organisation">🏢 Calculatrice organisation</button>
     <button class="nav-link" data-main="contact">📩 Contact &amp; Services</button>
   </div>
 </nav>
 
-<!-- ── Sous-navigation (visible uniquement sous "Calculatrice personnelle") ── -->
-<div id="subnav" class="subnav">
-  <button class="subnav-link active" data-section="catalogue">📦 Catalogue</button>
+<!-- ── Sous-navigation (Calculatrice personnelle) ─────────────────────────── -->
+<div id="subnav" class="subnav" style="display:none">
+  <button class="subnav-link" data-section="catalogue">Catalogue</button>
   <button class="subnav-link" data-section="compare">
-    ⚖️ Comparaison <span id="compare-badge" class="nav-badge" style="display:none">0</span>
+    Comparaison <span id="compare-badge" class="nav-badge" style="display:none">0</span>
   </button>
-  <button class="subnav-link" data-section="empreinte">🌱 Empreinte annuelle</button>
-</div>
-
-<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
-<div class="hero">
-  <h1>Quel est l'impact environnemental de vos objets du quotidien ?</h1>
-  <p>Explorez les 16 indicateurs de la méthode EF3.1 (Commission Européenne) pour des objets concrets — d'un café expresso à un vol Paris–New York.</p>
-  <div class="hero-stats">
-    <div class="hero-stat"><div class="num">17</div><div class="lbl">objets analysés</div></div>
-    <div class="hero-stat"><div class="num">16</div><div class="lbl">indicateurs EF3.1</div></div>
-    <div class="hero-stat"><div class="num">3</div><div class="lbl">sources de données</div></div>
-    <div class="hero-stat"><div class="num">100%</div><div class="lbl">hypothèses visibles</div></div>
-  </div>
+  <button class="subnav-link" data-section="empreinte">Empreinte annuelle</button>
 </div>
 
 <!-- ── Main ──────────────────────────────────────────────────────────────── -->
 <div class="main">
 
+  <!-- HOME -->
+  <div id="sec-home" class="section active">
+
+    <!-- Hero -->
+    <div class="home-hero">
+      <div class="home-hero-inner">
+        <div class="home-logo">🌿</div>
+        <h1>Dalisson Environnement</h1>
+        <p class="home-tagline">Conseil et outils d'analyse d'impact environnemental multi-critères</p>
+        <p class="home-sub">Méthode EF3.1 (Commission Européenne) · Bilan Carbone® · ACV simplifiées</p>
+        <div class="home-cta-row">
+          <button class="home-cta-btn home-cta-primary" onclick="goToMain('perso')">🌍 Calculatrice personnelle</button>
+          <button class="home-cta-btn home-cta-secondary" onclick="goToMain('organisation')">🏢 Calculatrice organisation</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nos outils -->
+    <section class="home-section">
+      <h2 class="home-section-title">Nos outils</h2>
+      <div class="home-tools-grid">
+        <div class="home-tool-card" onclick="goToMain('perso')">
+          <div class="htc-icon">🌍</div>
+          <h3>Calculatrice personnelle</h3>
+          <p>Explorez l'impact environnemental de vos objets du quotidien selon les 16 indicateurs EF3.1 — alimentation, textile, transport, électronique et plus.</p>
+          <div class="htc-stats">
+            <span>17 objets analysés</span>
+            <span>16 indicateurs</span>
+            <span>Empreinte annuelle</span>
+          </div>
+          <span class="htc-link">Accéder →</span>
+        </div>
+        <div class="home-tool-card" onclick="goToMain('organisation')">
+          <div class="htc-icon">🏢</div>
+          <h3>Calculatrice organisation</h3>
+          <p>Estimez les impacts environnementaux de votre organisation sur les 3 scopes du Bilan Carbone® — émissions directes, énergie, chaîne de valeur.</p>
+          <div class="htc-stats">
+            <span>3 scopes</span>
+            <span>15 postes d'émission</span>
+            <span>4 catégories d'impact</span>
+          </div>
+          <span class="htc-link">Accéder →</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- À propos -->
+    <section class="home-section">
+      <h2 class="home-section-title">À propos</h2>
+      <div class="home-about-grid">
+        <div class="home-about-profile">
+          <div class="about-avatar">🌿</div>
+          <h3>Clément Dalisson</h3>
+          <p class="about-title">Ingénieur Environnement</p>
+          <p class="about-bio">Diplômé de CentraleSupélec et du Master Politique Environnementale de Sciences Po Paris. Certifié Bilan Carbone® BCM2 (Institut de Formation Carbone).</p>
+          <a href="mailto:clement.dalisson@gmail.com" class="about-contact-btn">📩 clement.dalisson@gmail.com</a>
+        </div>
+        <div class="home-placeholder-card">
+          <div class="placeholder-icon">✏️</div>
+          <p class="placeholder-label">Section à compléter</p>
+          <p class="placeholder-hint">Parcours, motivations, approche méthodologique…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Expertise & Méthode -->
+    <section class="home-section">
+      <h2 class="home-section-title">Expertise &amp; Méthode</h2>
+      <div class="home-expertise-grid">
+        <div class="home-expertise-card">
+          <div class="hex-icon">📊</div>
+          <h4>Bilan Carbone® certifié</h4>
+          <p>Scopes 1, 2 et 3 — méthode officielle ADEME/ABC</p>
+        </div>
+        <div class="home-expertise-card">
+          <div class="hex-icon">🔬</div>
+          <h4>Analyse EF3.1 multi-critères</h4>
+          <p>16 indicateurs environnementaux au-delà du CO₂</p>
+        </div>
+        <div class="home-expertise-card">
+          <div class="hex-icon">♻️</div>
+          <h4>ACV simplifiées</h4>
+          <p>Produits &amp; services — ISO 14040/44</p>
+        </div>
+        <div class="home-expertise-card home-placeholder-card">
+          <div class="placeholder-icon">✏️</div>
+          <p class="placeholder-label">À compléter</p>
+          <p class="placeholder-hint">Autre domaine d'expertise…</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Références -->
+    <section class="home-section">
+      <h2 class="home-section-title">Références</h2>
+      <div class="home-refs-grid">
+        <div class="home-ref-card home-placeholder-card">
+          <div class="placeholder-icon">🏗️</div>
+          <p class="placeholder-label">Référence à venir</p>
+        </div>
+        <div class="home-ref-card home-placeholder-card">
+          <div class="placeholder-icon">🏗️</div>
+          <p class="placeholder-label">Référence à venir</p>
+        </div>
+        <div class="home-ref-card home-placeholder-card">
+          <div class="placeholder-icon">🏗️</div>
+          <p class="placeholder-label">Référence à venir</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Actualités -->
+    <section class="home-section">
+      <h2 class="home-section-title">Actualités</h2>
+      <div class="home-news-list">
+        <div class="home-placeholder-card" style="padding:2rem;text-align:center">
+          <div class="placeholder-icon">📰</div>
+          <p class="placeholder-label">Articles &amp; publications à venir</p>
+          <p class="placeholder-hint">Analyses, retours d'expérience, veille réglementaire EF3.1…</p>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- /sec-home -->
+
   <!-- CATALOGUE -->
-  <div id="sec-catalogue" class="section active">
+  <div id="sec-catalogue" class="section">
     <div class="filter-bar">
       <label>Filtrer :</label>
       <button class="filter-btn active" data-cat="all">Tout</button>
@@ -128,7 +222,7 @@
     <div id="compare-content"></div>
   </div>
 
-  <!-- EMPREINTE ANNUELLE -->
+  <!-- EMPREINTE -->
   <div id="sec-empreinte" class="section">
     <div class="empreinte-header">
       <h2>🌱 Empreinte annuelle</h2>
@@ -148,13 +242,12 @@
       <div id="empreinte-items-list" class="empreinte-items-list"></div>
     </div>
     <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--gray-400);text-align:center">
-      Les profils sont des estimations de référence, pas des situations individuelles précises.<br>
-      ⚠️ <strong>Couverture partielle (~50 %)</strong> : le catalogue couvre alimentation, transport, énergie logement, textile, électronique et mobilier — mais pas les services, la santé, l'administration publique, la construction des bâtiments, etc.<br>
-      Les seuils sont ajustés au périmètre du catalogue : <strong>Moyenne UE ≈ 500 mPt</strong> · <strong>Cible 2050 ≈ 150 mPt</strong> (trajectoire 1,5 °C).
+      ⚠️ <strong>Couverture partielle (~50 %)</strong> — catalogue couvre alimentation, transport, énergie logement, textile, électronique, mobilier.<br>
+      <strong>Moyenne UE ≈ 500 mPt</strong> · <strong>Cible 2050 ≈ 150 mPt</strong> (trajectoire 1,5 °C).
     </p>
   </div>
 
-  <!-- ORGANISATION (calculatrice entreprise) -->
+  <!-- ORGANISATION -->
   <div id="sec-entreprise" class="section">
     <!-- Contenu généré par app.js -->
   </div>
@@ -162,8 +255,6 @@
   <!-- CONTACT & SERVICES -->
   <div id="sec-contact" class="section">
     <div class="contact-wrapper">
-
-      <!-- Profil hero -->
       <div class="contact-hero">
         <div class="contact-avatar">🌿</div>
         <h2>Clément Dalisson</h2>
@@ -171,8 +262,6 @@
         <p class="contact-cert">Certifié Bilan Carbone® BCM2 — Institut de Formation Carbone</p>
         <a href="mailto:clement.dalisson@gmail.com" class="contact-email-link">📩 clement.dalisson@gmail.com</a>
       </div>
-
-      <!-- Services -->
       <h3 class="contact-section-title">Prestations proposées</h3>
       <div class="services-grid">
         <div class="service-card">
@@ -188,7 +277,7 @@
         <div class="service-card">
           <div class="service-icon">♻️</div>
           <h4>ACV simplifiées</h4>
-          <p>Analyse du cycle de vie de produits et services selon les normes ISO 14040/44.</p>
+          <p>Analyse du cycle de vie de produits et services — ISO 14040/44.</p>
         </div>
         <div class="service-card">
           <div class="service-icon">🎓</div>
@@ -196,46 +285,38 @@
           <p>Ateliers sur mesure pour équipes et dirigeants sur l'impact environnemental.</p>
         </div>
       </div>
-
-      <!-- CTA contact -->
       <div class="contact-cta-block">
         <p>Disponible pour missions freelance — réponse sous 48 h.</p>
         <a href="mailto:clement.dalisson@gmail.com" class="btn">Envoyer un message</a>
       </div>
-
-      <!-- Méthodologie (repliable) -->
       <details class="methodo-details">
         <summary>📖 Méthodologie EF3.1 — Documentation technique</summary>
         <div class="methodo-inner">
-
           <div class="formula-box" style="margin-top:1.2rem">
             <div><strong>Formule Score PEF :</strong></div>
             <div style="margin-top:0.5rem">Score PEF (mPt) = Σᵢ [ Impact_brut_i ÷ Facteur_normalisation_i × Poids_i ] × 1000</div>
             <div style="margin-top:0.5rem;opacity:0.7;font-size:0.8rem">
-              1 Pt = impact annuel moyen d'un Européen sur toutes les catégories.<br>
-              1 mPt = 0,001 Pt. Exemples typiques : café expresso ≈ 0,01 mPt · steak 200g ≈ 0,77 mPt · vol Paris-NY ≈ 46 mPt
+              1 Pt = impact annuel moyen d'un Européen. Exemples : café ≈ 0,01 mPt · steak 200g ≈ 0,77 mPt · vol Paris-NY ≈ 46 mPt
             </div>
           </div>
-
           <div class="methodo-grid" style="margin:1.5rem 0">
             <div class="methodo-card">
               <div class="methodo-card-header" style="color:var(--climat)">🌡️ Changement climatique</div>
-              <div class="methodo-card-body"><strong>GWP</strong> — kg CO₂ équivalent. Représente <strong>21,06%</strong> du score PEF. Normalisé sur 7 550 kg CO₂eq/pers./an.</div>
+              <div class="methodo-card-body"><strong>GWP</strong> — kg CO₂ eq. Représente <strong>21%</strong> du score PEF.</div>
             </div>
             <div class="methodo-card">
               <div class="methodo-card-header" style="color:var(--eco)">🌿 Écosystèmes</div>
-              <div class="methodo-card-body"><strong>AP, EP×3, ETIC, LU</strong> — Acidification, eutrophisation, écotoxicité, utilisation des sols. Total ≈ <strong>25%</strong> du score PEF.</div>
+              <div class="methodo-card-body"><strong>AP, EP×3, ETIC, LU</strong> — Acidification, eutrophisation, écotoxicité, sols. ≈ <strong>25%</strong>.</div>
             </div>
             <div class="methodo-card">
               <div class="methodo-card-header" style="color:var(--sante)">🏥 Santé humaine</div>
-              <div class="methodo-card-body"><strong>PM, ODP, IR, POCF, HT×2</strong> — Particules fines (8,96% — le plus important !), couche d'ozone, rayonnements ionisants. Total ≈ <strong>28%</strong>.</div>
+              <div class="methodo-card-body"><strong>PM, ODP, IR, POCF, HT×2</strong> — Particules fines, ozone, rayonnements. ≈ <strong>28%</strong>.</div>
             </div>
             <div class="methodo-card">
               <div class="methodo-card-header" style="color:var(--ressources)">🪨 Ressources</div>
-              <div class="methodo-card-body"><strong>WU, RU_Fossil, RU_Metal</strong> — Eau, énergie fossile, ressources minérales. Total ≈ <strong>24%</strong> du score PEF.</div>
+              <div class="methodo-card-body"><strong>WU, RU_Fossil, RU_Metal</strong> — Eau, fossiles, minéraux. ≈ <strong>24%</strong>.</div>
             </div>
           </div>
-
           <h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--navy)">Les 16 indicateurs EF3.1</h3>
           <div style="overflow-x:auto">
             <table class="compare-table" style="min-width:600px">
@@ -251,20 +332,12 @@
               <tbody id="methodo-indicators"></tbody>
             </table>
           </div>
-
           <div style="margin-top:1.5rem;padding:1.2rem;background:var(--gray-50);border-radius:var(--radius);font-size:0.82rem;color:var(--text-muted);line-height:1.8">
-            <strong>Sources des données :</strong><br>
-            • <strong>Ecobalyse v8.5 (ADEME, 2025)</strong> — alimentation, textile, énergie (France)<br>
-            • <strong>BASE-IMPACTS v3.0 (INRAE/ELISA)</strong> — matériaux, transport, énergie<br>
-            • <strong>Méthode EF3.1</strong> — Commission Européenne, 2021 ·
-              <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank" style="color:var(--navy-light)">Documentation officielle</a><br>
-            <br>
-            <strong>Limitations :</strong> Les compositions d'objets comme la table ou le canapé sont des hypothèses de référence (pas des données mesurées). Le GWP du vol avion n'inclut pas le forçage radiatif (×2 recommandé ADEME). Pour l'électronique, les indicateurs hors GWP sont estimés par mise à l'échelle proportionnelle depuis des proxies BASE-IMPACTS v3.0 et Ecobalyse v8.5.
+            <strong>Sources :</strong> Ecobalyse v8.5 (ADEME, 2025) · BASE-IMPACTS v3.0 · Méthode EF3.1 Commission Européenne 2021 ·
+            <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank" style="color:var(--navy-light)">Documentation officielle</a>
           </div>
-
         </div>
       </details>
-
     </div>
   </div>
 
@@ -293,7 +366,7 @@
             <div id="detail-pef-completude" class="desc">—</div>
           </div>
           <div style="flex:1;font-size:.78rem;color:var(--text-muted)">
-            Le score environnemental (mPt) résume l'ensemble des impacts sur le <strong>climat</strong>, les <strong>écosystèmes</strong>, la <strong>santé</strong> et les <strong>ressources</strong>.
+            Score environnemental résumant les impacts sur le <strong>climat</strong>, les <strong>écosystèmes</strong>, la <strong>santé</strong> et les <strong>ressources</strong>.
           </div>
         </div>
         <div id="detail-tokens" class="detail-cat-bars" style="margin-top:1rem"></div>
@@ -328,15 +401,12 @@
 
 <!-- ── Footer ────────────────────────────────────────────────────────────── -->
 <footer id="footer-pro" style="background:#1A2E3C;color:#fff;padding:2rem 1.5rem;margin-top:3rem;text-align:center">
-  <div style="max-width:900px;margin:0 auto">
-    <div style="font-size:0.78rem;color:#718096">
-      Outil pédagogique gratuit · Méthode EF3.1 Commission Européenne 2021 · Données : Ecobalyse v8.5, BASE-IMPACTS v3.0, AGRIBALYSE v3.2<br>
-      Clément Dalisson — Ingénieur Environnement · <a href="mailto:clement.dalisson@gmail.com" style="color:#68D391">clement.dalisson@gmail.com</a>
-    </div>
+  <div style="max-width:900px;margin:0 auto;font-size:0.78rem;color:#718096">
+    Dalisson Environnement · Méthode EF3.1 Commission Européenne 2021 · Données : Ecobalyse v8.5, BASE-IMPACTS v3.0<br>
+    <a href="mailto:clement.dalisson@gmail.com" style="color:#68D391">clement.dalisson@gmail.com</a>
   </div>
 </footer>
 
-<!-- ── Scripts ────────────────────────────────────────────────────────────── -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
 <script src="data.js"></script>
