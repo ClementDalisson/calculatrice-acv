@@ -903,115 +903,139 @@ function renderMethodologie() {
 
 // ── Facteurs d'émission entreprise (EF3.1, 16 indicateurs) ──────────
 const FE_ENTREPRISE = {
-  // SCOPE 1 — Émissions directes
+  // ÉNERGIE & CHAUFFAGE
   gaz_kwh: {
-    label: "Gaz naturel", unit: "kWh PCI", scope: 1,
+    label: "Gaz naturel", unit: "kWh PCI",
     GWP:0.2763, ODP:1.212e-8, AP:2.263e-4, EP_Eau:1.133e-6,
     EP_Marine:6.760e-5, EP_Terre:7.468e-4, POCF:4.805e-4, PM:1.272e-9,
     IR:1.372e-3, LU:0.09513, WU:6.220e-3, RU_Fossil:3.925,
     RU_Metal:2.703e-7, HT_cancer:6.408e-11, HT_nc:5.678e-10, ETIC:0.20720
   },
   fioul_L: {
-    label: "Fioul domestique", unit: "litres", scope: 1,
+    label: "Fioul domestique", unit: "litres",
     GWP:3.15, ODP:9.89e-9, AP:2.939e-4, EP_Eau:1.190e-5,
     EP_Marine:7.436e-4, EP_Terre:8.638e-3, POCF:6.059e-3, PM:2.541e-8,
     IR:1.440e-2, LU:0.9989, WU:6.531e-2, RU_Fossil:37.7,
     RU_Metal:2.838e-6, HT_cancer:1.009e-9, HT_nc:8.965e-9, ETIC:2.776
   },
-  diesel_100km: {
-    label: "Véhicule flotte diesel", unit: "100 km", scope: 1,
-    GWP:12.4, ODP:2.664e-7, AP:2.749e-2, EP_Eau:5.278e-5,
-    EP_Marine:5.210e-3, EP_Terre:5.048e-2, POCF:2.839e-2, PM:3.348e-7,
-    IR:4.627e-2, LU:21.84, WU:1.243, RU_Fossil:161.6,
-    RU_Metal:3.200e-6, HT_cancer:2.298e-9, HT_nc:3.940e-8, ETIC:97.9
-  },
-  hfc134a_kg: {
-    label: "Fuites réfrigérant HFC-134a", unit: "kg", scope: 1,
-    GWP:1430.0, ODP:0, AP:0, EP_Eau:0, EP_Marine:0, EP_Terre:0,
-    POCF:0, PM:0, IR:0, LU:0, WU:0, RU_Fossil:8.5,
-    RU_Metal:0, HT_cancer:0, HT_nc:0, ETIC:0
-  },
-  // SCOPE 2 — Énergie achetée
   elec_kwh: {
-    label: "Électricité réseau France", unit: "kWh", scope: 2,
+    label: "Électricité réseau France", unit: "kWh",
     GWP:0.0801, ODP:8.773e-10, AP:2.098e-4, EP_Eau:3.269e-8,
     EP_Marine:7.613e-5, EP_Terre:4.978e-4, POCF:2.108e-4, PM:4.158e-9,
     IR:3.2342, LU:0, WU:null, RU_Fossil:9.313,
     RU_Metal:4.858e-8, HT_cancer:null, HT_nc:null, ETIC:null
   },
-  // SCOPE 3 — Transport
+  hfc134a_kg: {
+    label: "Fuites réfrigérant HFC-134a", unit: "kg",
+    GWP:1430.0, ODP:0, AP:0, EP_Eau:0, EP_Marine:0, EP_Terre:0,
+    POCF:0, PM:0, IR:0, LU:0, WU:0, RU_Fossil:8.5,
+    RU_Metal:0, HT_cancer:0, HT_nc:0, ETIC:0
+  },
+  // MOBILITÉ PROFESSIONNELLE
+  diesel_100km: {
+    label: "Véhicule thermique diesel", unit: "100 km parcourus",
+    GWP:12.4, ODP:2.664e-7, AP:2.749e-2, EP_Eau:5.278e-5,
+    EP_Marine:5.210e-3, EP_Terre:5.048e-2, POCF:2.839e-2, PM:3.348e-7,
+    IR:4.627e-2, LU:21.84, WU:1.243, RU_Fossil:161.6,
+    RU_Metal:3.200e-6, HT_cancer:2.298e-9, HT_nc:3.940e-8, ETIC:97.9
+  },
   ve_100km: {
-    label: "Véhicule électrique (usage)", unit: "100 km", scope: 3,
+    label: "Véhicule électrique (usage)", unit: "100 km parcourus",
     GWP:1.442, ODP:1.579e-8, AP:3.776e-3, EP_Eau:5.884e-7,
     EP_Marine:1.370e-3, EP_Terre:8.960e-3, POCF:3.794e-3, PM:7.484e-8,
     IR:58.22, LU:0, WU:null, RU_Fossil:167.6,
     RU_Metal:8.744e-7, HT_cancer:null, HT_nc:null, ETIC:null
   },
+  train_km: {
+    label: "Train (TGV / intercités France)", unit: "km·passager",
+    GWP:3.85e-3, ODP:2.5e-11, AP:5.9e-6, EP_Eau:9.2e-10,
+    EP_Marine:2.1e-6, EP_Terre:1.4e-5, POCF:5.9e-6, PM:1.2e-10,
+    IR:0.0905, LU:0, WU:null, RU_Fossil:0.261,
+    RU_Metal:1.4e-9, HT_cancer:null, HT_nc:null, ETIC:null
+  },
   vol_court: {
-    label: "Vol court-courrier (Europe)", unit: "passager", scope: 3,
+    label: "Vol court-courrier (Europe)", unit: "passager·vol",
     GWP:65.3, ODP:3.559e-10, AP:1.655e-4, EP_Eau:4.857e-6,
     EP_Marine:6.893e-5, EP_Terre:7.545e-4, POCF:1.918e-4, PM:6.426e-7,
     IR:1.281, LU:0, WU:null, RU_Fossil:531.3,
     RU_Metal:1.960e-6, HT_cancer:null, HT_nc:null, ETIC:null
   },
   vol_lc: {
-    label: "Vol long-courrier (intercontinental)", unit: "passager", scope: 3,
+    label: "Vol long-courrier (intercontinental)", unit: "passager·vol",
     GWP:701.27, ODP:6.50e-9, AP:3.026e-3, EP_Eau:8.877e-5,
     EP_Marine:1.260e-3, EP_Terre:1.379e-2, POCF:3.505e-3, PM:1.174e-5,
     IR:23.41, LU:0, WU:null, RU_Fossil:9708.2,
     RU_Metal:3.583e-5, HT_cancer:null, HT_nc:null, ETIC:null
   },
-  // SCOPE 3 — Achats
+  // ACHATS & ÉQUIPEMENTS
   papier_ramette: {
-    label: "Papier A4 (ramette 500 f.)", unit: "ramettes", scope: 3,
+    label: "Papier A4 (ramette 500 f.)", unit: "ramettes",
     GWP:3.85, ODP:2.5e-9, AP:3.5e-2, EP_Eau:7.5e-4,
     EP_Marine:7.5e-3, EP_Terre:1.25e-2, POCF:5.0e-3, PM:7.5e-8,
     IR:0.075, LU:125.0, WU:0.75, RU_Fossil:50.0,
     RU_Metal:2.5e-7, HT_cancer:1.25e-9, HT_nc:2.0e-8, ETIC:12.5
   },
   ecran_24: {
-    label: "Écran 24\" (cycle de vie)", unit: "unités", scope: 3,
+    label: "Écran 24\" (cycle de vie)", unit: "unités achetées",
     GWP:216.0, ODP:2.023e-8, AP:1.875, EP_Eau:2.573e-3,
     EP_Marine:3.539e-1, EP_Terre:3.764, POCF:1.008, PM:4.749e-5,
     IR:58.52, LU:null, WU:329.5, RU_Fossil:800.9,
     RU_Metal:2.618e-2, HT_cancer:2.181e-7, HT_nc:1.357e-5, ETIC:2481.8
   },
   serveur_1u: {
-    label: "Serveur rack 1U (fabrication)", unit: "unités", scope: 3,
+    label: "Serveur rack 1U (fabrication)", unit: "unités achetées",
     GWP:800.0, ODP:7.494e-8, AP:6.943, EP_Eau:9.533e-3,
     EP_Marine:1.310, EP_Terre:1.394e1, POCF:3.732, PM:1.759e-4,
     IR:216.7, LU:null, WU:1220.6, RU_Fossil:2967.0,
     RU_Metal:9.696e-2, HT_cancer:8.076e-7, HT_nc:5.025e-5, ETIC:9190.0
   },
-  // SCOPE 3 — Services
+  // SERVICES EXTERNALISÉS
   nettoyage_m2: {
-    label: "Nettoyage locaux", unit: "m²/an", scope: 3,
+    label: "Nettoyage des locaux", unit: "m²/an",
     GWP:10.2, ODP:3.5e-9, AP:4.5e-3, EP_Eau:9.0e-6,
     EP_Marine:1.8e-3, EP_Terre:7.5e-3, POCF:6.0e-3, PM:6.0e-9,
     IR:0.72, LU:null, WU:null, RU_Fossil:112.0,
     RU_Metal:1.8e-7, HT_cancer:5.0e-11, HT_nc:8.0e-10, ETIC:2.5
   },
-  repas: {
-    label: "Repas restauration collective", unit: "repas", scope: 3,
-    GWP:2.2, ODP:8.0e-9, AP:1.9e-2, EP_Eau:8.0e-5,
-    EP_Marine:6.5e-3, EP_Terre:9.7e-2, POCF:3.5e-3, PM:1.9e-7,
-    IR:0.025, LU:80.0, WU:0.18, RU_Fossil:18.5,
-    RU_Metal:2.2e-6, HT_cancer:6.0e-10, HT_nc:1.1e-8, ETIC:6.8
-  },
   it_services_k: {
-    label: "Services IT (1 000 €)", unit: "k€ HT", scope: 3,
+    label: "Services IT externalisés", unit: "k€ HT/an",
     GWP:650.0, ODP:2.2e-7, AP:2.85e-1, EP_Eau:4.0e-4,
     EP_Marine:1.07e-1, EP_Terre:5.4e-1, POCF:2.85e-1, PM:2.8e-6,
     IR:210.0, LU:null, WU:null, RU_Fossil:6050.0,
     RU_Metal:6.5e-3, HT_cancer:null, HT_nc:null, ETIC:null
   },
   conseil_k: {
-    label: "Conseil / formation (1 000 €)", unit: "k€ HT", scope: 3,
+    label: "Conseil / formation", unit: "k€ HT/an",
     GWP:450.0, ODP:1.5e-7, AP:1.97e-1, EP_Eau:2.8e-4,
     EP_Marine:7.4e-2, EP_Terre:3.74e-1, POCF:1.97e-1, PM:1.95e-6,
     IR:145.0, LU:null, WU:null, RU_Fossil:4185.0,
     RU_Metal:2.5e-3, HT_cancer:null, HT_nc:null, ETIC:null
   },
+  // ALIMENTATION
+  repas: {
+    label: "Repas restauration collective", unit: "repas/an",
+    GWP:2.2, ODP:8.0e-9, AP:1.9e-2, EP_Eau:8.0e-5,
+    EP_Marine:6.5e-3, EP_Terre:9.7e-2, POCF:3.5e-3, PM:1.9e-7,
+    IR:0.025, LU:80.0, WU:0.18, RU_Fossil:18.5,
+    RU_Metal:2.2e-6, HT_cancer:6.0e-10, HT_nc:1.1e-8, ETIC:6.8
+  },
+};
+
+const FE_TO_GROUP = {
+  gaz_kwh: 'energie', fioul_L: 'energie', elec_kwh: 'energie', hfc134a_kg: 'energie',
+  diesel_100km: 'mobilite', ve_100km: 'mobilite', train_km: 'mobilite',
+  vol_court: 'mobilite', vol_lc: 'mobilite',
+  papier_ramette: 'achats', ecran_24: 'achats', serveur_1u: 'achats',
+  nettoyage_m2: 'services', it_services_k: 'services', conseil_k: 'services',
+  repas: 'alimentation',
+};
+
+const ACTIVITY_GROUPS = {
+  energie:      { icon: '⚡', label: 'Énergie & Chauffage',      color: '#E67E22' },
+  mobilite:     { icon: '🚗', label: 'Mobilité professionnelle', color: '#3498DB' },
+  achats:       { icon: '🛒', label: 'Achats & Équipements',     color: '#9B59B6' },
+  services:     { icon: '🏢', label: 'Services externalisés',    color: '#1ABC9C' },
+  alimentation: { icon: '🍽️', label: 'Alimentation',             color: '#27AE60' },
 };
 
 // ── Calcul PEF score depuis impacts bruts ────────────────────────────
@@ -1032,42 +1056,97 @@ function renderEntrepriseSection() {
   const sec = document.getElementById('sec-entreprise');
   if (!sec) return;
 
+  const SECTEURS = [
+    '— Secteur d\'activité —', 'Services & Conseil', 'Numérique & Technologie',
+    'Finance & Assurance', 'Santé & Social', 'Éducation & Recherche',
+    'Commerce & Distribution', 'Industrie & Manufacture', 'Construction & BTP',
+    'Agriculture & Agroalimentaire', 'Transport & Logistique',
+    'Énergie & Environnement', 'Hôtellerie & Tourisme', 'Médias & Communication',
+    'Collectivité territoriale', 'Association & ONG', 'Autre',
+  ];
+
   sec.innerHTML = `
     <div class="entreprise-wrapper">
       <div class="entreprise-hero">
-        <h2>🏢 Analyse Multi-Critères Entreprise</h2>
-        <p>Estimez les impacts environnementaux de votre organisation selon les <strong>16 indicateurs EF3.1</strong> sur les 3 scopes du Bilan Carbone®. Saisissez vos données d'activité annuelles.</p>
+        <h2>🏢 Profil d'impact de votre organisation</h2>
+        <p>Obtenez une <strong>cartographie multi-critères</strong> des impacts environnementaux de votre organisation selon les <strong>16 indicateurs EF3.1</strong> — bien au-delà du seul CO₂. Visualisez vos catégories de dommage dominantes : climat, santé, écosystèmes, ressources.</p>
         <div class="entreprise-badges">
-          <span class="badge scope1">Scope 1 — Émissions directes</span>
-          <span class="badge scope2">Scope 2 — Énergie achetée</span>
-          <span class="badge scope3">Scope 3 — Chaîne de valeur</span>
+          <span class="badge badge-neutral">🌡️ Changement climatique</span>
+          <span class="badge badge-neutral">🌿 Écosystèmes</span>
+          <span class="badge badge-neutral">🏥 Santé humaine</span>
+          <span class="badge badge-neutral">⛏️ Ressources</span>
+        </div>
+      </div>
+
+      <div class="org-profile-section">
+        <h3 class="org-profile-title">👤 Profil de l'organisation</h3>
+        <p class="org-profile-desc">Ces informations contextualisent votre profil d'impact. À terme, elles permettront une comparaison avec des organisations de même secteur et taille.</p>
+        <div class="org-profile-grid">
+          <div class="org-field">
+            <label class="org-label">Nom de l'organisation</label>
+            <input type="text" id="org-nom" placeholder="Ex : Agence Martin & Associés" class="org-input">
+          </div>
+          <div class="org-field">
+            <label class="org-label">Secteur d'activité</label>
+            <select id="org-secteur" class="org-input">
+              ${SECTEURS.map((s, i) => `<option value="${i === 0 ? '' : s}">${s}</option>`).join('')}
+            </select>
+          </div>
+          <div class="org-field">
+            <label class="org-label">Nombre de salariés (ETP)</label>
+            <input type="number" id="org-salaries" placeholder="Ex : 25" min="1" class="org-input">
+          </div>
+          <div class="org-field">
+            <label class="org-label">Surface des locaux (m²)</label>
+            <input type="number" id="org-surface" placeholder="Ex : 500" min="0" class="org-input">
+          </div>
+          <div class="org-field">
+            <label class="org-label">Type de chauffage principal</label>
+            <select id="org-chauffage" class="org-input">
+              <option value="">— Choisir —</option>
+              <option value="Gaz naturel">Gaz naturel</option>
+              <option value="Fioul domestique">Fioul domestique</option>
+              <option value="Électricité / PAC">Électricité / PAC</option>
+              <option value="Bois / Biomasse">Bois / Biomasse</option>
+              <option value="Réseau de chaleur">Réseau de chaleur</option>
+              <option value="Autre">Autre / Non concerné</option>
+            </select>
+          </div>
+          <div class="org-field">
+            <label class="org-label">Mode de travail dominant</label>
+            <select id="org-travail" class="org-input">
+              <option value="">— Choisir —</option>
+              <option value="100% présentiel">100 % présentiel</option>
+              <option value="Hybride">Hybride (2–3 j bureau / semaine)</option>
+              <option value="Télétravail majoritaire">Télétravail majoritaire</option>
+            </select>
+          </div>
         </div>
       </div>
 
       <div class="entreprise-form-grid">
-        ${renderScopeForm(1, 'Scope 1 — Émissions directes', ['gaz_kwh','fioul_L','diesel_100km','hfc134a_kg'])}
-        ${renderScopeForm(2, 'Scope 2 — Énergie achetée', ['elec_kwh'])}
-        ${renderScopeForm(3, 'Scope 3 — Transport', ['ve_100km','vol_court','vol_lc'])}
-        ${renderScopeForm(3, 'Scope 3 — Achats & équipements', ['papier_ramette','ecran_24','serveur_1u'])}
-        ${renderScopeForm(3, 'Scope 3 — Services externalisés', ['nettoyage_m2','repas','it_services_k','conseil_k'])}
+        ${renderActivityGroup('energie', '⚡ Énergie & Chauffage', ['gaz_kwh','fioul_L','elec_kwh','hfc134a_kg'])}
+        ${renderActivityGroup('mobilite', '🚗 Mobilité professionnelle', ['diesel_100km','ve_100km','train_km','vol_court','vol_lc'])}
+        ${renderActivityGroup('achats', '🛒 Achats & Équipements', ['papier_ramette','ecran_24','serveur_1u'])}
+        ${renderActivityGroup('services', '🏢 Services externalisés', ['nettoyage_m2','it_services_k','conseil_k'])}
+        ${renderActivityGroup('alimentation', '🍽️ Alimentation', ['repas'])}
       </div>
 
       <button id="btn-calc-entreprise" onclick="calcEntreprise()">
-        🔬 Calculer mes impacts multi-critères
+        🔬 Calculer mon profil d'impact
       </button>
 
       <div id="entreprise-results" style="display:none"></div>
 
       <div class="entreprise-disclaimer">
-        <strong>⚠️ Avertissement méthodologique</strong> : Les facteurs d'émission services (nettoyage, IT, conseil) sont issus de la méthode input-output EXIOBASE 3.9.4 (France 2019). Ils représentent des ordres de grandeur. Pour une étude certifiée Bilan Carbone®, des données primaires spécifiques au fournisseur sont recommandées.
-        <br>Outil développé par <a href="mailto:clement.dalisson@gmail.com">Clément Dalisson</a> — Ingénieur Environnement, certifié Bilan Carbone® BCM2.
+        <strong>⚠️ Précision méthodologique</strong> — Les facteurs services (IT, conseil, nettoyage) proviennent de la méthode input-output EXIOBASE 3.9.4 (France 2019). Ils donnent des ordres de grandeur et ne remplacent pas des données fournisseurs primaires. Train : ADEME Base Carbone 2023.
+        <br>Outil développé par <a href="mailto:clement.dalisson@gmail.com">Clément Dalisson</a>, Ingénieur Environnement.
       </div>
     </div>
   `;
 }
 
-function renderScopeForm(scopeNum, titre, keys) {
-  const scopeClass = `scope${scopeNum}`;
+function renderActivityGroup(groupKey, titre, keys) {
   const rows = keys.map(key => {
     const fe = FE_ENTREPRISE[key];
     if (!fe) return '';
@@ -1085,8 +1164,8 @@ function renderScopeForm(scopeNum, titre, keys) {
   }).join('');
 
   return `
-    <div class="scope-card ${scopeClass}">
-      <h3><span class="scope-badge ${scopeClass}">${titre.split('—')[0].trim()}</span> ${titre.split('—')[1]?.trim() || ''}</h3>
+    <div class="activity-card activity-${groupKey}">
+      <h3>${titre}</h3>
       ${rows}
     </div>
   `;
@@ -1094,14 +1173,13 @@ function renderScopeForm(scopeNum, titre, keys) {
 
 function calcEntreprise() {
   const totals = {};
-  const byScope = {1: {}, 2: {}, 3: {}};
+  const byGroup = {};
   const IND_KEYS = Object.keys(EF31);
 
+  Object.keys(ACTIVITY_GROUPS).forEach(g => { byGroup[g] = {}; });
   for (const key of IND_KEYS) {
     totals[key] = 0;
-    byScope[1][key] = 0;
-    byScope[2][key] = 0;
-    byScope[3][key] = 0;
+    Object.keys(ACTIVITY_GROUPS).forEach(g => { byGroup[g][key] = 0; });
   }
 
   let hasData = false;
@@ -1112,11 +1190,12 @@ function calcEntreprise() {
     if (qty === 0) continue;
     hasData = true;
 
+    const group = FE_TO_GROUP[feKey] || 'services';
     for (const indKey of IND_KEYS) {
       const val = fe[indKey];
       if (val != null && !isNaN(val)) {
         totals[indKey] += val * qty;
-        byScope[fe.scope][indKey] += val * qty;
+        byGroup[group][indKey] += val * qty;
       }
     }
   }
@@ -1126,19 +1205,26 @@ function calcEntreprise() {
     return;
   }
 
-  const pefS1 = calcPEF_entreprise(byScope[1]);
-  const pefS2 = calcPEF_entreprise(byScope[2]);
-  const pefS3 = calcPEF_entreprise(byScope[3]);
+  const profile = {
+    nom: document.getElementById('org-nom')?.value?.trim() || '',
+    secteur: document.getElementById('org-secteur')?.value || '',
+    salaries: parseInt(document.getElementById('org-salaries')?.value) || null,
+    surface: parseInt(document.getElementById('org-surface')?.value) || null,
+    chauffage: document.getElementById('org-chauffage')?.value || '',
+    travail: document.getElementById('org-travail')?.value || '',
+  };
+
+  const pefByGroup = {};
+  Object.keys(ACTIVITY_GROUPS).forEach(g => { pefByGroup[g] = calcPEF_entreprise(byGroup[g]); });
 
   const resultsDiv = document.getElementById('entreprise-results');
   resultsDiv.style.display = 'block';
-  resultsDiv.innerHTML = renderEntrepriseResults(totals, byScope, pefS1, pefS2, pefS3);
+  resultsDiv.innerHTML = renderEntrepriseResults(totals, byGroup, pefByGroup, profile);
   renderEntrepriseDonut(totals);
   resultsDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-function renderEntrepriseResults(totals, byScope, pefS1, pefS2, pefS3) {
-  // Compute damage category scores and percentages
+function renderEntrepriseResults(totals, byGroup, pefByGroup, profile) {
   const catData = Object.entries(DAMAGE_CATEGORIES).map(([key, cat]) => {
     const score = cat.indicators.reduce((sum, ind) => {
       const v = totals[ind];
@@ -1152,13 +1238,22 @@ function renderEntrepriseResults(totals, byScope, pefS1, pefS2, pefS3) {
 
   const dominant = catData.reduce((a, b) => a.score > b.score ? a : b);
   const gwpT = (totals.GWP || 0) / 1000;
-  const gwpFlights = Math.round(gwpT / 0.7); // ~0.7 t CO2 par vol Paris-NY
+  const gwpFlights = Math.round(gwpT / 0.7);
 
-  // Scope breakdown (% of total PEF score)
-  const scopeTotal = pefS1.score + pefS2.score + pefS3.score;
-  const scopePct = s => scopeTotal > 0 ? Math.round(s.score / scopeTotal * 100) : 0;
+  const groupTotal = Object.values(pefByGroup).reduce((s, p) => s + p.score, 0);
 
-  // Inputs summary for hypotheses
+  const profileTitle = [
+    profile.nom || null,
+    profile.secteur || null,
+    profile.salaries ? `${profile.salaries} sal.` : null,
+  ].filter(Boolean).join(' · ');
+
+  const profileMeta = [
+    profile.surface ? `${profile.surface} m²` : null,
+    profile.chauffage || null,
+    profile.travail || null,
+  ].filter(Boolean).join(' · ');
+
   const inputLines = Object.entries(FE_ENTREPRISE)
     .filter(([key]) => {
       const inp = document.getElementById(`inp-${key}`);
@@ -1167,19 +1262,37 @@ function renderEntrepriseResults(totals, byScope, pefS1, pefS2, pefS3) {
     .map(([key, fe]) => {
       const qty = parseFloat(document.getElementById(`inp-${key}`).value);
       const gwpContrib = (fe.GWP || 0) * qty;
-      return `<tr><td>${fe.label}</td><td style="text-align:right">${qty.toLocaleString('fr-FR')} ${fe.unit}</td><td style="text-align:right;color:var(--climat)">${gwpContrib < 1 ? gwpContrib.toFixed(3) : gwpContrib.toFixed(1)} kg CO₂</td><td style="text-align:center"><span class="scope-badge scope${fe.scope}" style="font-size:0.68rem">S${fe.scope}</span></td></tr>`;
+      const grp = ACTIVITY_GROUPS[FE_TO_GROUP[key]];
+      return `<tr>
+        <td>${fe.label}</td>
+        <td style="text-align:right">${qty.toLocaleString('fr-FR')} ${fe.unit}</td>
+        <td style="text-align:right;color:var(--climat)">${gwpContrib < 1 ? gwpContrib.toFixed(3) : gwpContrib.toFixed(1)} kg CO₂</td>
+        <td><span style="font-size:0.72rem;color:${grp?.color};font-weight:600">${grp?.icon} ${grp?.label || '—'}</span></td>
+      </tr>`;
+    }).join('');
+
+  const groupBars = Object.entries(ACTIVITY_GROUPS)
+    .filter(([g]) => pefByGroup[g] && pefByGroup[g].score > 0)
+    .sort(([ga], [gb]) => (pefByGroup[gb]?.score || 0) - (pefByGroup[ga]?.score || 0))
+    .map(([g, grp]) => {
+      const pct = groupTotal > 0 ? Math.round(pefByGroup[g].score / groupTotal * 100) : 0;
+      return `
+        <div class="scope-bar-row">
+          <span class="scope-bar-label" style="color:${grp.color}">${grp.icon} ${grp.label}</span>
+          <div class="scope-bar-track"><div class="scope-bar-fill" style="width:${pct}%;background:${grp.color}"></div></div>
+          <span class="scope-bar-val">${pct}%</span>
+        </div>`;
     }).join('');
 
   return `
     <div class="entreprise-results-inner">
 
-      <!-- Titre -->
       <div class="result-header">
-        <h3>Profil d'impact de votre organisation</h3>
+        <h3>Profil d'impact${profileTitle ? ' — ' + profileTitle : ''}</h3>
+        ${profileMeta ? `<p class="result-profile-meta">${profileMeta}</p>` : ''}
         <p class="result-subtitle">Répartition relative des impacts environnementaux selon la méthode EF3.1 (Commission Européenne)</p>
       </div>
 
-      <!-- Chart + résumé -->
       <div class="result-main-layout">
         <div class="result-donut-wrap">
           <canvas id="entreprise-donut-chart"></canvas>
@@ -1194,103 +1307,81 @@ function renderEntrepriseResults(totals, byScope, pefS1, pefS2, pefS3) {
               </div>`).join('')}
           </div>
           <div class="result-dominant-block">
-            <div class="dominant-label">Impact dominant</div>
+            <div class="dominant-label">IMPACT DOMINANT</div>
             <div class="dominant-value" style="color:${dominant.cat.color}">${dominant.cat.label}</div>
             <div class="dominant-pct">${dominant.pct}% du profil d'impact</div>
           </div>
           <div class="result-gwp-block">
-            <div class="gwp-label">🌡️ Équivalent carbone total</div>
+            <div class="gwp-label">🌡️ ÉQUIVALENT CARBONE TOTAL</div>
             <div class="gwp-value">${gwpT < 1 ? (gwpT * 1000).toFixed(0) + ' kg' : gwpT.toFixed(1) + ' t'} CO₂ eq.</div>
             ${gwpFlights > 0 ? `<div class="gwp-analogy">≈ ${gwpFlights} vol${gwpFlights > 1 ? 's' : ''} Paris–New York</div>` : ''}
           </div>
         </div>
       </div>
 
-      <!-- Répartition par scope -->
       <div class="result-scope-section">
-        <h4>Contribution par scope (Bilan Carbone®)</h4>
-        <div class="result-scope-bars">
-          ${[
-            {label:'Scope 1 — Émissions directes', pef:pefS1, cls:'scope1'},
-            {label:'Scope 2 — Énergie achetée', pef:pefS2, cls:'scope2'},
-            {label:'Scope 3 — Chaîne de valeur', pef:pefS3, cls:'scope3'},
-          ].map(s => `
-            <div class="scope-bar-row">
-              <span class="scope-bar-label ${s.cls}">${s.label}</span>
-              <div class="scope-bar-track"><div class="scope-bar-fill ${s.cls}" style="width:${scopePct(s.pef)}%"></div></div>
-              <span class="scope-bar-val">${scopePct(s.pef)}%</span>
-            </div>`).join('')}
-        </div>
+        <h4>Contribution par poste d'activité</h4>
+        <div class="result-scope-bars">${groupBars}</div>
       </div>
 
-      <!-- Repères indicatifs -->
       <div class="result-benchmark">
         <div class="benchmark-icon">📐</div>
         <div class="benchmark-content">
           <strong>Repères indicatifs</strong>
           <p>Ces résultats donnent une première estimation de votre profil d'impact relatif. Un référentiel sectoriel (PME françaises par secteur d'activité) est en cours de construction pour contextualiser ces données face au budget environnemental annuel d'organisations comparables.</p>
-          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem">Pour un Bilan Carbone® certifié et contextualisé : <a href="mailto:clement.dalisson@gmail.com" style="color:var(--eco)">clement.dalisson@gmail.com</a></p>
+          <p style="font-size:0.78rem;color:var(--text-muted);margin-top:0.4rem">Pour une analyse certifiée et contextualisée : <a href="mailto:clement.dalisson@gmail.com" style="color:var(--eco)">clement.dalisson@gmail.com</a></p>
         </div>
       </div>
 
-      <!-- Hypothèses de calcul -->
       <details class="result-hypotheses">
         <summary>🔍 Hypothèses de calcul — d'où viennent ces résultats ?</summary>
         <div class="hypotheses-inner">
-          <p class="hyp-intro">Chaque résultat est calculé en multipliant vos <strong>données d'activité</strong> (quantités saisies) par des <strong>facteurs d'émission EF3.1</strong> issus de bases de données officielles européennes.</p>
-
+          <p class="hyp-intro">Chaque résultat est calculé en multipliant vos <strong>données d'activité</strong> (quantités saisies) par des <strong>facteurs d'émission EF3.1</strong> issus de bases de données officielles européennes. Le score agrège les 16 indicateurs selon leurs poids EF3.1.</p>
           <div class="hyp-formula">
-            Impact = Quantité × Facteur d'émission (EF3.1)
+            Score (mPt) = Σᵢ [ Quantité × FE_i / Facteur_normalisation_i × Poids_i ] × 1000
           </div>
-
           <h5>Données saisies et contributions CO₂</h5>
           <div style="overflow-x:auto">
             <table class="hyp-table">
-              <thead><tr><th>Poste d'émission</th><th>Quantité</th><th>CO₂ eq.</th><th>Scope</th></tr></thead>
+              <thead><tr><th>Poste d'activité</th><th>Quantité</th><th>CO₂ eq.</th><th>Catégorie</th></tr></thead>
               <tbody>${inputLines || '<tr><td colspan="4" style="text-align:center;color:var(--gray-400)">—</td></tr>'}</tbody>
             </table>
           </div>
-
           <h5 style="margin-top:1rem">Sources des facteurs d'émission</h5>
           <ul class="hyp-sources">
-            <li><strong>Scope 1 (gaz, fioul, diesel)</strong> — Facteurs EF3.1 Commission Européenne 2021, complétés par BASE-IMPACTS v3.0 (INRAE)</li>
-            <li><strong>Scope 2 (électricité France)</strong> — Facteur d'émission réseau français RTE 2023 (0,080 kg CO₂/kWh), pondéré selon mix EF3.1</li>
-            <li><strong>Scope 3 — Transport aérien</strong> — Facteurs ADEME 2023, sans forçage radiatif (×2 recommandé pour impact réel)</li>
-            <li><strong>Scope 3 — Achats &amp; équipements</strong> — Ecobalyse v8.5 (ADEME) et Ecoinvent 3.9</li>
-            <li><strong>Scope 3 — Services externalisés</strong> — Méthode input-output EXIOBASE 3.9.4 (France 2019) — ordres de grandeur, non certifiés</li>
+            <li><strong>Énergie & Chauffage</strong> (gaz, fioul, électricité) — Facteurs EF3.1 Commission Européenne 2021 · BASE-IMPACTS v3.0 (INRAE) · RTE 2023 (élec. France : 0,080 kg CO₂/kWh)</li>
+            <li><strong>Mobilité</strong> (véhicules thermiques &amp; électriques) — Ecoinvent 3.9 · EF3.1</li>
+            <li><strong>Train</strong> — ADEME Base Carbone 2023 (TGV France : 0,00385 kg CO₂/km·pass.) · Dérivé du mix électrique</li>
+            <li><strong>Transport aérien</strong> — ADEME Base Carbone 2023 · Sans forçage radiatif (×2 recommandé pour l'impact réel)</li>
+            <li><strong>Achats &amp; Équipements</strong> — Ecobalyse v8.5 (ADEME) · Ecoinvent 3.9</li>
+            <li><strong>Services externalisés</strong> — Méthode input-output EXIOBASE 3.9.4 (France 2019) · Ordres de grandeur, non certifiés</li>
           </ul>
-
           <div class="hyp-warning">
-            ⚠️ Cet outil est à visée pédagogique. Les facteurs services (IT, conseil, nettoyage) sont des estimations macro-économiques, non des données primaires fournisseurs. Pour un diagnostic certifié Bilan Carbone®, des données spécifiques sont nécessaires.
+            ⚠️ Outil à visée pédagogique. Les facteurs services (IT, conseil, nettoyage) sont des estimations macro-économiques, non des données primaires fournisseurs. Pour un diagnostic certifié, des données spécifiques sont nécessaires.
           </div>
         </div>
       </details>
 
-      <!-- Vue détaillée (optionnelle) -->
       <div class="result-detail-section">
         <button class="result-detail-toggle-btn" onclick="toggleEntrepriseDetail()">
           <span id="detail-toggle-label">📋 Voir le détail des 16 indicateurs EF3.1</span>
         </button>
         <div id="entreprise-detail-view" style="display:none">
-          <div class="indicators-table" style="margin-top:1rem">
+          <div class="indicators-table" style="margin-top:1rem;overflow-x:auto">
             <table>
               <thead>
-                <tr><th>Indicateur</th><th>Scope 1</th><th>Scope 2</th><th>Scope 3</th><th>Total</th><th>Unité</th></tr>
+                <tr><th>Indicateur</th><th>Impact total</th><th>Unité</th><th>Score EF3.1 (mPt)</th></tr>
               </thead>
               <tbody>
                 ${Object.entries(EF31).map(([key, meta]) => {
-                  const v1 = byScope[1][key] || 0;
-                  const v2 = byScope[2][key] || 0;
-                  const v3 = byScope[3][key] || 0;
                   const tot = totals[key] || 0;
-                  const fmtV = v => v === 0 ? '—' : v.toExponential(2);
+                  const pefContrib = tot > 0 ? (tot / meta.norm) * (meta.weight / 100) * 1000 : 0;
+                  const dmg = DAMAGE_CATEGORIES[meta.damage];
                   return `<tr>
-                    <td><strong>${meta.label}</strong></td>
-                    <td class="scope1-text">${fmtV(v1)}</td>
-                    <td class="scope2-text">${fmtV(v2)}</td>
-                    <td class="scope3-text">${fmtV(v3)}</td>
-                    <td><strong>${fmtV(tot)}</strong></td>
+                    <td style="border-left:3px solid ${dmg ? dmg.color : '#ccc'};padding-left:8px"><strong>${meta.label}</strong></td>
+                    <td style="font-family:monospace">${tot === 0 ? '—' : tot.toExponential(2)}</td>
                     <td style="color:#888;font-size:0.75rem">${meta.unit}</td>
+                    <td style="font-weight:700;color:var(--navy)">${pefContrib === 0 ? '—' : pefContrib.toFixed(4)}</td>
                   </tr>`;
                 }).join('')}
               </tbody>

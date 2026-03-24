@@ -1311,6 +1311,84 @@ nav {
 }
 .result-detail-toggle-btn:hover { background: var(--gray-100); }
 
+/* ── Profil organisation ── */
+.org-profile-section {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+.org-profile-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.3rem;
+}
+.org-profile-desc {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+.org-profile-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+.org-field { display: flex; flex-direction: column; gap: 0.3rem; }
+.org-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.org-input {
+  padding: 0.5rem 0.75rem;
+  border: 1.5px solid var(--gray-300);
+  border-radius: 6px;
+  font-size: 0.9rem;
+  background: #fff;
+  color: var(--text);
+  transition: border-color 0.15s;
+  font-family: inherit;
+}
+.org-input:focus { outline: none; border-color: var(--navy-light); }
+
+/* ── Activity cards ── */
+.activity-card {
+  background: #fff;
+  border-radius: var(--radius);
+  border: 1px solid var(--gray-200);
+  padding: 1.25rem;
+}
+.activity-card h3 {
+  font-size: 0.92rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+.activity-card.activity-energie      { border-left: 4px solid #E67E22; }
+.activity-card.activity-mobilite     { border-left: 4px solid #3498DB; }
+.activity-card.activity-achats       { border-left: 4px solid #9B59B6; }
+.activity-card.activity-services     { border-left: 4px solid #1ABC9C; }
+.activity-card.activity-alimentation { border-left: 4px solid #27AE60; }
+
+/* ── Badge neutral ── */
+.badge.badge-neutral {
+  background: rgba(255,255,255,0.15);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+
+/* ── Result profile meta ── */
+.result-profile-meta {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0.2rem 0 0.3rem;
+}
+
 /* ── Responsive ── */
 @media (max-width: 640px) {
   nav { padding: 0 1rem; gap: 0.5rem; }
@@ -1327,4 +1405,5 @@ nav {
   .gauge-legend { gap: 1rem; }
   .services-grid { grid-template-columns: 1fr; }
   .entreprise-form-grid { grid-template-columns: 1fr; }
+  .org-profile-grid { grid-template-columns: 1fr 1fr; }
 }
