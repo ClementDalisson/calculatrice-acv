@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculatrice ACV — Impacts environnementaux Grand Public</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ── Navigation ────────────────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">🌍 Calculatrice ACV</div>
+  <div class="nav-links">
+    <button class="nav-link active" data-section="catalogue">Catalogue</button>
+    <button class="nav-link" data-section="compare">
+      Comparaison <span id="compare-badge" class="nav-badge" style="display:none">0</span>
+    </button>
+    <button class="nav-link" data-section="empreinte">🌱 Empreinte</button>
+    <button class="nav-link" data-section="methodo">Méthodologie</button>
+  </div>
+</nav>
+
+<!-- ── Hero ──────────────────────────────────────────────────────────────── -->
+<div class="hero">
+  <h1>Quel est l'impact environnemental de vos objets du quotidien ?</h1>
+  <p>Explorez les 16 indicateurs de la méthode EF3.1 (Commission Européenne) pour des objets concrets — d'un café expresso à un vol Paris–New York.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><div class="num">17</div><div class="lbl">objets analysés</div></div>
+    <div class="hero-stat"><div class="num">16</div><div class="lbl">indicateurs EF3.1</div></div>
+    <div class="hero-stat"><div class="num">3</div><div class="lbl">sources de données</div></div>
+    <div class="hero-stat"><div class="num">100%</div><div class="lbl">hypothèses visibles</div></div>
+  </div>
+</div>
+
+<!-- ── Main ──────────────────────────────────────────────────────────────── -->
+<div class="main">
+
+  <!-- CATALOGUE -->
+  <div id="sec-catalogue" class="section active">
+    <div class="filter-bar">
+      <label>Filtrer :</label>
+      <button class="filter-btn active" data-cat="all">Tout</button>
+      <button class="filter-btn" data-cat="Alimentation">🍽️ Alimentation</button>
+      <button class="filter-btn" data-cat="Textile">👗 Textile</button>
+      <button class="filter-btn" data-cat="Électronique">💻 Électronique</button>
+      <button class="filter-btn" data-cat="Transport">🚀 Transport</button>
+      <button class="filter-btn" data-cat="Emballage">📦 Emballage</button>
+      <button class="filter-btn" data-cat="Mobilier">🏠 Mobilier</button>
+      <button class="filter-btn" data-cat="Logement">🏡 Logement</button>
+    </div>
+    <div id="cards-grid" class="cards-grid"></div>
+    <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--gray-400);text-align:center">
+      Cliquez sur une carte pour voir le détail complet — ou sur <strong>+</strong> pour l'ajouter à la comparaison.
+    </p>
+  </div>
+
+  <!-- COMPARE -->
+  <div id="sec-compare" class="section">
+    <div class="compare-toolbar">
+      <h2>⚖️ Comparaison</h2>
+      <div id="compare-chips" class="compare-selected-chips"></div>
+      <button id="compare-clear-btn" class="btn btn-outline" style="margin-left:auto">Tout effacer</button>
+    </div>
+    <div id="compare-content"></div>
+  </div>
+
+  <!-- EMPREINTE ANNUELLE -->
+  <div id="sec-empreinte" class="section">
+    <div class="empreinte-header">
+      <h2>🌱 Empreinte annuelle</h2>
+      <p class="empreinte-intro">Estimez votre empreinte annuelle en sélectionnant un profil de consommation, et comparez-la à la moyenne européenne et à la cible 2050.</p>
+    </div>
+
+    <!-- Sélecteur de profil -->
+    <div class="profile-selector" id="profile-selector"></div>
+
+    <!-- Gauge principale -->
+    <div class="empreinte-gauge-section">
+      <div class="gauge-wrap">
+        <canvas id="empreinte-gauge-chart"></canvas>
+      </div>
+      <div class="gauge-legend" id="gauge-legend"></div>
+    </div>
+
+    <!-- Répartition par catégorie -->
+    <div class="empreinte-breakdown-section">
+      <h3>Répartition par catégorie</h3>
+      <div class="breakdown-chart-wrap">
+        <canvas id="empreinte-breakdown-chart"></canvas>
+      </div>
+    </div>
+
+    <!-- Détail par objet -->
+    <div class="empreinte-items-section">
+      <h3>Détail par objet</h3>
+      <div id="empreinte-items-list" class="empreinte-items-list"></div>
+    </div>
+
+    <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--gray-400);text-align:center">
+      Les profils sont des estimations de référence, pas des situations individuelles précises.<br>
+      ⚠️ <strong>Couverture partielle (~50 %)</strong> : le catalogue couvre alimentation, transport, énergie logement, textile, électronique et mobilier — mais pas les services, la santé, l'administration publique, la construction des bâtiments, etc.<br>
+      Les seuils sont ajustés au périmètre du catalogue : <strong>Moyenne UE ≈ 500 mPt</strong> (= ½ × 1 000 mPt EF3.1) · <strong>Cible 2050 ≈ 150 mPt</strong> (= ½ × 300 mPt, trajectoire 1,5 °C).<br>
+      Pour estimer votre empreinte totale, multipliez les valeurs ci-dessus par ~2.
+    </p>
+  </div>
+
+  <!-- METHODO -->
+  <div id="sec-methodo" class="section">
+    <h2 style="margin-bottom:1.5rem;font-size:1.3rem">📖 Méthodologie EF3.1</h2>
+
+    <div class="formula-box">
+      <div><strong>Formule Score PEF :</strong></div>
+      <div style="margin-top:0.5rem">Score PEF (mPt) = Σᵢ [ Impact_brut_i ÷ Facteur_normalisation_i × Poids_i ] × 1000</div>
+      <div style="margin-top:0.5rem;opacity:0.7;font-size:0.8rem">
+        1 Pt = impact annuel moyen d'un Européen sur toutes les catégories.<br>
+        1 mPt = 0,001 Pt. Exemples typiques : café expresso ≈ 0,01 mPt · steak 200g ≈ 0,77 mPt · vol Paris-NY ≈ 46 mPt
+      </div>
+    </div>
+
+    <div class="methodo-grid" style="margin-bottom:1.5rem">
+      <div class="methodo-card">
+        <div class="methodo-card-header" style="color:var(--climat)">🌡️ Changement climatique</div>
+        <div class="methodo-card-body">
+          <strong>GWP</strong> — kg CO₂ équivalent. Inclut CO₂, méthane (×28), N₂O, gaz fluorés.
+          Représente <strong>21,06%</strong> du score PEF. Normalisé sur 7 550 kg CO₂eq/pers./an.
+        </div>
+      </div>
+      <div class="methodo-card">
+        <div class="methodo-card-header" style="color:var(--eco)">🌿 Écosystèmes</div>
+        <div class="methodo-card-body">
+          <strong>AP, EP×3, ETIC, LU</strong> — Acidification, eutrophisation (eau douce, marine, terrestre),
+          écotoxicité, utilisation des sols. Total ≈ <strong>25%</strong> du score PEF.
+          LU très élevé pour le coton, l'élevage bovin et le café.
+        </div>
+      </div>
+      <div class="methodo-card">
+        <div class="methodo-card-header" style="color:var(--sante)">🏥 Santé humaine</div>
+        <div class="methodo-card-body">
+          <strong>PM, ODP, IR, POCF, HT×2</strong> — Particules fines (8,96% — le plus important !),
+          appauvrissement couche d'ozone, rayonnements ionisants, smog, toxicité humaine.
+          Total ≈ <strong>28%</strong> du score PEF.
+        </div>
+      </div>
+      <div class="methodo-card">
+        <div class="methodo-card-header" style="color:var(--ressources)">🪨 Ressources</div>
+        <div class="methodo-card-body">
+          <strong>WU, RU_Fossil, RU_Metal</strong> — Eau, énergie fossile, ressources minérales (cobalt, lithium, cuivre).
+          Total ≈ <strong>24%</strong> du score PEF.
+          RU_Metal très élevé pour l'électronique (terres rares, cobalt, lithium, or).
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--navy)">Les 16 indicateurs EF3.1</h3>
+    <div style="overflow-x:auto">
+      <table class="compare-table" style="min-width:600px">
+        <thead>
+          <tr>
+            <th style="text-align:left">Indicateur</th>
+            <th style="text-align:left">Code</th>
+            <th style="text-align:left">Unité</th>
+            <th style="text-align:right">Poids EF3.1</th>
+            <th style="text-align:left">Catégorie dommage</th>
+          </tr>
+        </thead>
+        <tbody id="methodo-indicators"></tbody>
+      </table>
+    </div>
+
+    <div style="margin-top:2rem;padding:1.2rem;background:var(--gray-50);border-radius:var(--radius);font-size:0.82rem;color:var(--text-muted);line-height:1.8">
+      <strong>Sources des données :</strong><br>
+      • <strong>Ecobalyse v8.5 (ADEME, 2025)</strong> — alimentation, textile, énergie (France)<br>
+      • <strong>BASE-IMPACTS v3.0 (INRAE/ELISA)</strong> — matériaux, transport, énergie<br>
+• <strong>Méthode EF3.1</strong> — Commission Européenne, 2021 ·
+        <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank" style="color:var(--navy-light)">Documentation officielle</a><br>
+      <br>
+      <strong>Limitations :</strong> Les compositions d'objets comme la table ou le canapé sont des hypothèses de référence
+      (pas des données mesurées). Le GWP du vol avion n'inclut pas le forçage radiatif (×2 recommandé ADEME).
+      Pour l'électronique (smartphone, ordinateur), les indicateurs hors GWP sont estimés par mise à l'échelle proportionnelle
+      depuis des proxies BASE-IMPACTS v3.0 et Ecobalyse v8.5 (pas d'ACV publique EF3.1 complète disponible). Voir les hypothèses dans chaque fiche détail.
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<!-- ── Detail Overlay ─────────────────────────────────────────────────────── -->
+<div id="detail-overlay" class="detail-overlay">
+  <div class="detail-panel">
+    <div class="detail-header">
+      <div>
+        <div id="detail-title" class="detail-title">—</div>
+        <div id="detail-uf" class="detail-uf">—</div>
+      </div>
+      <button id="detail-close-btn" class="detail-close">✕</button>
+    </div>
+
+    <div class="detail-body">
+
+      <!-- Score environnemental + jetons -->
+      <div class="detail-section">
+        <h3>Score environnemental</h3>
+        <div class="pef-score-big">
+          <div>
+            <div style="font-size:0.75rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:.2rem">Score total</div>
+            <div style="display:flex;align-items:baseline;gap:.4rem">
+              <span id="detail-pef-score" class="score">—</span>
+              <span class="unit">mPt</span>
+            </div>
+            <div id="detail-pef-completude" class="desc">—</div>
+          </div>
+          <div style="flex:1;font-size:.78rem;color:var(--text-muted)">
+            Le score environnemental (mPt) résume l'ensemble des impacts sur le <strong>climat</strong>, les <strong>écosystèmes</strong>, la <strong>santé</strong> et les <strong>ressources</strong>. Les 4 barres ci-dessous montrent la part de chaque catégorie pour ce produit.
+          </div>
+        </div>
+        <div id="detail-tokens" class="detail-cat-bars" style="margin-top:1rem"></div>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="detail-section">
+        <h3>Répartition par catégorie de dommage</h3>
+        <div class="chart-wrap">
+          <canvas id="detail-radar-chart"></canvas>
+        </div>
+      </div>
+
+      <!-- All 16 indicators -->
+      <div class="detail-section">
+        <h3>Tous les indicateurs EF3.1</h3>
+        <div id="detail-indicators"></div>
+      </div>
+
+      <!-- Composition -->
+      <div class="detail-section">
+        <h3>Composition hypothétique</h3>
+        <div id="detail-composition"></div>
+      </div>
+
+      <!-- Hypotheses -->
+      <div class="detail-section">
+        <h3>Hypothèses & périmètre</h3>
+        <div id="detail-hypothesis" class="hypothesis-box"></div>
+      </div>
+
+      <!-- Sources -->
+      <div class="detail-section">
+        <h3>Facteurs d'émission & sources</h3>
+        <div id="detail-sources" class="sources-box"></div>
+      </div>
+
+      <!-- Add to compare -->
+      <div style="margin-top:1rem;display:flex;gap:.75rem;flex-wrap:wrap">
+        <button id="detail-add-compare" class="btn btn-outline">+ Ajouter à la comparaison</button>
+        <button class="btn btn-outline" onclick="closeDetail()">Fermer</button>
+      </div>
+
+    </div><!-- /detail-body -->
+  </div><!-- /detail-panel -->
+</div><!-- /detail-overlay -->
+
+<!-- ── Scripts ────────────────────────────────────────────────────────────── -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation@3.0.1/dist/chartjs-plugin-annotation.min.js"></script>
+<script src="data.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

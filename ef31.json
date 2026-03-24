@@ -1,0 +1,82 @@
+{
+  "GWP": {
+    "norm": 7550,
+    "weight": 21.06,
+    "unit": "kg CO₂ eq."
+  },
+  "ODP": {
+    "norm": 0.0536,
+    "weight": 6.31,
+    "unit": "kg CFC-11 eq."
+  },
+  "AP": {
+    "norm": 55.6,
+    "weight": 6.2,
+    "unit": "mol H⁺ eq."
+  },
+  "EP_Eau": {
+    "norm": 1.61,
+    "weight": 2.8,
+    "unit": "kg P eq."
+  },
+  "EP_Marine": {
+    "norm": 19.5,
+    "weight": 2.96,
+    "unit": "kg N eq."
+  },
+  "EP_Terre": {
+    "norm": 177,
+    "weight": 3.71,
+    "unit": "mol N eq."
+  },
+  "POCF": {
+    "norm": 40.6,
+    "weight": 4.78,
+    "unit": "kg COVNM eq."
+  },
+  "PM": {
+    "norm": 0.000595,
+    "weight": 8.96,
+    "unit": "incidence"
+  },
+  "IR": {
+    "norm": 4220,
+    "weight": 5.01,
+    "unit": "kBq U-235 eq."
+  },
+  "LU": {
+    "norm": 819000,
+    "weight": 7.94,
+    "unit": "pt sol"
+  },
+  "WU": {
+    "norm": 11500,
+    "weight": 8.51,
+    "unit": "m³ dépriv."
+  },
+  "RU_Fossil": {
+    "norm": 65000,
+    "weight": 8.32,
+    "unit": "MJ"
+  },
+  "RU_Metal": {
+    "norm": 0.636,
+    "weight": 7.55,
+    "unit": "kg Sb eq."
+  },
+  "HT_cancer": {
+    "norm": 1.69e-05,
+    "weight": 2.13,
+    "unit": "CTUh"
+  },
+  "HT_nc": {
+    "norm": 0.000125,
+    "weight": 1.84,
+    "unit": "CTUh"
+  },
+  "ETIC": {
+    "norm": 56200,
+    "weight": 1.92,
+    "unit": "CTUe"
+  }
+}
