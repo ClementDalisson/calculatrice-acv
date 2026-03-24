@@ -4,14 +4,16 @@
 
 /* ── State ── */
 let state = {
+  main: 'perso',
   section: 'catalogue',
+  subSection: 'catalogue',
   selectedIds: [],
   filterCat: 'all',
   detailId: null,
   detailChart: null,
   compareChart1: null,
   compareChart2: null,
-  empreinteProfile: 2, // Default: Moyen français
+  empreinteProfile: 2,
   empreinteGaugeChart: null,
   empreinteBreakdownChart: null,
 };
@@ -202,11 +204,38 @@ function computeProfileTokenTotals(profile) {
 }
 
 /* ── Navigation ── */
+function showOnly(section) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  const el = document.getElementById('sec-' + section);
+  if (el) el.classList.add('active');
+}
+
+function goToMain(main) {
+  state.main = main;
+  document.querySelectorAll('.nav-link[data-main]').forEach(l => {
+    l.classList.toggle('active', l.dataset.main === main);
+  });
+  const subnav = document.getElementById('subnav');
+  if (subnav) subnav.style.display = main === 'perso' ? '' : 'none';
+
+  if (main === 'perso') {
+    goTo(state.subSection || 'catalogue');
+  } else if (main === 'organisation') {
+    showOnly('entreprise');
+    renderEntrepriseSection();
+  } else if (main === 'contact') {
+    showOnly('contact');
+    renderMethodologie();
+  }
+}
+
 function goTo(section) {
   state.section = section;
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById('sec-' + section).classList.add('active');
-  document.querySelectorAll('.nav-link').forEach(l => {
+  if (['catalogue', 'compare', 'empreinte'].includes(section)) {
+    state.subSection = section;
+  }
+  showOnly(section);
+  document.querySelectorAll('.subnav-link').forEach(l => {
     l.classList.toggle('active', l.dataset.section === section);
   });
   if (section === 'compare') renderCompare();
@@ -865,10 +894,351 @@ function renderMethodologie() {
   }).join('');
 }
 
+// ════════════════════════════════════════════════════════════════════
+// MODE ENTREPRISE — Analyse multi-critères EF3.1 pour organisations
+// ════════════════════════════════════════════════════════════════════
+
+// ── Facteurs d'émission entreprise (EF3.1, 16 indicateurs) ──────────
+const FE_ENTREPRISE = {
+  // SCOPE 1 — Émissions directes
+  gaz_kwh: {
+    label: "Gaz naturel", unit: "kWh PCI", scope: 1,
+    GWP:0.2763, ODP:1.212e-8, AP:2.263e-4, EP_Eau:1.133e-6,
+    EP_Marine:6.760e-5, EP_Terre:7.468e-4, POCF:4.805e-4, PM:1.272e-9,
+    IR:1.372e-3, LU:0.09513, WU:6.220e-3, RU_Fossil:3.925,
+    RU_Metal:2.703e-7, HT_cancer:6.408e-11, HT_nc:5.678e-10, ETIC:0.20720
+  },
+  fioul_L: {
+    label: "Fioul domestique", unit: "litres", scope: 1,
+    GWP:3.15, ODP:9.89e-9, AP:2.939e-4, EP_Eau:1.190e-5,
+    EP_Marine:7.436e-4, EP_Terre:8.638e-3, POCF:6.059e-3, PM:2.541e-8,
+    IR:1.440e-2, LU:0.9989, WU:6.531e-2, RU_Fossil:37.7,
+    RU_Metal:2.838e-6, HT_cancer:1.009e-9, HT_nc:8.965e-9, ETIC:2.776
+  },
+  diesel_100km: {
+    label: "Véhicule flotte diesel", unit: "100 km", scope: 1,
+    GWP:12.4, ODP:2.664e-7, AP:2.749e-2, EP_Eau:5.278e-5,
+    EP_Marine:5.210e-3, EP_Terre:5.048e-2, POCF:2.839e-2, PM:3.348e-7,
+    IR:4.627e-2, LU:21.84, WU:1.243, RU_Fossil:161.6,
+    RU_Metal:3.200e-6, HT_cancer:2.298e-9, HT_nc:3.940e-8, ETIC:97.9
+  },
+  hfc134a_kg: {
+    label: "Fuites réfrigérant HFC-134a", unit: "kg", scope: 1,
+    GWP:1430.0, ODP:0, AP:0, EP_Eau:0, EP_Marine:0, EP_Terre:0,
+    POCF:0, PM:0, IR:0, LU:0, WU:0, RU_Fossil:8.5,
+    RU_Metal:0, HT_cancer:0, HT_nc:0, ETIC:0
+  },
+  // SCOPE 2 — Énergie achetée
+  elec_kwh: {
+    label: "Électricité réseau France", unit: "kWh", scope: 2,
+    GWP:0.0801, ODP:8.773e-10, AP:2.098e-4, EP_Eau:3.269e-8,
+    EP_Marine:7.613e-5, EP_Terre:4.978e-4, POCF:2.108e-4, PM:4.158e-9,
+    IR:3.2342, LU:0, WU:null, RU_Fossil:9.313,
+    RU_Metal:4.858e-8, HT_cancer:null, HT_nc:null, ETIC:null
+  },
+  // SCOPE 3 — Transport
+  ve_100km: {
+    label: "Véhicule électrique (usage)", unit: "100 km", scope: 3,
+    GWP:1.442, ODP:1.579e-8, AP:3.776e-3, EP_Eau:5.884e-7,
+    EP_Marine:1.370e-3, EP_Terre:8.960e-3, POCF:3.794e-3, PM:7.484e-8,
+    IR:58.22, LU:0, WU:null, RU_Fossil:167.6,
+    RU_Metal:8.744e-7, HT_cancer:null, HT_nc:null, ETIC:null
+  },
+  vol_court: {
+    label: "Vol court-courrier (Europe)", unit: "passager", scope: 3,
+    GWP:65.3, ODP:3.559e-10, AP:1.655e-4, EP_Eau:4.857e-6,
+    EP_Marine:6.893e-5, EP_Terre:7.545e-4, POCF:1.918e-4, PM:6.426e-7,
+    IR:1.281, LU:0, WU:null, RU_Fossil:531.3,
+    RU_Metal:1.960e-6, HT_cancer:null, HT_nc:null, ETIC:null
+  },
+  vol_lc: {
+    label: "Vol long-courrier (intercontinental)", unit: "passager", scope: 3,
+    GWP:701.27, ODP:6.50e-9, AP:3.026e-3, EP_Eau:8.877e-5,
+    EP_Marine:1.260e-3, EP_Terre:1.379e-2, POCF:3.505e-3, PM:1.174e-5,
+    IR:23.41, LU:0, WU:null, RU_Fossil:9708.2,
+    RU_Metal:3.583e-5, HT_cancer:null, HT_nc:null, ETIC:null
+  },
+  // SCOPE 3 — Achats
+  papier_ramette: {
+    label: "Papier A4 (ramette 500 f.)", unit: "ramettes", scope: 3,
+    GWP:3.85, ODP:2.5e-9, AP:3.5e-2, EP_Eau:7.5e-4,
+    EP_Marine:7.5e-3, EP_Terre:1.25e-2, POCF:5.0e-3, PM:7.5e-8,
+    IR:0.075, LU:125.0, WU:0.75, RU_Fossil:50.0,
+    RU_Metal:2.5e-7, HT_cancer:1.25e-9, HT_nc:2.0e-8, ETIC:12.5
+  },
+  ecran_24: {
+    label: "Écran 24\" (cycle de vie)", unit: "unités", scope: 3,
+    GWP:216.0, ODP:2.023e-8, AP:1.875, EP_Eau:2.573e-3,
+    EP_Marine:3.539e-1, EP_Terre:3.764, POCF:1.008, PM:4.749e-5,
+    IR:58.52, LU:null, WU:329.5, RU_Fossil:800.9,
+    RU_Metal:2.618e-2, HT_cancer:2.181e-7, HT_nc:1.357e-5, ETIC:2481.8
+  },
+  serveur_1u: {
+    label: "Serveur rack 1U (fabrication)", unit: "unités", scope: 3,
+    GWP:800.0, ODP:7.494e-8, AP:6.943, EP_Eau:9.533e-3,
+    EP_Marine:1.310, EP_Terre:1.394e1, POCF:3.732, PM:1.759e-4,
+    IR:216.7, LU:null, WU:1220.6, RU_Fossil:2967.0,
+    RU_Metal:9.696e-2, HT_cancer:8.076e-7, HT_nc:5.025e-5, ETIC:9190.0
+  },
+  // SCOPE 3 — Services
+  nettoyage_m2: {
+    label: "Nettoyage locaux", unit: "m²/an", scope: 3,
+    GWP:10.2, ODP:3.5e-9, AP:4.5e-3, EP_Eau:9.0e-6,
+    EP_Marine:1.8e-3, EP_Terre:7.5e-3, POCF:6.0e-3, PM:6.0e-9,
+    IR:0.72, LU:null, WU:null, RU_Fossil:112.0,
+    RU_Metal:1.8e-7, HT_cancer:5.0e-11, HT_nc:8.0e-10, ETIC:2.5
+  },
+  repas: {
+    label: "Repas restauration collective", unit: "repas", scope: 3,
+    GWP:2.2, ODP:8.0e-9, AP:1.9e-2, EP_Eau:8.0e-5,
+    EP_Marine:6.5e-3, EP_Terre:9.7e-2, POCF:3.5e-3, PM:1.9e-7,
+    IR:0.025, LU:80.0, WU:0.18, RU_Fossil:18.5,
+    RU_Metal:2.2e-6, HT_cancer:6.0e-10, HT_nc:1.1e-8, ETIC:6.8
+  },
+  it_services_k: {
+    label: "Services IT (1 000 €)", unit: "k€ HT", scope: 3,
+    GWP:650.0, ODP:2.2e-7, AP:2.85e-1, EP_Eau:4.0e-4,
+    EP_Marine:1.07e-1, EP_Terre:5.4e-1, POCF:2.85e-1, PM:2.8e-6,
+    IR:210.0, LU:null, WU:null, RU_Fossil:6050.0,
+    RU_Metal:6.5e-3, HT_cancer:null, HT_nc:null, ETIC:null
+  },
+  conseil_k: {
+    label: "Conseil / formation (1 000 €)", unit: "k€ HT", scope: 3,
+    GWP:450.0, ODP:1.5e-7, AP:1.97e-1, EP_Eau:2.8e-4,
+    EP_Marine:7.4e-2, EP_Terre:3.74e-1, POCF:1.97e-1, PM:1.95e-6,
+    IR:145.0, LU:null, WU:null, RU_Fossil:4185.0,
+    RU_Metal:2.5e-3, HT_cancer:null, HT_nc:null, ETIC:null
+  },
+};
+
+// ── Calcul PEF score depuis impacts bruts ────────────────────────────
+function calcPEF_entreprise(impacts) {
+  let score = 0, counted = 0;
+  for (const [key, {norm, weight}] of Object.entries(EF31)) {
+    const val = impacts[key];
+    if (val != null && !isNaN(val)) {
+      score += (val / norm) * (weight / 100) * 1000;
+      counted++;
+    }
+  }
+  return { score: Math.round(score * 1000) / 1000, completude: Math.round(counted / 16 * 100) };
+}
+
+// ── Rendu HTML du mode entreprise ────────────────────────────────────
+function renderEntrepriseSection() {
+  const sec = document.getElementById('sec-entreprise');
+  if (!sec) return;
+
+  sec.innerHTML = `
+    <div class="entreprise-wrapper">
+      <div class="entreprise-hero">
+        <h2>🏢 Analyse Multi-Critères Entreprise</h2>
+        <p>Estimez les impacts environnementaux de votre organisation selon les <strong>16 indicateurs EF3.1</strong> sur les 3 scopes du Bilan Carbone®. Saisissez vos données d'activité annuelles.</p>
+        <div class="entreprise-badges">
+          <span class="badge scope1">Scope 1 — Émissions directes</span>
+          <span class="badge scope2">Scope 2 — Énergie achetée</span>
+          <span class="badge scope3">Scope 3 — Chaîne de valeur</span>
+        </div>
+      </div>
+
+      <div class="entreprise-form-grid">
+        ${renderScopeForm(1, 'Scope 1 — Émissions directes', ['gaz_kwh','fioul_L','diesel_100km','hfc134a_kg'])}
+        ${renderScopeForm(2, 'Scope 2 — Énergie achetée', ['elec_kwh'])}
+        ${renderScopeForm(3, 'Scope 3 — Transport', ['ve_100km','vol_court','vol_lc'])}
+        ${renderScopeForm(3, 'Scope 3 — Achats & équipements', ['papier_ramette','ecran_24','serveur_1u'])}
+        ${renderScopeForm(3, 'Scope 3 — Services externalisés', ['nettoyage_m2','repas','it_services_k','conseil_k'])}
+      </div>
+
+      <button id="btn-calc-entreprise" onclick="calcEntreprise()">
+        🔬 Calculer mes impacts multi-critères
+      </button>
+
+      <div id="entreprise-results" style="display:none"></div>
+
+      <div class="entreprise-disclaimer">
+        <strong>⚠️ Avertissement méthodologique</strong> : Les facteurs d'émission services (nettoyage, IT, conseil) sont issus de la méthode input-output EXIOBASE 3.9.4 (France 2019). Ils représentent des ordres de grandeur. Pour une étude certifiée Bilan Carbone®, des données primaires spécifiques au fournisseur sont recommandées.
+        <br>Outil développé par <a href="mailto:clement.dalisson@gmail.com">Clément Dalisson</a> — Ingénieur Environnement, certifié Bilan Carbone® BCM2.
+      </div>
+    </div>
+  `;
+}
+
+function renderScopeForm(scopeNum, titre, keys) {
+  const scopeClass = `scope${scopeNum}`;
+  const rows = keys.map(key => {
+    const fe = FE_ENTREPRISE[key];
+    if (!fe) return '';
+    return `
+      <div class="fe-input-row">
+        <label class="fe-label">
+          <span class="fe-name">${fe.label}</span>
+          <span class="fe-unit">/ ${fe.unit}</span>
+        </label>
+        <input type="number" id="inp-${key}" class="fe-input"
+               placeholder="0" min="0" step="any"
+               onchange="updateEntreprisePreview()">
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="scope-card ${scopeClass}">
+      <h3><span class="scope-badge ${scopeClass}">${titre.split('—')[0].trim()}</span> ${titre.split('—')[1]?.trim() || ''}</h3>
+      ${rows}
+    </div>
+  `;
+}
+
+function calcEntreprise() {
+  const totals = {};
+  const byScope = {1: {}, 2: {}, 3: {}};
+  const IND_KEYS = Object.keys(EF31);
+
+  for (const key of IND_KEYS) {
+    totals[key] = 0;
+    byScope[1][key] = 0;
+    byScope[2][key] = 0;
+    byScope[3][key] = 0;
+  }
+
+  let hasData = false;
+  for (const [feKey, fe] of Object.entries(FE_ENTREPRISE)) {
+    const input = document.getElementById(`inp-${feKey}`);
+    if (!input) continue;
+    const qty = parseFloat(input.value) || 0;
+    if (qty === 0) continue;
+    hasData = true;
+
+    for (const indKey of IND_KEYS) {
+      const val = fe[indKey];
+      if (val != null && !isNaN(val)) {
+        totals[indKey] += val * qty;
+        byScope[fe.scope][indKey] += val * qty;
+      }
+    }
+  }
+
+  if (!hasData) {
+    alert('Veuillez saisir au moins une donnée d\'activité.');
+    return;
+  }
+
+  const pefTotal = calcPEF_entreprise(totals);
+  const pefS1 = calcPEF_entreprise(byScope[1]);
+  const pefS2 = calcPEF_entreprise(byScope[2]);
+  const pefS3 = calcPEF_entreprise(byScope[3]);
+
+  const resultsDiv = document.getElementById('entreprise-results');
+  resultsDiv.style.display = 'block';
+  resultsDiv.innerHTML = renderEntrepriseResults(totals, byScope, pefTotal, pefS1, pefS2, pefS3);
+  resultsDiv.scrollIntoView({ behavior: 'smooth' });
+}
+
+function renderEntrepriseResults(totals, byScope, pefTotal, pefS1, pefS2, pefS3) {
+  const scopeTotal = pefS1.score + pefS2.score + pefS3.score;
+  const pct = s => scopeTotal > 0 ? Math.round(s.score / scopeTotal * 100) : 0;
+
+  return `
+    <div class="entreprise-results-inner">
+      <h3>📊 Résultats — Score environnemental EF3.1</h3>
+
+      <div class="result-score-grid">
+        <div class="result-score-total">
+          <div class="score-val">${pefTotal.score.toFixed(1)} <span>mPt</span></div>
+          <div class="score-label">Score environnemental total</div>
+          <div class="score-sub">${pefTotal.completude}% des indicateurs disponibles</div>
+        </div>
+        <div class="result-scope-bars">
+          ${[
+            {label:'Scope 1', pef:pefS1, cls:'scope1'},
+            {label:'Scope 2', pef:pefS2, cls:'scope2'},
+            {label:'Scope 3', pef:pefS3, cls:'scope3'},
+          ].map(s => `
+            <div class="scope-bar-row">
+              <span class="scope-bar-label ${s.cls}">${s.label}</span>
+              <div class="scope-bar-track">
+                <div class="scope-bar-fill ${s.cls}" style="width:${pct(s.pef)}%"></div>
+              </div>
+              <span class="scope-bar-val">${s.pef.score.toFixed(1)} mPt (${pct(s.pef)}%)</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+
+      <h4 style="margin-top:1.5rem">Détail par catégorie de dommage</h4>
+      <div class="damage-grid">
+        ${Object.entries(DAMAGE_CATEGORIES).map(([key, cat]) => {
+          const catScore = cat.indicators.reduce((sum, ind) => {
+            const v = totals[ind];
+            if (v == null) return sum;
+            return sum + (v / EF31[ind].norm) * (EF31[ind].weight / 100) * 1000;
+          }, 0);
+          return `
+            <div class="damage-card" style="border-left:4px solid ${cat.color}">
+              <div class="damage-label">${cat.label}</div>
+              <div class="damage-score" style="color:${cat.color}">${catScore.toFixed(2)} mPt</div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+
+      <h4 style="margin-top:1.5rem">16 indicateurs EF3.1 détaillés</h4>
+      <div class="indicators-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Indicateur</th><th>Scope 1</th><th>Scope 2</th><th>Scope 3</th><th>Total</th><th>Unité</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${Object.entries(EF31).map(([key, meta]) => {
+              const v1 = byScope[1][key] || 0;
+              const v2 = byScope[2][key] || 0;
+              const v3 = byScope[3][key] || 0;
+              const tot = totals[key] || 0;
+              const fmtV = v => v === 0 ? '—' : v.toExponential(2);
+              return `
+                <tr>
+                  <td><strong>${meta.label}</strong></td>
+                  <td class="scope1-text">${fmtV(v1)}</td>
+                  <td class="scope2-text">${fmtV(v2)}</td>
+                  <td class="scope3-text">${fmtV(v3)}</td>
+                  <td><strong>${fmtV(tot)}</strong></td>
+                  <td style="color:#888;font-size:0.75rem">${meta.unit}</td>
+                </tr>
+              `;
+            }).join('')}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="result-gwp-highlight">
+        <span>🌡️ GWP total :</span>
+        <strong>${(totals.GWP || 0).toFixed(1)} kg CO₂ eq.</strong>
+        <span style="color:#888;font-size:0.85rem">= ${((totals.GWP||0)/1000).toFixed(2)} t CO₂ eq.</span>
+      </div>
+
+      <p style="font-size:0.78rem;color:#888;margin-top:1rem;text-align:center">
+        Outil pédagogique — Pour un Bilan Carbone® certifié adapté à votre organisation :
+        <a href="mailto:clement.dalisson@gmail.com" style="color:#2D5016;font-weight:bold">clement.dalisson@gmail.com</a>
+      </p>
+    </div>
+  `;
+}
+
+function updateEntreprisePreview() {
+  // Peut être étendu pour preview temps réel
+}
+
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', () => {
-  // Nav
-  document.querySelectorAll('.nav-link').forEach(l => {
+  // Main nav
+  document.querySelectorAll('.nav-link[data-main]').forEach(l => {
+    l.addEventListener('click', () => goToMain(l.dataset.main));
+  });
+
+  // Sub-nav
+  document.querySelectorAll('.subnav-link').forEach(l => {
     l.addEventListener('click', () => goTo(l.dataset.section));
   });
 
@@ -892,7 +1262,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   renderCatalogue();
-  renderMethodologie();
   updateNavBadge();
-  goTo('catalogue');
+  goToMain('perso');
 });
