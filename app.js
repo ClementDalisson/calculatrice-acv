@@ -1493,6 +1493,18 @@ document.addEventListener('DOMContentLoaded', () => {
   const brand = document.querySelector('.nav-brand');
   if (brand) brand.addEventListener('click', () => goToMain('home'));
 
+  // Articles → home puis scroll vers Actualités
+  const navArticlesBtn = document.getElementById('nav-articles-btn');
+  if (navArticlesBtn) {
+    navArticlesBtn.addEventListener('click', () => {
+      if (state.main !== 'home') goToMain('home');
+      setTimeout(() => {
+        const el = document.getElementById('home-news-list');
+        if (el) el.scrollIntoView({ behavior: 'smooth' });
+      }, 50);
+    });
+  }
+
   // Dropdown Outils
   const navToolsBtn = document.getElementById('nav-tools-btn');
   const navToolsDropdown = document.getElementById('nav-tools-dropdown');
