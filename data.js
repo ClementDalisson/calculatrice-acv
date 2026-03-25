@@ -482,8 +482,8 @@ const ARTICLES = [
     titre: "Bilan carbone, c'est bien. Bilan environnemental, c'est mieux — et la réglementation l'a compris.",
     date: "25 mars 2026",
     resume: "CSRD, OEF, RE2020, Digital Product Passport… Les textes réglementaires européens élargissent la focale bien au-delà du CO₂. Pourquoi le bilan environnemental complet s'impose aujourd'hui.",
-    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
-    imageAlt: "Panorama montagne — réglementation environnementale européenne",
+    image: "https://upload.wikimedia.org/wikipedia/commons/7/75/Berlaymont_EU_Building-Brussels.jpg",
+    imageAlt: "Bâtiment Berlaymont — siège de la Commission Européenne, Bruxelles",
     contenu: `
       <p>Pendant des années, le "bilan carbone" a été <em>le</em> repère. Mais ce cadre commence à se fissurer. Non par idéologie, mais parce que les textes réglementaires européens et français, les uns après les autres, élargissent la focale. On ne vous demande plus seulement de compter vos tonnes de CO₂ — on vous demande de regarder votre empreinte sur l'eau, la biodiversité, les particules fines, l'acidification des sols. Bienvenue dans l'ère du bilan environnemental complet.</p>
       <h3>La CSRD/ESRS : cinq chapitres, cinq dimensions</h3>
