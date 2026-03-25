@@ -1488,6 +1488,50 @@ document.addEventListener('DOMContentLoaded', () => {
   if (brand) brand.addEventListener('click', () => goToMain('home'));
 
   renderCatalogue();
+  renderNews();
   updateNavBadge();
   goToMain('home');
+
+  // Article modal close
+  document.getElementById('article-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeArticle();
+  });
+  document.getElementById('article-modal-close').addEventListener('click', closeArticle);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeArticle();
+  });
 });
+
+/* ── Actualités ── */
+function renderNews() {
+  const list = document.getElementById('home-news-list');
+  if (!list) return;
+  list.innerHTML = ARTICLES.map(a => `
+    <article class="news-card">
+      <img class="news-card-img" src="${a.image}" alt="${a.imageAlt}" loading="lazy">
+      <div class="news-card-body">
+        <div class="news-card-date">${a.date}</div>
+        <div class="news-card-titre" onclick="openArticle(${a.id})">${a.titre}</div>
+        <p class="news-card-resume">${a.resume}</p>
+        <button class="news-card-btn" onclick="openArticle(${a.id})">Lire l'article →</button>
+      </div>
+    </article>
+  `).join('');
+}
+
+function openArticle(id) {
+  const a = ARTICLES.find(x => x.id === id);
+  if (!a) return;
+  document.getElementById('article-modal-date').textContent = a.date;
+  document.getElementById('article-modal-titre').textContent = a.titre;
+  document.getElementById('article-modal-img').src = a.image;
+  document.getElementById('article-modal-img').alt = a.imageAlt;
+  document.getElementById('article-modal-contenu').innerHTML = a.contenu;
+  document.getElementById('article-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeArticle() {
+  document.getElementById('article-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}

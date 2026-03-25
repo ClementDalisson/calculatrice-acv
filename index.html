@@ -182,13 +182,7 @@
     <!-- Actualités -->
     <section class="home-section">
       <h2 class="home-section-title">Actualités</h2>
-      <div class="home-news-list">
-        <div class="home-placeholder-card" style="padding:2rem;text-align:center">
-          <div class="placeholder-icon">📰</div>
-          <p class="placeholder-label">Articles &amp; publications à venir</p>
-          <p class="placeholder-hint">Analyses, retours d'expérience, veille réglementaire EF3.1…</p>
-        </div>
-      </div>
+      <div class="home-news-list" id="home-news-list"></div>
     </section>
 
   </div><!-- /sec-home -->
@@ -395,6 +389,23 @@
         <button id="detail-add-compare" class="btn btn-outline">+ Ajouter à la comparaison</button>
         <button class="btn btn-outline" onclick="closeDetail()">Fermer</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── Article Modal ─────────────────────────────────────────────────────── -->
+<div id="article-overlay" class="article-overlay">
+  <div class="article-modal">
+    <div class="article-modal-header">
+      <div>
+        <div id="article-modal-date" class="article-modal-date"></div>
+        <div id="article-modal-titre" class="article-modal-titre"></div>
+      </div>
+      <button id="article-modal-close" class="article-modal-close">✕</button>
+    </div>
+    <div class="article-modal-body">
+      <img id="article-modal-img" class="article-modal-img" src="" alt="">
+      <div id="article-modal-contenu" class="article-modal-contenu"></div>
     </div>
   </div>
 </div>

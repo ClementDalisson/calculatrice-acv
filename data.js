@@ -474,3 +474,27 @@ const ECI = {
   HT_nc:     77800,    // €/CTUh          — maladies non-cancéreuses
   ETIC:      0.00278,  // €/CTUe          — écotoxicité aquatique
 };
+
+// ── Articles & actualités ─────────────────────────────────────────────────────
+const ARTICLES = [
+  {
+    id: 1,
+    titre: "Bilan carbone, c'est bien. Bilan environnemental, c'est mieux — et la réglementation l'a compris.",
+    date: "25 mars 2026",
+    resume: "CSRD, OEF, RE2020, Digital Product Passport… Les textes réglementaires européens élargissent la focale bien au-delà du CO₂. Pourquoi le bilan environnemental complet s'impose aujourd'hui.",
+    image: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80",
+    imageAlt: "Panorama montagne — réglementation environnementale européenne",
+    contenu: `
+      <p>Pendant des années, le "bilan carbone" a été <em>le</em> repère. Mais ce cadre commence à se fissurer. Non par idéologie, mais parce que les textes réglementaires européens et français, les uns après les autres, élargissent la focale. On ne vous demande plus seulement de compter vos tonnes de CO₂ — on vous demande de regarder votre empreinte sur l'eau, la biodiversité, les particules fines, l'acidification des sols. Bienvenue dans l'ère du bilan environnemental complet.</p>
+      <h3>La CSRD/ESRS : cinq chapitres, cinq dimensions</h3>
+      <p>Les cinq standards environnementaux (E1 à E5) couvrent : le climat, la pollution, l'eau, la biodiversité, et l'économie circulaire. Le carbone n'est qu'un indicateur parmi une vingtaine. La CSRD ne vous demande pas un bilan carbone : elle vous demande un bilan environnemental.</p>
+      <h3>PEF/OEF : la méthodologie européenne d'ACV organisationnelle</h3>
+      <p>La méthode OEF (Organisation Environmental Footprint) est une ACV organisationnelle multi-critères à part entière — 16 catégories d'impact. Elle s'intègre progressivement à l'ESPR applicable depuis juillet 2024 à la quasi-totalité des produits physiques sur le marché européen.</p>
+      <h3>RE2020 et le CPR : le bâtiment en pointe</h3>
+      <p>La RE2020 impose déjà une ACV complète des bâtiments neufs sur 50 ans. Le nouveau Règlement sur les Produits de Construction (CPR 2024/3110, applicable dès janvier 2026) rend ensuite obligatoire l'ensemble des indicateurs LCA d'ici 2030. Le bâtiment montre la voie aux autres secteurs.</p>
+      <h3>Le Digital Product Passport</h3>
+      <p>À partir de 2027, il faudra documenter l'empreinte environnementale complète d'un produit : carbone, eau, recyclabilité, composition. Le carbone sera présent — mais comme une ligne parmi d'autres dans un tableau de bord environnemental intégré.</p>
+      <p>Le message réglementaire est cohérent : le bilan carbone seul ne suffit plus. Une entreprise peut réduire ses émissions de CO₂ tout en aggravant sa pression sur l'eau ou la biodiversité locale. C'est précisément pour ça que l'ACV organisationnelle multi-critères existe. Si vous souhaitez savoir où en est votre organisation, la calculatrice est accessible en ligne — et je suis disponible pour accompagner les organisations qui veulent aller plus loin.</p>
+    `
+  }
+];
