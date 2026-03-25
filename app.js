@@ -469,11 +469,6 @@ function renderCompare() {
   // Build comparison table
   let rows = '';
 
-  // GWP header row
-  rows += `<tr class="highlight-row">
-    <td>🌡️ Changement climatique (kg CO₂ eq.) — <em>Climat 21%</em></td>
-    ${buildValueCells(objects, 'GWP', true)}</tr>`;
-
   // PEF score
   rows += `<tr class="compare-score-total-row">
     <td>📊 Score PEF total (mPt)</td>
@@ -572,19 +567,26 @@ function renderCompareCharts(objects) {
     return result;
   }
 
-  // Radar chart — 4 catégories de dommage en valeurs absolues (mPt)
+  // Radar chart — normalisé : chaque axe = % du max entre les profils comparés
   const ctx1 = document.getElementById('compare-radar-chart');
   if (ctx1) {
     const radarLabels = Object.values(DAMAGE_CATEGORIES).map(d => d.label.replace(/^.+? /, ''));
     const allAbsData = objects.map(obj => {
       const abs = damageAbsolute(obj);
-      return Object.keys(DAMAGE_CATEGORIES).map(k => +abs[k].toFixed(2));
+      return Object.keys(DAMAGE_CATEGORIES).map(k => abs[k]);
     });
-    const radarMax = Math.ceil(Math.max(...allAbsData.flat()) / 10) * 10 || 50;
+    // Pour chaque axe, normaliser par le max entre tous les profils (→ 0–100 %)
+    const numAxes = Object.keys(DAMAGE_CATEGORIES).length;
+    const axisMaxes = Array.from({ length: numAxes }, (_, i) =>
+      Math.max(...allAbsData.map(d => d[i]), 1e-12)
+    );
+    const normalizedData = allAbsData.map(row =>
+      row.map((v, i) => +((v / axisMaxes[i]) * 100).toFixed(1))
+    );
 
     const datasets = objects.map((obj, i) => ({
       label: obj.emoji + ' ' + obj.nom,
-      data: allAbsData[i],
+      data: normalizedData[i],
       backgroundColor: colors[i % colors.length] + '33',
       borderColor: colors[i % colors.length],
       pointBackgroundColor: colors[i % colors.length],
@@ -602,9 +604,9 @@ function renderCompareCharts(objects) {
           r: {
             min: 0,
             beginAtZero: true,
-            max: radarMax,
-            ticks: { display: true, stepSize: radarMax / 4, font: { size: 9 }, color: '#A0AEC0',
-                     callback: v => v + ' Pt' },
+            max: 100,
+            ticks: { display: true, stepSize: 25, font: { size: 9 }, color: '#A0AEC0',
+                     callback: v => v + '%' },
             pointLabels: { font: { size: 11 } },
             grid: { color: '#E2E8F0' },
           }
@@ -613,9 +615,10 @@ function renderCompareCharts(objects) {
           legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } },
           tooltip: {
             callbacks: {
-              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.r.toFixed(2)} Pt`
+              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.r.toFixed(1)}% de l'impact max`
             }
-          }
+          },
+          title: { display: true, text: 'Profil normalisé — 100% = l\'impact le plus élevé sur chaque axe', font: { size: 11 }, color: '#718096' }
         }
       }
     });
@@ -896,34 +899,38 @@ function selectProfile(i) {
 }
 
 /* ── Methodologie ── */
-const METHODO_EXPLANATIONS = {
-  GWP:       "Les émissions de gaz à effet de serre qui réchauffent la planète. C'est ce que mesure le « bilan carbone ».",
-  ODP:       "Les substances qui détruisent le bouclier naturel contre les UV solaires.",
-  IR:        "L'exposition aux radiations, notamment liée au nucléaire.",
-  POCF:      "Les polluants qui forment le « smog » urbain et irritent les voies respiratoires.",
-  PM:        "Les microparticules dans l'air qui pénètrent les poumons et causent des maladies respiratoires et cardiovasculaires.",
-  HT_nc:     "L'exposition à des substances chimiques nocives autres que les cancérigènes.",
-  HT_cancer: "L'exposition à des substances qui augmentent le risque de cancer.",
-  AP:        "Les émissions (SO₂, NOₓ) qui rendent les pluies acides et appauvrissent les sols et les lacs.",
-  EP_Eau:    "L'excès de nutriments (azote, phosphore) dans les rivières et lacs qui provoque la prolifération d'algues et l'asphyxie des écosystèmes aquatiques.",
-  EP_Marine: "Même phénomène mais en mer : zones mortes, marées vertes.",
-  EP_Terre:  "L'excès d'azote dans les sols qui appauvrit la biodiversité végétale.",
-  ETIC:      "La toxicité des substances chimiques pour les poissons, insectes et plantes aquatiques.",
-  LU:        "L'occupation et la transformation des sols (artificialisation, déforestation) qui détruit les habitats naturels.",
-  WU:        "La quantité d'eau douce prélevée et sa rareté locale.",
-  RU_Fossil: "L'épuisement du pétrole, gaz et charbon.",
-  RU_Metal:  "L'épuisement des métaux rares et matériaux critiques.",
+const INDICATOR_META = {
+  GWP:       { simple: "Mesure les gaz à effet de serre qui réchauffent la planète (CO₂, méthane, N₂O…)", fait: "1 km en voiture thermique ≈ 120 g CO₂ eq. — un Français émet ~10 t CO₂ eq./an" },
+  ODP:       { simple: "Mesure la destruction de la couche d'ozone stratosphérique qui nous protège des UV", fait: "1 kg de CFC-11 détruit l'équivalent de 1 000 kg d'ozone stratosphérique" },
+  IR:        { simple: "Mesure l'exposition aux radiations émises par des matières radioactives dans les procédés industriels", fait: "Un scanner médical expose à ~10 mSv — soit 3 ans de radioactivité naturelle" },
+  POCF:      { simple: "Mesure la formation de smog photochimique (brouillard toxique) qui irrite les voies respiratoires", fait: "Les pics de smog réduisent l'espérance de vie de 1 à 2 ans dans les grandes villes" },
+  PM:        { simple: "Mesure les poussières fines (PM2.5) qui pénètrent profondément dans les poumons et le sang", fait: "Les PM2.5 causent 40 000 décès prématurés/an en France — 1ère cause de mortalité environnementale" },
+  HT_nc:     { simple: "Mesure les effets toxiques non-cancérogènes des substances chimiques sur la santé humaine", fait: "L'exposition aux pesticides organophosphorés est liée à des troubles neurologiques dès des doses infimes (μg/kg)" },
+  HT_cancer: { simple: "Mesure le risque de cancers induit par l'exposition à des substances chimiques tout au long du cycle de vie", fait: "L'amiante cause encore 3 000 mésothéliomes/an en France, 40 ans après son interdiction" },
+  AP:        { simple: "Mesure l'acidification des sols et des eaux par les pluies acides (SO₂, NOₓ, NH₃)", fait: "Le pH des lacs scandinaves a chuté de 0,5 unité en 30 ans à cause des pluies acides" },
+  EP_Eau:    { simple: "Mesure l'excès de phosphore qui provoque la prolifération d'algues étouffant la vie en eau douce", fait: "15 kg de phosphore suffisent à rendre un lac de 1 ha impropre à la baignade" },
+  EP_Marine: { simple: "Mesure l'excès d'azote qui crée des zones mortes sans oxygène dans les océans et mers côtières", fait: "La zone morte du Golfe du Mexique (>20 000 km²) est liée aux engrais du Mississippi" },
+  EP_Terre:  { simple: "Mesure le dépôt d'azote qui appauvrit la biodiversité végétale des prairies et forêts", fait: "Les dépôts azotés font disparaître 1 espèce végétale tous les 10 ans dans les prairies européennes" },
+  ETIC:      { simple: "Mesure la toxicité des substances chimiques (métaux lourds, pesticides…) sur les organismes aquatiques", fait: "10 μg/L de cuivre dans un ruisseau suffisent à éliminer 50% des invertébrés aquatiques" },
+  LU:        { simple: "Mesure l'impact sur les sols : occupation, dégradation, imperméabilisation et déforestation", fait: "L'artificialisation consomme 20 000 ha/an en France — l'équivalent d'un département tous les 10 ans" },
+  WU:        { simple: "Mesure la consommation d'eau douce dans les zones où elle est rare (eau de déprivation)", fait: "Produire 1 kg de bœuf consomme ~15 000 litres d'eau — 1 kg de blé ≈ 1 500 litres" },
+  RU_Fossil: { simple: "Mesure l'épuisement des combustibles fossiles non renouvelables (pétrole, gaz, charbon)", fait: "À la consommation actuelle, les réserves de pétrole conventionnel couvrent ~50 ans" },
+  RU_Metal:  { simple: "Mesure l'épuisement des ressources minérales et métalliques (fer, cuivre, lithium, terres rares…)", fait: "Un smartphone contient 60+ métaux différents — dont certains extraits quasi exclusivement en zone de conflit" },
 };
 
 function renderMethodologie() {
   const container = document.getElementById('methodo-indicators');
   container.innerHTML = Object.entries(EF31).map(([k, m]) => {
     const dmg = DAMAGE_CATEGORIES[m.damage];
-    const expl = METHODO_EXPLANATIONS[k]
-      ? `<details class="indicator-explain"><summary>ℹ️ En langage simple</summary><p>${METHODO_EXPLANATIONS[k]}</p></details>`
+    const meta = INDICATOR_META[k] || {};
+    const simpleHtml = meta.simple
+      ? `<div style="font-size:0.85em;color:#666;margin-top:4px">${meta.simple}</div>`
+      : '';
+    const faitHtml = meta.fait
+      ? `<div style="font-size:0.82em;color:#2B6CB0;font-style:italic;margin-top:3px">${meta.fait}</div>`
       : '';
     return `<tr>
-      <td><strong>${m.label}</strong>${expl}</td>
+      <td><strong>${m.label}</strong>${simpleHtml}${faitHtml}</td>
       <td style="font-family:monospace;font-size:0.78rem">${k}</td>
       <td style="font-size:0.78rem;color:var(--text-muted)">${m.unit}</td>
       <td style="text-align:right;font-weight:700">${m.weight}%</td>
