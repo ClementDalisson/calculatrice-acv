@@ -51,7 +51,7 @@
   <button class="nav-brand" onclick="goToMain('home')">🌿 Dalisson Environnement</button>
   <div class="nav-links">
     <button class="nav-link" data-main="contact">💼 Services</button>
-    <button class="nav-link" id="nav-articles-btn">📝 Articles</button>
+    <button class="nav-link" data-main="methode">📐 Méthode</button>
     <div class="nav-tools-dropdown" id="nav-tools-dropdown">
       <button class="nav-link nav-tools-btn" id="nav-tools-btn">🧮 Outils ▾</button>
       <div class="nav-tools-menu" id="nav-tools-menu">
@@ -289,55 +289,63 @@
         <p>Disponible pour missions freelance — réponse sous 48 h.</p>
         <a href="mailto:clement.dalisson@gmail.com" class="btn">Envoyer un message</a>
       </div>
-      <details class="methodo-details">
-        <summary>📖 Méthodologie EF3.1 — Documentation technique</summary>
-        <div class="methodo-inner">
-          <div class="formula-box" style="margin-top:1.2rem">
-            <div><strong>Formule Score PEF :</strong></div>
-            <div style="margin-top:0.5rem">Score PEF (mPt) = Σᵢ [ Impact_brut_i ÷ Facteur_normalisation_i × Poids_i ] × 1000</div>
-            <div style="margin-top:0.5rem;opacity:0.7;font-size:0.8rem">
-              1 Pt = impact annuel moyen d'un Européen. Exemples : café ≈ 0,01 mPt · steak 200g ≈ 0,77 mPt · vol Paris-NY ≈ 46 mPt
-            </div>
-          </div>
-          <div class="methodo-grid" style="margin:1.5rem 0">
-            <div class="methodo-card">
-              <div class="methodo-card-header" style="color:var(--climat)">🌡️ Changement climatique</div>
-              <div class="methodo-card-body"><strong>GWP</strong> — kg CO₂ eq. Représente <strong>21%</strong> du score PEF.</div>
-            </div>
-            <div class="methodo-card">
-              <div class="methodo-card-header" style="color:var(--eco)">🌿 Écosystèmes</div>
-              <div class="methodo-card-body"><strong>AP, EP×3, ETIC, LU</strong> — Acidification, eutrophisation, écotoxicité, sols. ≈ <strong>25%</strong>.</div>
-            </div>
-            <div class="methodo-card">
-              <div class="methodo-card-header" style="color:var(--sante)">🏥 Santé humaine</div>
-              <div class="methodo-card-body"><strong>PM, ODP, IR, POCF, HT×2</strong> — Particules fines, ozone, rayonnements. ≈ <strong>28%</strong>.</div>
-            </div>
-            <div class="methodo-card">
-              <div class="methodo-card-header" style="color:var(--ressources)">🪨 Ressources</div>
-              <div class="methodo-card-body"><strong>WU, RU_Fossil, RU_Metal</strong> — Eau, fossiles, minéraux. ≈ <strong>24%</strong>.</div>
-            </div>
-          </div>
-          <h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--navy)">Les 16 indicateurs EF3.1</h3>
-          <div style="overflow-x:auto">
-            <table class="compare-table" style="min-width:600px">
-              <thead>
-                <tr>
-                  <th style="text-align:left">Indicateur</th>
-                  <th style="text-align:left">Code</th>
-                  <th style="text-align:left">Unité</th>
-                  <th style="text-align:right">Poids EF3.1</th>
-                  <th style="text-align:left">Catégorie dommage</th>
-                </tr>
-              </thead>
-              <tbody id="methodo-indicators"></tbody>
-            </table>
-          </div>
-          <div style="margin-top:1.5rem;padding:1.2rem;background:var(--gray-50);border-radius:var(--radius);font-size:0.82rem;color:var(--text-muted);line-height:1.8">
-            <strong>Sources :</strong> Ecobalyse v8.5 (ADEME, 2025) · BASE-IMPACTS v3.0 · Méthode EF3.1 Commission Européenne 2021 ·
-            <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank" style="color:var(--navy-light)">Documentation officielle</a>
+    </div>
+  </div>
+
+  <!-- MÉTHODE -->
+  <div id="sec-methode" class="section">
+    <div class="contact-wrapper">
+      <div class="contact-hero">
+        <div class="contact-avatar">📐</div>
+        <h2>Méthode EF3.1</h2>
+        <p class="contact-subtitle">Documentation technique — Analyse d'empreinte environnementale</p>
+      </div>
+      <div class="methodo-inner">
+        <div class="formula-box" style="margin-top:1.2rem">
+          <div><strong>Formule Score PEF :</strong></div>
+          <div style="margin-top:0.5rem">Score PEF (mPt) = Σᵢ [ Impact_brut_i ÷ Facteur_normalisation_i × Poids_i ] × 1000</div>
+          <div style="margin-top:0.5rem;opacity:0.7;font-size:0.8rem">
+            1 Pt = impact annuel moyen d'un Européen. Exemples : café ≈ 0,01 mPt · steak 200g ≈ 0,77 mPt · vol Paris-NY ≈ 46 mPt
           </div>
         </div>
-      </details>
+        <div class="methodo-grid" style="margin:1.5rem 0">
+          <div class="methodo-card">
+            <div class="methodo-card-header" style="color:var(--climat)">🌡️ Changement climatique</div>
+            <div class="methodo-card-body"><strong>GWP</strong> — kg CO₂ eq. Représente <strong>21%</strong> du score PEF.</div>
+          </div>
+          <div class="methodo-card">
+            <div class="methodo-card-header" style="color:var(--eco)">🌿 Écosystèmes</div>
+            <div class="methodo-card-body"><strong>AP, EP×3, ETIC, LU</strong> — Acidification, eutrophisation, écotoxicité, sols. ≈ <strong>25%</strong>.</div>
+          </div>
+          <div class="methodo-card">
+            <div class="methodo-card-header" style="color:var(--sante)">🏥 Santé humaine</div>
+            <div class="methodo-card-body"><strong>PM, ODP, IR, POCF, HT×2</strong> — Particules fines, ozone, rayonnements. ≈ <strong>28%</strong>.</div>
+          </div>
+          <div class="methodo-card">
+            <div class="methodo-card-header" style="color:var(--ressources)">🪨 Ressources</div>
+            <div class="methodo-card-body"><strong>WU, RU_Fossil, RU_Metal</strong> — Eau, fossiles, minéraux. ≈ <strong>24%</strong>.</div>
+          </div>
+        </div>
+        <h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--navy)">Les 16 indicateurs EF3.1</h3>
+        <div style="overflow-x:auto">
+          <table class="compare-table" style="min-width:600px">
+            <thead>
+              <tr>
+                <th style="text-align:left">Indicateur</th>
+                <th style="text-align:left">Code</th>
+                <th style="text-align:left">Unité</th>
+                <th style="text-align:right">Poids EF3.1</th>
+                <th style="text-align:left">Catégorie dommage</th>
+              </tr>
+            </thead>
+            <tbody id="methodo-indicators"></tbody>
+          </table>
+        </div>
+        <div style="margin-top:1.5rem;padding:1.2rem;background:var(--gray-50);border-radius:var(--radius);font-size:0.82rem;color:var(--text-muted);line-height:1.8">
+          <strong>Sources :</strong> Ecobalyse v8.5 (ADEME, 2025) · BASE-IMPACTS v3.0 · Méthode EF3.1 Commission Européenne 2021 ·
+          <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank" style="color:var(--navy-light)">Documentation officielle</a>
+        </div>
+      </div>
     </div>
   </div>
 

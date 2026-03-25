@@ -234,6 +234,8 @@ function goToMain(main) {
     renderEntrepriseSection();
   } else if (main === 'contact') {
     showOnly('contact');
+  } else if (main === 'methode') {
+    showOnly('methode');
     renderMethodologie();
   }
 }
