@@ -496,8 +496,22 @@ nav {
   color: var(--text-muted);
 }
 .compare-table tr.highlight-row td { background: #EBF8FF; font-weight: 700; }
+.compare-table tr.compare-score-total-row td {
+  background: #EBF8FF;
+  font-weight: 800;
+  font-size: 0.9rem;
+  border-top: 2px solid var(--navy-light);
+  border-bottom: 2px solid var(--navy-light);
+  color: var(--navy);
+}
+.compare-table tr.compare-score-total-row td:first-child { color: var(--navy); }
 .best { color: var(--eco); font-weight: 700; }
 .worst { color: var(--climat); font-weight: 700; }
+
+.compare-table-toggle-btn {
+  font-size: 0.88rem;
+  padding: 0.5rem 1.2rem;
+}
 
 .compare-chart-wrap { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem; }
 .compare-chart-box {

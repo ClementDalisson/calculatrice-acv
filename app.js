@@ -471,11 +471,11 @@ function renderCompare() {
 
   // GWP header row
   rows += `<tr class="highlight-row">
-    <td>🌡️ GWP (kg CO₂ eq.) — <em>Climat 21%</em></td>
+    <td>🌡️ Changement climatique (kg CO₂ eq.) — <em>Climat 21%</em></td>
     ${buildValueCells(objects, 'GWP', true)}</tr>`;
 
   // PEF score
-  rows += `<tr class="highlight-row">
+  rows += `<tr class="compare-score-total-row">
     <td>📊 Score PEF total (mPt)</td>
     ${objects.map(o => {
       const v = o.pef_mpt;
@@ -511,7 +511,7 @@ function renderCompare() {
   const charts = `
     <div class="compare-chart-wrap">
       <div class="compare-chart-box" style="flex:1;min-width:320px">
-        <h4>Catégories de dommage (% du score PEF)</h4>
+        <h4>Catégories de dommage (Pt EF3.1)</h4>
         <div class="compare-radar-wrap"><canvas id="compare-radar-chart"></canvas></div>
       </div>
       <div class="compare-chart-box" style="flex:1;min-width:280px">
@@ -520,7 +520,13 @@ function renderCompare() {
       </div>
     </div>`;
 
-  document.getElementById('compare-content').innerHTML = table + charts;
+  const tableSection = `
+    <div style="margin-top:1.5rem">
+      <button class="btn btn-outline compare-table-toggle-btn" onclick="toggleCompareTable(this)">📊 Voir le tableau détaillé</button>
+    </div>
+    <div id="compare-table-section" style="display:none;margin-top:1rem">${table}</div>`;
+
+  document.getElementById('compare-content').innerHTML = charts + tableSection;
 
   // Render charts
   setTimeout(() => {
@@ -594,10 +600,11 @@ function renderCompareCharts(objects) {
         maintainAspectRatio: false,
         scales: {
           r: {
+            min: 0,
             beginAtZero: true,
             max: radarMax,
             ticks: { display: true, stepSize: radarMax / 4, font: { size: 9 }, color: '#A0AEC0',
-                     callback: v => v + ' mPt' },
+                     callback: v => v + ' Pt' },
             pointLabels: { font: { size: 11 } },
             grid: { color: '#E2E8F0' },
           }
@@ -606,7 +613,7 @@ function renderCompareCharts(objects) {
           legend: { position: 'bottom', labels: { font: { size: 10 }, boxWidth: 12 } },
           tooltip: {
             callbacks: {
-              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.r.toFixed(2)} mPt`
+              label: (ctx) => ` ${ctx.dataset.label}: ${ctx.parsed.r.toFixed(2)} Pt`
             }
           }
         }
@@ -646,6 +653,14 @@ function updateCompareChips(objects) {
       ${o.emoji} ${o.nom}
       <button onclick="toggleSelect({stopPropagation:()=>{}},${o.id});renderCompare()">×</button>
     </span>`).join('');
+}
+
+function toggleCompareTable(btn) {
+  const el = document.getElementById('compare-table-section');
+  if (!el) return;
+  const hidden = el.style.display === 'none';
+  el.style.display = hidden ? '' : 'none';
+  btn.textContent = hidden ? '▲ Masquer le tableau' : '📊 Voir le tableau détaillé';
 }
 
 function clearCompare() {
@@ -778,7 +793,6 @@ function renderEmpreinte() {
   const legend = document.getElementById('gauge-legend');
   const pct_eu = ((totalPef / PLANETARY.EU_MOYENNE) * 100).toFixed(0);
   const pct_2050 = ((totalPef / PLANETARY.CIBLE_2050) * 100).toFixed(0);
-  const annualTokens = computeProfileTokenTotals(profile);
   legend.innerHTML = `
     <div class="gauge-stat" style="color:${profile.color}">
       <div class="gauge-stat-val">${totalPef.toFixed(1)}</div>
@@ -793,15 +807,6 @@ function renderEmpreinte() {
     <div class="gauge-stat" style="color:#276749">
       <div class="gauge-stat-val">${pct_2050}%</div>
       <div class="gauge-stat-lbl">de la cible 2050</div>
-    </div>
-    <div style="width:100%;margin-top:1rem;padding-top:1rem;border-top:1px solid var(--gray-200)">
-      <div style="font-size:0.72rem;color:var(--text-muted);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:.04em">Jetons annuels estimés</div>
-      <div class="annual-tokens-row">
-        <span class="token-pill" title="CO₂ annuel"><span class="tp-emoji">🌡️</span><span class="tp-val">${fmtTokenVal(annualTokens.GWP, 'co2')}</span></span>
-        <span class="token-pill" title="Eau annuelle"><span class="tp-emoji">💧</span><span class="tp-val">${fmtTokenVal(annualTokens.WU, 'eau_L')}</span></span>
-        <span class="token-pill" title="Minerais annuels"><span class="tp-emoji">⛏️</span><span class="tp-val">${fmtTokenVal(annualTokens.RU_Metal, 'minerais')}</span></span>
-        <span class="token-pill" title="Ressources fossiles annuelles"><span class="tp-emoji">⚡</span><span class="tp-val">${fmtTokenVal(annualTokens.RU_Fossil, 'fossile')}</span></span>
-      </div>
     </div>`;
 
   // Breakdown radar chart — valeurs absolues (mPt) par catégorie de dommage
