@@ -369,8 +369,9 @@ nav {
   border-radius: var(--radius);
   padding: 1rem;
   margin-bottom: 1rem;
+  position: relative;
+  height: 300px;
 }
-.chart-wrap canvas { max-height: 280px; }
 
 /* Composition table */
 .comp-table {
@@ -508,7 +509,26 @@ nav {
   padding: 1rem;
 }
 .compare-chart-box h4 { font-size: 0.85rem; margin-bottom: 0.75rem; color: var(--text-muted); }
-.compare-chart-box canvas { max-height: 260px; }
+.compare-pef-chart-wrap { position: relative; height: 240px; }
+
+/* ── Indicateur dépliants ── */
+.indicator-explain { font-size: 0.75rem; margin-top: 0.25rem; }
+.indicator-explain summary {
+  cursor: pointer;
+  color: var(--navy-light);
+  list-style: none;
+  user-select: none;
+}
+.indicator-explain summary::-webkit-details-marker { display: none; }
+.indicator-explain p {
+  margin-top: 0.3rem;
+  padding: 0.4rem 0.6rem;
+  background: var(--gray-50);
+  border-radius: var(--radius-sm);
+  color: var(--text-muted);
+  line-height: 1.5;
+  font-style: italic;
+}
 
 /* ── Methodologie ── */
 .methodo-grid {
@@ -755,6 +775,8 @@ nav {
 
 /* ── Radar chart in comparison ── */
 .compare-radar-wrap {
+  position: relative;
+  height: 280px;
   max-width: 380px;
   margin: 0 auto;
 }
@@ -853,6 +875,8 @@ nav {
   margin-bottom: 1rem;
 }
 .breakdown-chart-wrap {
+  position: relative;
+  height: 320px;
   max-width: 500px;
   margin: 0 auto;
 }
@@ -1259,7 +1283,7 @@ nav {
   gap: 2rem; align-items: center; margin-bottom: 1.5rem;
   background: var(--gray-50); border-radius: 12px; padding: 1.5rem;
 }
-.result-donut-wrap { max-width: 260px; }
+.result-donut-wrap { position: relative; height: 260px; max-width: 260px; }
 .result-summary-panel { display: flex; flex-direction: column; gap: 1rem; }
 
 .result-impact-legend { display: flex; flex-direction: column; gap: 0.5rem; }
@@ -1476,7 +1500,7 @@ nav {
 
   /* Organisation résultats */
   .result-main-layout { grid-template-columns: 1fr; }
-  .result-donut-wrap { max-width: 200px; margin: 0 auto; }
+  .result-donut-wrap { height: 200px; max-width: 200px; margin: 0 auto; }
   .damage-grid { grid-template-columns: 1fr; }
 
   /* Organisation profil */
@@ -1663,3 +1687,15 @@ nav {
   color: var(--text-muted);
 }
 .article-modal-contenu em { font-style: italic; }
+.article-sources-block {
+  margin-top: 2rem;
+  padding: 1rem 1.2rem;
+  background: var(--gray-50);
+  border-left: 3px solid var(--gray-400);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.article-sources-block strong { display: block; margin-bottom: 0.4rem; color: var(--text); }
+.article-sources-block ul { padding-left: 1.2rem; }
+.article-sources-block li { margin-bottom: 0.25rem; }

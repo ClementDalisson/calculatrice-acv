@@ -434,7 +434,7 @@ function renderDetailChart(obj) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       plugins: {
         legend: { position: 'right', labels: { font: { size: 11 }, boxWidth: 14 } },
         tooltip: {
@@ -516,7 +516,7 @@ function renderCompare() {
       </div>
       <div class="compare-chart-box" style="flex:1;min-width:280px">
         <h4>Score PEF (mPt)</h4>
-        <canvas id="compare-pef-chart"></canvas>
+        <div class="compare-pef-chart-wrap"><canvas id="compare-pef-chart"></canvas></div>
       </div>
     </div>`;
 
@@ -591,7 +591,7 @@ function renderCompareCharts(objects) {
       data: { labels: radarLabels, datasets },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         scales: {
           r: {
             beginAtZero: true,
@@ -631,7 +631,7 @@ function renderCompareCharts(objects) {
         }]
       },
       options: {
-        responsive: true, maintainAspectRatio: true,
+        responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
         scales: { y: { title: { display: true, text: 'mPt' } } }
       }
@@ -836,7 +836,7 @@ function renderEmpreinte() {
       data: { labels: radarLabels, datasets },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         scales: {
           r: {
             beginAtZero: true,
@@ -891,12 +891,34 @@ function selectProfile(i) {
 }
 
 /* ── Methodologie ── */
+const METHODO_EXPLANATIONS = {
+  GWP:       "Les émissions de gaz à effet de serre qui réchauffent la planète. C'est ce que mesure le « bilan carbone ».",
+  ODP:       "Les substances qui détruisent le bouclier naturel contre les UV solaires.",
+  IR:        "L'exposition aux radiations, notamment liée au nucléaire.",
+  POCF:      "Les polluants qui forment le « smog » urbain et irritent les voies respiratoires.",
+  PM:        "Les microparticules dans l'air qui pénètrent les poumons et causent des maladies respiratoires et cardiovasculaires.",
+  HT_nc:     "L'exposition à des substances chimiques nocives autres que les cancérigènes.",
+  HT_cancer: "L'exposition à des substances qui augmentent le risque de cancer.",
+  AP:        "Les émissions (SO₂, NOₓ) qui rendent les pluies acides et appauvrissent les sols et les lacs.",
+  EP_Eau:    "L'excès de nutriments (azote, phosphore) dans les rivières et lacs qui provoque la prolifération d'algues et l'asphyxie des écosystèmes aquatiques.",
+  EP_Marine: "Même phénomène mais en mer : zones mortes, marées vertes.",
+  EP_Terre:  "L'excès d'azote dans les sols qui appauvrit la biodiversité végétale.",
+  ETIC:      "La toxicité des substances chimiques pour les poissons, insectes et plantes aquatiques.",
+  LU:        "L'occupation et la transformation des sols (artificialisation, déforestation) qui détruit les habitats naturels.",
+  WU:        "La quantité d'eau douce prélevée et sa rareté locale.",
+  RU_Fossil: "L'épuisement du pétrole, gaz et charbon.",
+  RU_Metal:  "L'épuisement des métaux rares et matériaux critiques.",
+};
+
 function renderMethodologie() {
   const container = document.getElementById('methodo-indicators');
   container.innerHTML = Object.entries(EF31).map(([k, m]) => {
     const dmg = DAMAGE_CATEGORIES[m.damage];
+    const expl = METHODO_EXPLANATIONS[k]
+      ? `<details class="indicator-explain"><summary>ℹ️ En langage simple</summary><p>${METHODO_EXPLANATIONS[k]}</p></details>`
+      : '';
     return `<tr>
-      <td><strong>${m.label}</strong></td>
+      <td><strong>${m.label}</strong>${expl}</td>
       <td style="font-family:monospace;font-size:0.78rem">${k}</td>
       <td style="font-size:0.78rem;color:var(--text-muted)">${m.unit}</td>
       <td style="text-align:right;font-weight:700">${m.weight}%</td>
@@ -1435,7 +1457,7 @@ function renderEntrepriseDonut(totals) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       cutout: '60%',
       plugins: {
         legend: { display: false },
@@ -1557,7 +1579,12 @@ function openArticle(id) {
   document.getElementById('article-modal-titre').textContent = a.titre;
   document.getElementById('article-modal-img').src = a.image;
   document.getElementById('article-modal-img').alt = a.imageAlt;
-  document.getElementById('article-modal-contenu').innerHTML = a.contenu;
+  let contenu = a.contenu;
+  if (a.sources && a.sources.length) {
+    const items = a.sources.map(s => `<li>${s}</li>`).join('');
+    contenu += `<div class="article-sources-block"><strong>Sources</strong><ul>${items}</ul></div>`;
+  }
+  document.getElementById('article-modal-contenu').innerHTML = contenu;
   document.getElementById('article-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
 }

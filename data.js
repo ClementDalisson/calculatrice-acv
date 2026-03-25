@@ -495,6 +495,13 @@ const ARTICLES = [
       <h3>Le Digital Product Passport</h3>
       <p>À partir de 2027, il faudra documenter l'empreinte environnementale complète d'un produit : carbone, eau, recyclabilité, composition. Le carbone sera présent — mais comme une ligne parmi d'autres dans un tableau de bord environnemental intégré.</p>
       <p>Le message réglementaire est cohérent : le bilan carbone seul ne suffit plus. Une entreprise peut réduire ses émissions de CO₂ tout en aggravant sa pression sur l'eau ou la biodiversité locale. C'est précisément pour ça que l'ACV organisationnelle multi-critères existe. Si vous souhaitez savoir où en est votre organisation, la calculatrice est accessible en ligne — et je suis disponible pour accompagner les organisations qui veulent aller plus loin.</p>
-    `
+    `,
+    sources: [
+      "Photo : Bâtiment Berlaymont (siège de la Commission Européenne, Bruxelles) — Wikimedia Commons, domaine public",
+      "CSRD / ESRS — Commission Européenne, 2024",
+      "Méthode OEF (Organisation Environmental Footprint) — Recommandation 2021/2279, Commission Européenne",
+      "RE2020 et CPR 2024/3110 — MTEECT / Commission Européenne",
+      "ESPR — Digital Product Passport — Commission Européenne, 2024",
+    ]
   }
 ];
