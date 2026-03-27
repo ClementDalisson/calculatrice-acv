@@ -899,6 +899,8 @@ function selectProfile(i) {
 }
 
 /* ── Methodologie ── */
+
+// Descriptions enrichies des indicateurs (intégrées dans le niveau 2)
 const INDICATOR_META = {
   GWP:       { simple: "Mesure les gaz à effet de serre qui réchauffent la planète (CO₂, méthane, N₂O…)", fait: "1 km en voiture thermique ≈ 120 g CO₂ eq. — un Français émet ~10 t CO₂ eq./an" },
   ODP:       { simple: "Mesure la destruction de la couche d'ozone stratosphérique qui nous protège des UV", fait: "1 kg de CFC-11 détruit l'équivalent de 1 000 kg d'ozone stratosphérique" },
@@ -918,24 +920,129 @@ const INDICATOR_META = {
   RU_Metal:  { simple: "Mesure l'épuisement des ressources minérales et métalliques (fer, cuivre, lithium, terres rares…)", fait: "Un smartphone contient 60+ métaux différents — dont certains extraits quasi exclusivement en zone de conflit" },
 };
 
+// ════════════════════════════════════════════════════════════════════
+// PAGE MÉTHODE — logique multi-niveaux
+// ════════════════════════════════════════════════════════════════════
+
 function renderMethodologie() {
-  const container = document.getElementById('methodo-indicators');
-  container.innerHTML = Object.entries(EF31).map(([k, m]) => {
-    const dmg = DAMAGE_CATEGORIES[m.damage];
-    const meta = INDICATOR_META[k] || {};
-    const simpleHtml = meta.simple
-      ? `<div style="font-size:0.85em;color:#666;margin-top:4px">${meta.simple}</div>`
-      : '';
-    const faitHtml = meta.fait
-      ? `<div style="font-size:0.82em;color:#2B6CB0;font-style:italic;margin-top:3px">${meta.fait}</div>`
-      : '';
-    return `<tr>
-      <td><strong>${m.label}</strong>${simpleHtml}${faitHtml}</td>
-      <td style="font-family:monospace;font-size:0.78rem">${k}</td>
-      <td style="font-size:0.78rem;color:var(--text-muted)">${m.unit}</td>
-      <td style="text-align:right;font-weight:700">${m.weight}%</td>
-      <td style="color:${dmg.color};font-size:0.78rem">${dmg.label}</td>
-    </tr>`;
+  initMethodePage();
+}
+
+let _methodeInited = false;
+
+function initMethodePage() {
+  // Tabs niveau
+  document.querySelectorAll('.mlevel-tab').forEach(btn => {
+    btn.onclick = () => setMethodeLevel(parseInt(btn.dataset.level));
+  });
+
+  // Accordéons niveau 3
+  document.querySelectorAll('.macc-header').forEach(hdr => {
+    hdr.onclick = () => {
+      const item = hdr.closest('.macc-item');
+      item.classList.toggle('open');
+    };
+  });
+
+  // Rendu dynamique niveau 2 (une seule fois)
+  if (!_methodeInited) {
+    _renderMethodeIndicatorsL2();
+    _renderMethodeWeightBars();
+    _methodeInited = true;
+  }
+
+  // Activer niveau 1 par défaut
+  setMethodeLevel(1);
+}
+
+function setMethodeLevel(n) {
+  // Tabs
+  document.querySelectorAll('.mlevel-tab').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.level) === n);
+  });
+  // Contenu
+  document.querySelectorAll('.methode-level-content').forEach(el => {
+    el.classList.toggle('hidden', el.id !== `mlevel-${n}`);
+  });
+}
+
+/* Grille des 16 indicateurs (niveau 2) — avec descriptions INDICATOR_META */
+function _renderMethodeIndicatorsL2() {
+  const container = document.getElementById('methode-indicators-l2');
+  if (!container) return;
+
+  const damageInfo = {
+    climat:      { label: '🌡️ Changement climatique', color: '#C53030', bg: '#FFF5F5' },
+    ecosystemes: { label: '🌿 Écosystèmes',            color: '#276749', bg: '#F0FFF4' },
+    sante:       { label: '🏥 Santé humaine',           color: '#744210', bg: '#FFFFF0' },
+    ressources:  { label: '🪨 Ressources',              color: '#44337A', bg: '#FAF5FF' },
+  };
+
+  const groups = {};
+  Object.entries(EF31).forEach(([k, m]) => {
+    if (!groups[m.damage]) groups[m.damage] = [];
+    groups[m.damage].push({ k, ...m });
+  });
+
+  const maxWeight = Math.max(...Object.values(EF31).map(m => m.weight));
+
+  let html = '';
+  Object.entries(DAMAGE_CATEGORIES).forEach(([dKey, dData]) => {
+    const grp = groups[dKey];
+    if (!grp) return;
+    const di = damageInfo[dKey];
+    html += `<div class="mind-group">
+      <div class="mind-group-header" style="background:${di.bg};color:${di.color}">${di.label}</div>`;
+    grp.forEach(m => {
+      const barW = (m.weight / maxWeight * 100).toFixed(1);
+      const meta = INDICATOR_META[m.k] || {};
+      const descHtml = meta.simple
+        ? `<div class="mind-desc">${meta.simple}</div>`
+        : '';
+      const faitHtml = meta.fait
+        ? `<div class="mind-fait">${meta.fait}</div>`
+        : '';
+      html += `<div class="mind-row">
+        <span class="mind-name">${m.label}${descHtml}${faitHtml}</span>
+        <span class="mind-code">${m.k}</span>
+        <span class="mind-unit">${m.unit}</span>
+        <span class="mind-weight" style="color:${di.color}">${m.weight}%</span>
+        <div class="mind-weight-bar">
+          <div class="mind-weight-bar-fill" style="width:${barW}%;background:${di.color}"></div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  container.innerHTML = html;
+}
+
+/* Barres de pondération agrégées (niveau 2) */
+function _renderMethodeWeightBars() {
+  const container = document.getElementById('methode-weight-bars-l2');
+  if (!container) return;
+
+  const damageColors = {
+    climat:      '#C53030',
+    ecosystemes: '#276749',
+    sante:       '#744210',
+    ressources:  '#44337A',
+  };
+
+  const sorted = Object.entries(EF31).sort((a, b) => b[1].weight - a[1].weight);
+  const maxW = sorted[0][1].weight;
+
+  container.innerHTML = sorted.map(([k, m]) => {
+    const barW = (m.weight / maxW * 100).toFixed(1);
+    const color = damageColors[m.damage] || '#718096';
+    return `<div class="mwb-row">
+      <span class="mwb-label">${m.label}</span>
+      <div class="mwb-track">
+        <div class="mwb-fill" style="width:${barW}%;background:${color}"></div>
+      </div>
+      <span class="mwb-val" style="color:${color}">${m.weight}%</span>
+    </div>`;
   }).join('');
 }
 

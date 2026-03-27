@@ -294,60 +294,513 @@
 
   <!-- MÉTHODE -->
   <div id="sec-methode" class="section">
-    <div class="contact-wrapper">
-      <div class="contact-hero">
-        <div class="contact-avatar">📐</div>
-        <h2>Méthode EF3.1</h2>
-        <p class="contact-subtitle">Documentation technique — Analyse d'empreinte environnementale</p>
-      </div>
-      <div class="methodo-inner">
-        <div class="formula-box" style="margin-top:1.2rem">
-          <div><strong>Formule Score PEF :</strong></div>
-          <div style="margin-top:0.5rem">Score PEF (mPt) = Σᵢ [ Impact_brut_i ÷ Facteur_normalisation_i × Poids_i ] × 1000</div>
-          <div style="margin-top:0.5rem;opacity:0.7;font-size:0.8rem">
-            1 Pt = impact annuel moyen d'un Européen. Exemples : café ≈ 0,01 mPt · steak 200g ≈ 0,77 mPt · vol Paris-NY ≈ 46 mPt
-          </div>
-        </div>
-        <div class="methodo-grid" style="margin:1.5rem 0">
-          <div class="methodo-card">
-            <div class="methodo-card-header" style="color:var(--climat)">🌡️ Changement climatique</div>
-            <div class="methodo-card-body"><strong>GWP</strong> — kg CO₂ eq. Représente <strong>21%</strong> du score PEF.</div>
-          </div>
-          <div class="methodo-card">
-            <div class="methodo-card-header" style="color:var(--eco)">🌿 Écosystèmes</div>
-            <div class="methodo-card-body"><strong>AP, EP×3, ETIC, LU</strong> — Acidification, eutrophisation, écotoxicité, sols. ≈ <strong>25%</strong>.</div>
-          </div>
-          <div class="methodo-card">
-            <div class="methodo-card-header" style="color:var(--sante)">🏥 Santé humaine</div>
-            <div class="methodo-card-body"><strong>PM, ODP, IR, POCF, HT×2</strong> — Particules fines, ozone, rayonnements. ≈ <strong>28%</strong>.</div>
-          </div>
-          <div class="methodo-card">
-            <div class="methodo-card-header" style="color:var(--ressources)">🪨 Ressources</div>
-            <div class="methodo-card-body"><strong>WU, RU_Fossil, RU_Metal</strong> — Eau, fossiles, minéraux. ≈ <strong>24%</strong>.</div>
-          </div>
-        </div>
-        <h3 style="margin-bottom:0.75rem;font-size:1rem;color:var(--navy)">Les 16 indicateurs EF3.1</h3>
-        <div style="overflow-x:auto">
-          <table class="compare-table" style="min-width:600px">
-            <thead>
-              <tr>
-                <th style="text-align:left">Indicateur</th>
-                <th style="text-align:left">Code</th>
-                <th style="text-align:left">Unité</th>
-                <th style="text-align:right">Poids EF3.1</th>
-                <th style="text-align:left">Catégorie dommage</th>
-              </tr>
-            </thead>
-            <tbody id="methodo-indicators"></tbody>
-          </table>
-        </div>
-        <div style="margin-top:1.5rem;padding:1.2rem;background:var(--gray-50);border-radius:var(--radius);font-size:0.82rem;color:var(--text-muted);line-height:1.8">
-          <strong>Sources :</strong> Ecobalyse v8.5 (ADEME, 2025) · BASE-IMPACTS v3.0 · Méthode EF3.1 Commission Européenne 2021 ·
-          <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank" style="color:var(--navy-light)">Documentation officielle</a>
-        </div>
+
+    <!-- Hero Méthode -->
+    <div class="methode-hero">
+      <div class="methode-hero-inner">
+        <div class="methode-hero-badge">Méthode EF3.1 — Commission Européenne</div>
+        <h2>Analyse d'impact environnemental multi-critères</h2>
+        <p>Au-delà du CO₂ — 16 indicateurs, de la mesure physique au score agrégé</p>
       </div>
     </div>
-  </div>
+
+    <!-- Sélecteur de niveau -->
+    <div class="methode-level-bar">
+      <div class="methode-level-label">Choisissez votre niveau de lecture :</div>
+      <div class="methode-level-tabs">
+        <button class="mlevel-tab active" data-level="1">
+          <span class="mlevel-icon">🌱</span>
+          <span class="mlevel-title">L'essentiel</span>
+          <span class="mlevel-sub">Je connais le CO₂</span>
+        </button>
+        <button class="mlevel-tab" data-level="2">
+          <span class="mlevel-icon">📐</span>
+          <span class="mlevel-title">Comprendre l'ACV</span>
+          <span class="mlevel-sub">La formule et les indicateurs</span>
+        </button>
+        <button class="mlevel-tab" data-level="3">
+          <span class="mlevel-icon">🔬</span>
+          <span class="mlevel-title">La pondération</span>
+          <span class="mlevel-sub">Pourquoi 21% pour le CO₂ ?</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- ───────────────── NIVEAU 1 ───────────────── -->
+    <div class="methode-level-content" id="mlevel-1">
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Pourquoi ne pas se limiter au CO₂ ?</h3>
+        <div class="methode-insight-box">
+          <div class="mib-icon">💡</div>
+          <div class="mib-text">
+            <strong>Un exemple concret :</strong> un jean en coton conventionnel émet ~30 % de CO₂ de plus qu'un jean synthétique.
+            Mais le coton synthétique consomme davantage de ressources minérales et génère bien plus de microplastiques (écotoxicité).
+            Se concentrer sur le seul CO₂ conduirait au mauvais choix pour l'environnement global.
+          </div>
+        </div>
+        <div class="methode-co2-limits">
+          <div class="co2-limit-card">
+            <div class="clc-num">16</div>
+            <div class="clc-label">indicateurs mesurés</div>
+            <div class="clc-sub">Contre 1 seul avec le bilan carbone classique</div>
+          </div>
+          <div class="co2-limit-card">
+            <div class="clc-num">~50%</div>
+            <div class="clc-label">des impacts invisibles au CO₂</div>
+            <div class="clc-sub">Toxicité, eau, sols, biodiversité… non capturés par le GES seul</div>
+          </div>
+          <div class="co2-limit-card">
+            <div class="clc-num">1 score</div>
+            <div class="clc-label">pour tout agréger</div>
+            <div class="clc-sub">Le score EF synthétise les 16 indicateurs en un seul chiffre comparable</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Les 4 grandes familles d'impact</h3>
+        <div class="methode-damage-cards">
+          <div class="mdc-card mdc-climat">
+            <div class="mdc-emoji">🌡️</div>
+            <div class="mdc-name">Changement climatique</div>
+            <div class="mdc-pct">21 %</div>
+            <div class="mdc-desc">Le réchauffement de la planète par les gaz à effet de serre. C'est l'impact que vous connaissez déjà — mesuré en kg CO₂ équivalent.</div>
+            <div class="mdc-ex"><strong>Exemple :</strong> un steak 200 g émet 8,4 kg CO₂eq</div>
+          </div>
+          <div class="mdc-card mdc-eco">
+            <div class="mdc-emoji">🌿</div>
+            <div class="mdc-name">Écosystèmes</div>
+            <div class="mdc-pct">25 %</div>
+            <div class="mdc-desc">L'impact sur la nature : acidification des sols, eutrophisation des lacs, perte de biodiversité, dégradation des terres agricoles.</div>
+            <div class="mdc-ex"><strong>Exemple :</strong> les pesticides du coton dégradent les sols et les cours d'eau</div>
+          </div>
+          <div class="mdc-card mdc-sante">
+            <div class="mdc-emoji">🏥</div>
+            <div class="mdc-name">Santé humaine</div>
+            <div class="mdc-pct">28 %</div>
+            <div class="mdc-desc">Les impacts directs sur notre santé : particules fines (PM2,5), substances cancérogènes, appauvrissement de la couche d'ozone, rayonnements ionisants.</div>
+            <div class="mdc-ex"><strong>Exemple :</strong> la combustion du diesel libère des particules PM2,5</div>
+          </div>
+          <div class="mdc-card mdc-ressources">
+            <div class="mdc-emoji">🪨</div>
+            <div class="mdc-name">Ressources</div>
+            <div class="mdc-pct">24 %</div>
+            <div class="mdc-desc">L'épuisement des ressources non renouvelables : eau douce, pétrole et gaz, métaux rares (lithium, cobalt, terres rares…).</div>
+            <div class="mdc-ex"><strong>Exemple :</strong> une batterie lithium-ion mobilise du cobalt et du nickel</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Le score EF : un seul chiffre pour tout comparer</h3>
+        <div class="methode-score-explain">
+          <div class="mse-def">
+            <div class="mse-unit">1 Pt</div>
+            <div class="mse-eq">= l'impact environnemental total d'un Européen moyen sur 1 an (tous indicateurs confondus)</div>
+          </div>
+          <div class="mse-scale">
+            <div class="mse-scale-title">Exemples de scores (en millièmes de point = mPt)</div>
+            <div class="mse-bar-list">
+              <div class="mse-bar-item">
+                <span class="mse-bar-label">☕ Café expresso</span>
+                <div class="mse-bar-track"><div class="mse-bar-fill" style="width:0.2%;background:#68D391"></div></div>
+                <span class="mse-bar-val">0,01 mPt</span>
+              </div>
+              <div class="mse-bar-item">
+                <span class="mse-bar-label">🍞 Pain 250 g</span>
+                <div class="mse-bar-track"><div class="mse-bar-fill" style="width:1%;background:#68D391"></div></div>
+                <span class="mse-bar-val">0,05 mPt</span>
+              </div>
+              <div class="mse-bar-item">
+                <span class="mse-bar-label">🥩 Steak 200 g</span>
+                <div class="mse-bar-track"><div class="mse-bar-fill" style="width:8%;background:#F6AD55"></div></div>
+                <span class="mse-bar-val">0,77 mPt</span>
+              </div>
+              <div class="mse-bar-item">
+                <span class="mse-bar-label">👗 Jean en coton</span>
+                <div class="mse-bar-track"><div class="mse-bar-fill" style="width:25%;background:#F6AD55"></div></div>
+                <span class="mse-bar-val">2,5 mPt</span>
+              </div>
+              <div class="mse-bar-item">
+                <span class="mse-bar-label">✈️ Vol Paris–NY (A/R)</span>
+                <div class="mse-bar-track"><div class="mse-bar-fill" style="width:100%;background:#FC8181"></div></div>
+                <span class="mse-bar-val">46 mPt</span>
+              </div>
+              <div class="mse-bar-item mse-bar-ref">
+                <span class="mse-bar-label">🧑‍🤝‍🧑 Européen moyen / an</span>
+                <div class="mse-bar-track"><div class="mse-bar-fill" style="width:100%;background:#90CDF4;opacity:0.5"></div></div>
+                <span class="mse-bar-val">1 000 mPt</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="methode-note">Note : les scores de cet outil couvrent ~50 % des impacts (catalogue partiel). Les scores complets seraient environ 2× plus élevés.</p>
+      </div>
+
+    </div><!-- /niveau 1 -->
+
+    <!-- ───────────────── NIVEAU 2 ───────────────── -->
+    <div class="methode-level-content hidden" id="mlevel-2">
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">La formule EF3.1 déconstruite</h3>
+        <div class="methode-formula-visual">
+          <div class="mfv-formula">
+            Score PEF (mPt) = <span class="mfv-sigma">Σ</span>
+            <span class="mfv-bracket">[</span>
+            <span class="mfv-term mfv-brut">Impact brut<sub>i</sub></span>
+            <span class="mfv-op">÷</span>
+            <span class="mfv-term mfv-norm">NF<sub>i</sub></span>
+            <span class="mfv-op">×</span>
+            <span class="mfv-term mfv-poids">w<sub>i</sub></span>
+            <span class="mfv-bracket">]</span>
+            <span class="mfv-op">× 1 000</span>
+          </div>
+          <div class="mfv-legend">
+            <div class="mfv-leg-item">
+              <span class="mfv-leg-dot mfv-brut"></span>
+              <div><strong>Impact brut<sub>i</sub></strong> — la mesure physique de l'inventaire (ex. 8,4 kg CO₂eq pour un steak)</div>
+            </div>
+            <div class="mfv-leg-item">
+              <span class="mfv-leg-dot mfv-norm"></span>
+              <div><strong>NF<sub>i</sub></strong> — facteur de normalisation : impact moyen d'un Européen sur 1 an pour cet indicateur (ex. 8 100 kg CO₂eq/hab/an pour le CC)</div>
+            </div>
+            <div class="mfv-leg-item">
+              <span class="mfv-leg-dot mfv-poids"></span>
+              <div><strong>w<sub>i</sub></strong> — poids de pondération de la catégorie (ex. 21,06 % pour le changement climatique)</div>
+            </div>
+            <div class="mfv-leg-item">
+              <span class="mfv-leg-dot" style="background:#718096"></span>
+              <div><strong>× 1 000</strong> — conversion en millipoints (mPt) pour des chiffres lisibles</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="methode-calc-example">
+          <div class="mce-title">Exemple : changement climatique d'un steak 200 g</div>
+          <div class="mce-steps">
+            <div class="mce-step">
+              <span class="mce-step-n">1</span>
+              <span class="mce-step-text">Impact brut (inventaire) : <strong>8,4 kg CO₂eq</strong></span>
+            </div>
+            <div class="mce-step">
+              <span class="mce-step-n">2</span>
+              <span class="mce-step-text">÷ NF<sub>CC</sub> = 8 100 kg CO₂eq/hab/an → score normalisé : <strong>0,001037 hab·an</strong></span>
+            </div>
+            <div class="mce-step">
+              <span class="mce-step-n">3</span>
+              <span class="mce-step-text">× w<sub>CC</sub> = 21,06 % → score pondéré : <strong>0,0002184 Pt</strong></span>
+            </div>
+            <div class="mce-step">
+              <span class="mce-step-n">4</span>
+              <span class="mce-step-text">× 1 000 → contribution CC : <strong>0,218 mPt</strong> (sur 0,77 mPt total)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Les 16 indicateurs EF3.1</h3>
+        <div class="methode-indicators-grid" id="methode-indicators-l2"></div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Normalisation — la référence "personne·an EU"</h3>
+        <div class="methode-insight-box">
+          <div class="mib-icon">📏</div>
+          <div class="mib-text">
+            La normalisation rend les indicateurs comparables entre eux en les ramenant à la même unité.
+            Le facteur de normalisation (NF) représente l'impact d'un Européen moyen sur une année entière,
+            calculé par le JRC sur la base des inventaires nationaux EU / 446 millions d'habitants.
+            Le résultat est adimensionnel — littéralement "combien de fois l'impact annuel d'une personne".
+          </div>
+        </div>
+        <div class="methode-nf-examples">
+          <div class="mnfe-item">
+            <div class="mnfe-ind">🌡️ CC</div>
+            <div class="mnfe-nf">8 100 kg CO₂eq / hab·an</div>
+          </div>
+          <div class="mnfe-item">
+            <div class="mnfe-ind">💧 Eau</div>
+            <div class="mnfe-nf">11 500 m³ dépriv. / hab·an</div>
+          </div>
+          <div class="mnfe-item">
+            <div class="mnfe-ind">⛏️ Minerais</div>
+            <div class="mnfe-nf">0,636 kg Sb eq. / hab·an</div>
+          </div>
+          <div class="mnfe-item">
+            <div class="mnfe-ind">🫁 PM2,5</div>
+            <div class="mnfe-nf">5,95×10⁻⁴ incidences / hab·an</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Pondération — vue d'ensemble</h3>
+        <div class="methode-weight-bars" id="methode-weight-bars-l2"></div>
+        <p style="margin-top:0.75rem;font-size:0.8rem;color:var(--text-muted)">
+          Poids issus d'un exercice DELPHI mené par le JRC pour la Commission Européenne (2017, révisé 2021).
+          <button class="methode-level-jump" onclick="setMethodeLevel(3)">En savoir plus → Niveau expert</button>
+        </p>
+      </div>
+
+      <div class="methode-sources-box">
+        <strong>Sources :</strong> Ecobalyse v8.5 (ADEME, 2025) · BASE-IMPACTS v3.0 · Technical Report EF 3.1 — JRC 2021 ·
+        <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank">Documentation officielle JRC</a>
+      </div>
+
+    </div><!-- /niveau 2 -->
+
+    <!-- ───────────────── NIVEAU 3 ───────────────── -->
+    <div class="methode-level-content hidden" id="mlevel-3">
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Étape 1 — La normalisation : construction des NF</h3>
+        <p class="methode-p">
+          Les facteurs de normalisation (NF) sont calculés par le JRC (Joint Research Centre, Ispra) en agrégeant les inventaires nationaux européens sur l'ensemble des activités — production, consommation, imports/exports. La population de référence est ~446 M habitants. Le NF CC (~8 100 kg CO₂eq/hab/an) couvre les émissions européennes scope complet, y compris les imports.
+        </p>
+        <div class="methode-formula-box">
+          <code>Score normalisé<sub>i</sub> = Impact brut<sub>i</sub> [unité physique] ÷ NF<sub>i</sub> [même unité / hab·an]</code>
+          <div class="mfb-note">Le résultat est adimensionnel — exprime la fraction de l'impact annuel moyen d'un Européen. Exemple CC steak : 8,4 / 8 100 = 0,00104 hab·an.</div>
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Étape 2 — La pondération : le processus DELPHI</h3>
+        <div class="methode-delphi-flow">
+          <div class="mdf-step">
+            <div class="mdf-num">1</div>
+            <div class="mdf-label">Tour 1</div>
+            <div class="mdf-desc">~50 experts LCA européens notent indépendamment chaque catégorie sur 3 critères (évite l'effet de groupe)</div>
+          </div>
+          <div class="mdf-arrow">→</div>
+          <div class="mdf-step">
+            <div class="mdf-num">2</div>
+            <div class="mdf-label">Feedback anonymisé</div>
+            <div class="mdf-desc">Chaque expert reçoit la distribution anonyme des réponses des autres et peut réviser sa note</div>
+          </div>
+          <div class="mdf-arrow">→</div>
+          <div class="mdf-step">
+            <div class="mdf-num">3</div>
+            <div class="mdf-label">Convergence</div>
+            <div class="mdf-desc">Plusieurs tours jusqu'à convergence → score composite par catégorie, normalisé pour que la somme = 100 %</div>
+          </div>
+        </div>
+        <div class="methode-delphi-criteria">
+          <div class="mdc-crit">
+            <div class="mdc-crit-name">Robustesse scientifique</div>
+            <div class="mdc-crit-def">Maturité et qualité du modèle de caractérisation (méthode de calcul des FE)</div>
+          </div>
+          <div class="mdc-crit">
+            <div class="mdc-crit-name">Complétude des données</div>
+            <div class="mdc-crit-def">Couverture des substances et flux dans les bases d'inventaire disponibles (ecoinvent, ELCD…)</div>
+          </div>
+          <div class="mdc-crit">
+            <div class="mdc-crit-name">Pertinence environnementale</div>
+            <div class="mdc-crit-def">Lien avec des dommages réels ou des limites planétaires connues</div>
+          </div>
+        </div>
+        <p class="methode-note">⚠️ La pondération relative de ces 3 critères entre eux n'est pas explicitement publiée dans les documents officiels. Plusieurs chercheurs (Sala et al., Huijbregts et al.) ont tenté de la reverse-engineer sans y parvenir exactement — opacité réelle, pas perçue.</p>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Pourquoi 21,06 % pour le changement climatique ?</h3>
+        <p class="methode-p">Le CC est la seule catégorie qui score au plus haut niveau sur les 3 critères simultanément :</p>
+        <div style="overflow-x:auto;margin:1rem 0">
+          <table class="methode-delphi-table">
+            <thead>
+              <tr>
+                <th>Catégorie</th>
+                <th>Robustesse</th>
+                <th>Complétude</th>
+                <th>Pertinence</th>
+                <th>Poids EF3.1</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="mdt-highlight">
+                <td>🌡️ Changement climatique</td>
+                <td><span class="mdt-score high">Très élevée</span></td>
+                <td><span class="mdt-score high">Très élevée</span></td>
+                <td><span class="mdt-score high">Très élevée</span></td>
+                <td><strong>21,06 %</strong></td>
+              </tr>
+              <tr>
+                <td>🫁 Particules fines (PM)</td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score high">Très élevée</span></td>
+                <td>8,96 %</td>
+              </tr>
+              <tr>
+                <td>💧 Consommation eau</td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score high">Élevée</span></td>
+                <td>8,51 %</td>
+              </tr>
+              <tr>
+                <td>🌱 Utilisation des sols</td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td>7,94 %</td>
+              </tr>
+              <tr>
+                <td>⛏️ Ressources minérales</td>
+                <td><span class="mdt-score med">Correcte</span></td>
+                <td><span class="mdt-score low">Partielle</span></td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td>7,55 %</td>
+              </tr>
+              <tr>
+                <td>🧪 Acidification</td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score med">Élevée</span></td>
+                <td><span class="mdt-score low">Modérée</span></td>
+                <td>6,20 %</td>
+              </tr>
+              <tr>
+                <td>☣️ Toxicité humaine (cancer)</td>
+                <td><span class="mdt-score low">Faible</span></td>
+                <td><span class="mdt-score low">Faible</span></td>
+                <td><span class="mdt-score high">Élevée</span></td>
+                <td>2,13 %</td>
+              </tr>
+              <tr>
+                <td>🐟 Écotoxicité eau douce</td>
+                <td><span class="mdt-score low">Faible</span></td>
+                <td><span class="mdt-score low">Partielle</span></td>
+                <td><span class="mdt-score med">Modérée</span></td>
+                <td>1,92 %</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="methode-insight-box" style="border-left-color:#C53030">
+          <div class="mib-icon">⚖️</div>
+          <div class="mib-text">
+            <strong>Le poids de 21,06 % n'est pas une vérité physique.</strong> C'est le résultat d'un jugement de valeur collectif habillé en processus expert. La Commission Européenne l'assume explicitement dans le Technical Report EF 3.1 (2021) : <em>"weighting remains a value choice"</em>.
+          </div>
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Les 5 critiques principales</h3>
+        <div class="methode-accordions" id="methode-accordions">
+
+          <div class="macc-item">
+            <button class="macc-header">
+              <span class="macc-icon">🔄</span>
+              <span class="macc-title">Circularité du processus</span>
+              <span class="macc-chevron">▸</span>
+            </button>
+            <div class="macc-body">
+              Les experts notent la "pertinence environnementale", mais leurs jugements sont influencés par leur familiarité avec les catégories. Le CC est la catégorie la plus médiatisée → biais de disponibilité cognitive probable. Aucune correction systématique n'est appliquée dans la procédure officielle.
+            </div>
+          </div>
+
+          <div class="macc-item">
+            <button class="macc-header">
+              <span class="macc-icon">📉</span>
+              <span class="macc-title">Sous-représentation des catégories émergentes</span>
+              <span class="macc-chevron">▸</span>
+            </button>
+            <div class="macc-body">
+              La toxicité (CTUh), l'utilisation des terres et la consommation d'eau ont des modèles moins matures → pénalisées sur le critère "robustesse" → poids faibles dans le score agrégé. Paradoxe : on sous-pondère ce qu'on comprend mal, alors que c'est précisément là que le risque inconnu est le plus grand.
+            </div>
+          </div>
+
+          <div class="macc-item">
+            <button class="macc-header">
+              <span class="macc-icon">🎭</span>
+              <span class="macc-title">Absence de fondement normatif explicite</span>
+              <span class="macc-chevron">▸</span>
+            </button>
+            <div class="macc-body">
+              Les poids DELPHI ne sont pas ancrés dans une théorie éthique cohérente (utilitarisme, approche par les droits, limites planétaires…). C'est un consensus de praticiens, pas un système de valeurs formalisé. La Commission l'admet mais présente quand même le résultat comme "la" méthode de référence PEF.
+            </div>
+          </div>
+
+          <div class="macc-item">
+            <button class="macc-header">
+              <span class="macc-icon">📊</span>
+              <span class="macc-title">Instabilité entre versions</span>
+              <span class="macc-chevron">▸</span>
+            </button>
+            <div class="macc-body">
+              Entre EF 2.0 et EF 3.1, plusieurs poids ont significativement changé (ex. ressources eau : +3 points). Conséquence : des décisions produit ou politique basées sur EF 2.0 seraient différentes avec EF 3.1 — problème majeur pour la comparabilité temporelle et la crédibilité des affichages environnementaux.
+            </div>
+          </div>
+
+          <div class="macc-item">
+            <button class="macc-header">
+              <span class="macc-icon">🏛️</span>
+              <span class="macc-title">Biais pro-CC et contexte politique</span>
+              <span class="macc-chevron">▸</span>
+            </button>
+            <div class="macc-body">
+              21,06 % pour le CC correspond aussi à l'agenda politique EU (Green Deal, taxonomie). Sala, Notarnicola et d'autres auteurs suggèrent que le processus DELPHI, bien que présenté comme scientifique, a convergé vers un résultat politiquement acceptable. Impossible à prouver formellement, mais difficile à réfuter étant donné l'opacité de l'agrégation des 3 critères.
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Méthodologies alternatives à la pondération EF</h3>
+        <div class="methode-alt-grid">
+          <div class="malt-card">
+            <div class="malt-header">📌 Approche endpoint (ReCiPe, IMPACT World+)</div>
+            <div class="malt-body">
+              Modélisation des midpoints jusqu'aux dommages finaux sur 3 aires de protection : santé humaine (DALY), écosystèmes (species·year), ressources (surplus energy). La pondération devient une comparaison DALY vs species·year — jugement de valeur plus explicite.
+            </div>
+            <div class="malt-limit">⚠️ Incertitude des modèles endpoint très élevée (facteur 10²–10³, surtout toxicité)</div>
+          </div>
+          <div class="malt-card">
+            <div class="malt-header">🌍 Limites planétaires (Ryberg, Bjørn & Hauschild)</div>
+            <div class="malt-body">
+              Poids = distance à la limite planétaire correspondante. Si on est à 50 % du budget CC restant mais à 200 % de la limite biodiversité → biodiversité pondérée 4×. Fondement normatif objectif (limites physiques du système Terre).
+            </div>
+            <div class="malt-limit">⚠️ Toutes les catégories ACV n'ont pas de limite planétaire définie (toxicité, acidification régionale…)</div>
+          </div>
+          <div class="malt-card">
+            <div class="malt-header">💶 Monétarisation (LIME, ExternE, LC-Impact)</div>
+            <div class="malt-body">
+              Conversion de tous les impacts en valeur monétaire via coût d'évitement, consentement à payer ou coût des dommages. Parle directement aux décideurs économiques. Le coût social du carbone varie de 15 à 1 000 €/t CO₂ selon les études.
+            </div>
+            <div class="malt-limit">⚠️ Résultats très sensibles aux hypothèses de monétarisation. Comment monétariser l'extinction d'une espèce ?</div>
+          </div>
+          <div class="malt-card">
+            <div class="malt-header">⚖️ Equal weighting (1/n)</div>
+            <div class="malt-body">
+              Tout pondérer à parts égales (6,25 % chacune pour 16 catégories EF). Aucune justification scientifique mais maximise la transparence : on ne prétend pas à une objectivité inexistante. Utilisé comme analyse de sensibilité.
+            </div>
+            <div class="malt-limit">⚠️ Ne reflète aucune hiérarchie des enjeux environnementaux réels</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="methode-section">
+        <h3 class="methode-section-title">Références bibliographiques</h3>
+        <div class="methode-refs">
+          <div class="mref-item">Pizzol M. et al. (2017) — <em>Weighting in LCA</em> — International Journal of Life Cycle Assessment</div>
+          <div class="mref-item">Sala S. et al. (2017) — Construction des poids EF — JRC Technical Report</div>
+          <div class="mref-item">Huijbregts M.A.J. et al. (2017) — <em>ReCiPe 2016: a harmonised life cycle impact assessment method</em></div>
+          <div class="mref-item">Ryberg M. et al. (2018) — <em>Absolute Environmental Sustainability Assessment</em> — Ecological Indicators</div>
+          <div class="mref-item">Commission Européenne (2021) — <em>Technical Report EF 3.1</em> — JRC, Ispra</div>
+        </div>
+      </div>
+
+      <div class="methode-sources-box">
+        <strong>Sources données :</strong> Ecobalyse v8.5 (ADEME, 2025) · BASE-IMPACTS v3.0 · Technical Report EF 3.1 — JRC 2021 ·
+        <a href="https://eplca.jrc.ec.europa.eu/LCDN/developerEF.xhtml" target="_blank">Documentation officielle JRC</a>
+      </div>
+
+    </div><!-- /niveau 3 -->
+
+  </div><!-- /sec-methode -->
 
 </div><!-- /main -->
 

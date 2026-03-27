@@ -1713,3 +1713,534 @@ nav {
 .article-sources-block strong { display: block; margin-bottom: 0.4rem; color: var(--text); }
 .article-sources-block ul { padding-left: 1.2rem; }
 .article-sources-block li { margin-bottom: 0.25rem; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   PAGE MÉTHODE — REFONTE MULTI-NIVEAUX
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── Hero ── */
+.methode-hero {
+  background: linear-gradient(135deg, #1A2E3C 0%, #1a3a1a 60%, #2D5016 100%);
+  color: white;
+  padding: 3rem 2rem 2.5rem;
+  margin: -2rem -2rem 0;
+  text-align: center;
+}
+.methode-hero-inner { max-width: 680px; margin: 0 auto; }
+.methode-hero-badge {
+  display: inline-block;
+  background: rgba(104,211,145,0.2);
+  border: 1px solid rgba(104,211,145,0.4);
+  color: #68D391;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.9rem;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+}
+.methode-hero h2 { font-size: 2rem; font-weight: 800; margin-bottom: 0.5rem; letter-spacing: -0.02em; }
+.methode-hero p  { color: rgba(255,255,255,0.7); font-size: 0.95rem; }
+
+/* ── Sélecteur de niveau ── */
+.methode-level-bar {
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+  padding: 1.2rem 2rem;
+  position: sticky;
+  top: 60px;
+  z-index: 80;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.methode-level-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 0.7rem;
+}
+.methode-level-tabs {
+  display: flex;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+.mlevel-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.2rem;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 10px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+.mlevel-tab:hover { border-color: var(--navy-light); background: var(--gray-50); }
+.mlevel-tab.active {
+  border-color: var(--navy);
+  background: var(--navy);
+  color: white;
+}
+.mlevel-icon { font-size: 1.3rem; flex-shrink: 0; }
+.mlevel-title { font-size: 0.88rem; font-weight: 700; display: block; line-height: 1.2; }
+.mlevel-sub   { font-size: 0.72rem; opacity: 0.7; display: block; }
+.mlevel-tab.active .mlevel-sub { opacity: 0.8; }
+
+/* ── Contenu niveau ── */
+.methode-level-content { max-width: 900px; margin: 0 auto; padding: 2rem 0.5rem 4rem; }
+.methode-level-content.hidden { display: none; }
+
+/* ── Sections génériques ── */
+.methode-section { margin-bottom: 2.5rem; }
+.methode-section-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--navy);
+  margin-bottom: 1.2rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--gray-200);
+}
+.methode-p { font-size: 0.9rem; color: var(--text-muted); line-height: 1.8; margin-bottom: 1rem; }
+.methode-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-top: 0.8rem;
+  background: var(--gray-50);
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  border-left: 3px solid var(--gray-300);
+}
+.methode-sources-box {
+  background: #EBF8FF;
+  border-left: 3px solid #4299E1;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 0.9rem 1.2rem;
+  font-size: 0.8rem;
+  color: var(--navy-light);
+  line-height: 1.8;
+  margin-top: 2rem;
+}
+.methode-sources-box a { color: var(--navy); font-weight: 600; }
+
+/* ── Insight box ── */
+.methode-insight-box {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+  background: #EBF8FF;
+  border-left: 4px solid #4299E1;
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+  padding: 1rem 1.2rem;
+  margin: 1rem 0;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+.mib-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+
+/* ── Niveau 1 : stats CO2 ── */
+.methode-co2-limits {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin-top: 1.2rem;
+}
+.co2-limit-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  text-align: center;
+  box-shadow: var(--shadow);
+}
+.clc-num { font-size: 1.8rem; font-weight: 800; color: var(--navy); line-height: 1.1; }
+.clc-label { font-size: 0.85rem; font-weight: 700; color: var(--text); margin: 0.3rem 0 0.4rem; }
+.clc-sub { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+/* ── Niveau 1 : 4 damage cards ── */
+.methode-damage-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.mdc-card {
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  border: 1px solid transparent;
+  box-shadow: var(--shadow);
+}
+.mdc-climat   { background: #FFF5F5; border-color: #FC8181; }
+.mdc-eco      { background: #F0FFF4; border-color: #68D391; }
+.mdc-sante    { background: #FFFFF0; border-color: #F6E05E; }
+.mdc-ressources { background: #FAF5FF; border-color: #B794F4; }
+
+.mdc-emoji { font-size: 2rem; margin-bottom: 0.4rem; }
+.mdc-name  { font-size: 0.95rem; font-weight: 700; color: var(--navy); margin-bottom: 0.2rem; }
+.mdc-pct   {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: rgba(0,0,0,0.08);
+  border-radius: 12px;
+  padding: 0.15rem 0.5rem;
+  margin-bottom: 0.6rem;
+  color: var(--text-muted);
+}
+.mdc-desc { font-size: 0.83rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 0.7rem; }
+.mdc-ex   { font-size: 0.78rem; color: var(--text-muted); font-style: italic; border-top: 1px solid rgba(0,0,0,0.08); padding-top: 0.5rem; }
+
+/* ── Niveau 1 : échelle mPt ── */
+.methode-score-explain { background: white; border-radius: var(--radius); box-shadow: var(--shadow); padding: 1.5rem; }
+.mse-def {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: var(--navy);
+  color: white;
+  border-radius: var(--radius-sm);
+  padding: 0.8rem 1.2rem;
+  margin-bottom: 1.2rem;
+}
+.mse-unit { font-size: 2rem; font-weight: 800; flex-shrink: 0; }
+.mse-eq   { font-size: 0.88rem; opacity: 0.9; line-height: 1.5; }
+.mse-scale-title { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; }
+.mse-bar-list { display: flex; flex-direction: column; gap: 0.5rem; }
+.mse-bar-item { display: flex; align-items: center; gap: 0.8rem; font-size: 0.82rem; }
+.mse-bar-ref  { opacity: 0.5; border-top: 1px dashed var(--gray-200); padding-top: 0.5rem; margin-top: 0.2rem; }
+.mse-bar-label { width: 160px; flex-shrink: 0; color: var(--text-muted); }
+.mse-bar-track { flex: 1; height: 12px; background: var(--gray-100); border-radius: 6px; overflow: hidden; }
+.mse-bar-fill  { height: 100%; border-radius: 6px; min-width: 3px; }
+.mse-bar-val   { width: 60px; text-align: right; font-weight: 700; color: var(--text); font-size: 0.8rem; }
+
+/* ── Niveau 2 : formule visuelle ── */
+.methode-formula-visual {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 1.5rem;
+  margin-bottom: 1.2rem;
+}
+.mfv-formula {
+  background: var(--navy);
+  color: white;
+  border-radius: var(--radius-sm);
+  padding: 1.2rem 1.5rem;
+  font-family: 'Courier New', monospace;
+  font-size: 1.05rem;
+  line-height: 2;
+  margin-bottom: 1.2rem;
+  text-align: center;
+  letter-spacing: 0.01em;
+}
+.mfv-sigma  { font-size: 1.5em; vertical-align: middle; }
+.mfv-bracket { opacity: 0.6; }
+.mfv-op     { opacity: 0.7; margin: 0 0.3em; }
+.mfv-term   { border-radius: 4px; padding: 0.1em 0.4em; font-weight: 700; }
+.mfv-brut   { background: rgba(197,48,48,0.4); }
+.mfv-norm   { background: rgba(44,82,130,0.5); }
+.mfv-poids  { background: rgba(39,103,73,0.4); }
+
+.mfv-legend { display: flex; flex-direction: column; gap: 0.7rem; }
+.mfv-leg-item { display: flex; align-items: flex-start; gap: 0.8rem; font-size: 0.85rem; line-height: 1.5; color: var(--text-muted); }
+.mfv-leg-dot { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; margin-top: 0.25rem; }
+.mfv-brut.mfv-leg-dot { background: #C53030; }
+.mfv-norm.mfv-leg-dot { background: #2C5282; }
+.mfv-poids.mfv-leg-dot { background: #276749; }
+
+/* ── Niveau 2 : exemple de calcul ── */
+.methode-calc-example {
+  background: #F0FFF4;
+  border: 1px solid #68D391;
+  border-radius: var(--radius);
+  padding: 1.2rem 1.5rem;
+}
+.mce-title { font-size: 0.85rem; font-weight: 700; color: var(--eco); margin-bottom: 0.8rem; }
+.mce-steps { display: flex; flex-direction: column; gap: 0.5rem; }
+.mce-step  { display: flex; align-items: flex-start; gap: 0.8rem; font-size: 0.85rem; color: var(--text); line-height: 1.5; }
+.mce-step-n {
+  background: var(--eco);
+  color: white;
+  border-radius: 50%;
+  width: 20px; height: 20px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.72rem; font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+
+/* ── Niveau 2 : grille indicateurs ── */
+.methode-indicators-grid { display: flex; flex-direction: column; gap: 0.5rem; }
+.mind-group { margin-bottom: 0.3rem; }
+.mind-group-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: var(--radius-sm);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.3rem;
+}
+.mind-row {
+  display: grid;
+  grid-template-columns: 1fr 80px 120px 60px;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.45rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.82rem;
+  border: 1px solid transparent;
+  transition: background 0.15s;
+}
+.mind-row:nth-child(odd) { background: var(--gray-50); }
+.mind-row:hover { background: var(--gray-100); }
+.mind-name  { color: var(--text); }
+.mind-code  { font-family: monospace; font-size: 0.75rem; color: var(--text-muted); }
+.mind-unit  { font-size: 0.72rem; color: var(--gray-400); }
+.mind-weight {
+  text-align: right;
+  font-weight: 700;
+  font-size: 0.85rem;
+}
+.mind-desc { font-size: 0.74rem; color: var(--text-muted); margin-top: 2px; line-height: 1.4; }
+.mind-fait { font-size: 0.72rem; color: var(--navy-light); font-style: italic; margin-top: 1px; line-height: 1.4; }
+
+.mind-weight-bar {
+  grid-column: 1 / -1;
+  height: 3px;
+  background: var(--gray-200);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.mind-weight-bar-fill { height: 100%; border-radius: 2px; }
+
+/* ── Niveau 2 : exemples NF ── */
+.methode-nf-examples {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+}
+.mnfe-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 0.7rem 1rem;
+  font-size: 0.83rem;
+}
+.mnfe-ind  { font-weight: 700; color: var(--navy); width: 80px; flex-shrink: 0; }
+.mnfe-nf   { color: var(--text-muted); font-family: 'Courier New', monospace; font-size: 0.78rem; }
+
+/* ── Niveau 2 : barres de pondération ── */
+.methode-weight-bars { display: flex; flex-direction: column; gap: 0.4rem; }
+.mwb-row {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 0.82rem;
+}
+.mwb-label { width: 200px; flex-shrink: 0; color: var(--text-muted); }
+.mwb-track { flex: 1; height: 14px; background: var(--gray-100); border-radius: 7px; overflow: hidden; }
+.mwb-fill  { height: 100%; border-radius: 7px; }
+.mwb-val   { width: 48px; text-align: right; font-weight: 700; color: var(--text); font-size: 0.8rem; }
+
+/* ── Jump level button ── */
+.methode-level-jump {
+  background: none;
+  border: none;
+  color: var(--navy-light);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* ── Niveau 3 : formule box ── */
+.methode-formula-box {
+  background: var(--navy);
+  color: white;
+  border-radius: var(--radius);
+  padding: 1rem 1.4rem;
+  margin: 1rem 0;
+  font-family: 'Courier New', monospace;
+  font-size: 0.88rem;
+}
+.mfb-note {
+  margin-top: 0.6rem;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  font-size: 0.78rem;
+  opacity: 0.75;
+  line-height: 1.6;
+}
+
+/* ── Niveau 3 : flow DELPHI ── */
+.methode-delphi-flow {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  flex-wrap: wrap;
+}
+.mdf-step {
+  flex: 1;
+  min-width: 160px;
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+.mdf-num {
+  width: 28px; height: 28px;
+  background: var(--navy);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.85rem; font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.mdf-label { font-size: 0.85rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+.mdf-desc  { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+.mdf-arrow { font-size: 1.5rem; color: var(--gray-400); align-self: center; flex-shrink: 0; }
+
+.methode-delphi-criteria {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.8rem;
+  margin: 1rem 0;
+}
+.mdc-crit {
+  background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 0.9rem;
+}
+.mdc-crit-name { font-size: 0.85rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+.mdc-crit-def  { font-size: 0.78rem; color: var(--text-muted); line-height: 1.6; }
+
+/* ── Niveau 3 : tableau DELPHI ── */
+.methode-delphi-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.methode-delphi-table th {
+  background: var(--navy);
+  color: white;
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+}
+.methode-delphi-table td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--gray-200);
+}
+.methode-delphi-table tr.mdt-highlight td { background: #FFF5F5; }
+.methode-delphi-table tr:hover td { background: var(--gray-50); }
+.mdt-score {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 12px;
+}
+.mdt-score.high { background: #C6F6D5; color: #276749; }
+.mdt-score.med  { background: #FEEBC8; color: #744210; }
+.mdt-score.low  { background: #FED7D7; color: #9B2C2C; }
+
+/* ── Niveau 3 : accordéons ── */
+.methode-accordions { display: flex; flex-direction: column; gap: 0.5rem; }
+.macc-item {
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+.macc-header {
+  width: 100%;
+  background: var(--gray-50);
+  border: none;
+  padding: 0.9rem 1.1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s;
+}
+.macc-header:hover { background: var(--gray-100); }
+.macc-item.open .macc-header { background: var(--navy); color: white; }
+.macc-icon  { font-size: 1.1rem; flex-shrink: 0; }
+.macc-title { flex: 1; font-size: 0.88rem; font-weight: 700; }
+.macc-chevron { transition: transform 0.2s; font-size: 0.75rem; }
+.macc-item.open .macc-chevron { transform: rotate(90deg); }
+.macc-body {
+  display: none;
+  padding: 1rem 1.2rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  line-height: 1.75;
+  border-top: 1px solid var(--gray-200);
+  background: white;
+}
+.macc-item.open .macc-body { display: block; }
+
+/* ── Niveau 3 : alternatives ── */
+.methode-alt-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+.malt-card {
+  background: white;
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  padding: 1.2rem;
+  box-shadow: var(--shadow);
+}
+.malt-header {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.7rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--gray-100);
+}
+.malt-body  { font-size: 0.82rem; color: var(--text-muted); line-height: 1.7; margin-bottom: 0.7rem; }
+.malt-limit { font-size: 0.78rem; color: var(--sante); font-style: italic; }
+
+/* ── Références ── */
+.methode-refs { display: flex; flex-direction: column; gap: 0.5rem; }
+.mref-item {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  padding: 0.5rem 0.8rem;
+  border-left: 3px solid var(--gray-300);
+  background: var(--gray-50);
+  border-radius: 0 4px 4px 0;
+}
+.mref-item em { color: var(--text); }
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .methode-hero h2 { font-size: 1.4rem; }
+  .methode-damage-cards { grid-template-columns: 1fr; }
+  .methode-co2-limits { grid-template-columns: 1fr; }
+  .methodo-nf-examples { grid-template-columns: 1fr; }
+  .methode-delphi-criteria { grid-template-columns: 1fr; }
+  .methode-alt-grid { grid-template-columns: 1fr; }
+  .methode-delphi-flow { flex-direction: column; }
+  .mdf-arrow { display: none; }
+  .mind-row { grid-template-columns: 1fr 70px 55px; }
+  .mind-unit { display: none; }
+  .mse-bar-label { width: 110px; font-size: 0.75rem; }
+  .mlevel-tab { padding: 0.5rem 0.9rem; }
+}
