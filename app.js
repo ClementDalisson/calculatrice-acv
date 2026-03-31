@@ -1238,28 +1238,12 @@ function renderEntrepriseSection() {
     'Collectivité territoriale', 'Association & ONG', 'Autre',
   ];
 
-  // ── Accordéons secteur + sélecteur catégorie à l'intérieur ──────────
-  const catalogHtml = Object.entries(_orgTree).map(([secteur, cats]) => {
-    const meta = SECTEUR_META[secteur] || { icon: '📦', color: '#718096' };
-    const totalItems = Object.values(cats).reduce((s, arr) => s + arr.length, 0);
-    const opts = Object.entries(cats).map(([cat, items]) =>
-      `<optgroup label="${cat}">${items.map(it => `<option value="${it.id}">${it.n}</option>`).join('')}</optgroup>`
-    ).join('');
-    return `<details class="org-secteur-panel">
-      <summary class="org-secteur-header" style="--sec-color:${meta.color}">
-        <span class="org-sec-icon">${meta.icon}</span>
-        <span class="org-sec-name">${secteur}</span>
-        <span class="org-sec-count">${totalItems} poste${totalItems > 1 ? 's' : ''}</span>
-        <span class="org-sec-chevron">›</span>
-      </summary>
-      <div class="org-secteur-body">
-        <div class="org-adder-row">
-          <select class="org-adder-select" multiple size="4">${opts}</select>
-          <button class="org-adder-btn" onclick="addOrgItem(this)">+ Ajouter</button>
-        </div>
-        <div class="org-selected-list"></div>
-      </div>
-    </details>`;
+  // ── Sélecteur de postes (optgroups par secteur) ──────────────────────
+  const selectOptions = Object.entries(_orgTree).map(([secteur, cats]) => {
+    const meta = SECTEUR_META[secteur] || { icon: '📦' };
+    const opts = Object.values(cats).flat()
+      .map(it => `<option value="${it.id}">${it.n}</option>`).join('');
+    return `<optgroup label="${meta.icon} ${secteur}">${opts}</optgroup>`;
   }).join('');
 
   sec.innerHTML = `
@@ -1321,11 +1305,19 @@ function renderEntrepriseSection() {
         </div>
       </div>
 
-      <div class="org-catalog-header">
+      <div class="org-adder-section">
         <h3 class="org-adder-title">📋 Postes d'activité</h3>
-        <p class="org-catalog-hint">Ouvrez un secteur · choisissez un poste dans le sélecteur · saisissez la quantité annuelle</p>
+        <div class="org-adder-row">
+          <select id="org-item-select" class="org-adder-select">
+            <option value="">— Rechercher un poste (325 disponibles) —</option>
+            ${selectOptions}
+          </select>
+          <button class="org-adder-btn" onclick="addOrgItem()">+ Ajouter</button>
+        </div>
+        <div id="org-selected-list" class="org-selected-list">
+          <p class="org-selected-empty">Aucun poste ajouté. Utilisez le sélecteur ci-dessus.</p>
+        </div>
       </div>
-      <div class="org-catalog">${catalogHtml}</div>
 
       <button id="btn-calc-entreprise" onclick="calcEntreprise()">
         🔬 Calculer mon profil d'impact
@@ -1341,39 +1333,52 @@ function renderEntrepriseSection() {
   `;
 }
 
-function addOrgItem(btn) {
-  const panel = btn.closest('.org-secteur-panel');
-  const sel   = panel.querySelector('.org-adder-select');
-  const list  = panel.querySelector('.org-selected-list');
-  const selected = Array.from(sel.selectedOptions).filter(o => o.value);
-  if (!selected.length) return;
+function addOrgItem() {
+  const sel = document.getElementById('org-item-select');
+  const itemId = sel.value;
+  if (!itemId) return;
+  const item = _orgById[itemId];
+  if (!item) return;
 
-  selected.forEach(opt => {
-    const item = _orgById[opt.value];
-    if (!item || list.querySelector(`[data-item-id="${item.id}"]`)) return;
-    const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
-    const row  = document.createElement('div');
-    row.className = 'org-sel-row';
-    row.dataset.itemId = item.id;
-    row.innerHTML = `
-      <span class="org-sel-tag" style="background:${meta.color}20;color:${meta.color}">${item.c}</span>
-      <div class="org-sel-info">
-        <span class="org-sel-name">${item.n}</span>
-        <span class="org-sel-uf">${item.uf}</span>
-        ${item.bom ? `<span class="org-sel-bom-text">${item.bom}</span>` : ''}
-      </div>
-      <input type="number" class="org-sel-qty" min="0" step="1" placeholder="qté" value="1">
-      <button class="org-sel-remove" onclick="removeOrgItem(this)" title="Retirer">×</button>
-    `;
-    list.appendChild(row);
-  });
-  Array.from(sel.options).forEach(o => { o.selected = false; });
+  const list = document.getElementById('org-selected-list');
+  // Éviter les doublons
+  if (list.querySelector(`[data-item-id="${itemId}"]`)) {
+    list.querySelector(`[data-item-id="${itemId}"] .org-sel-qty`).focus();
+    return;
+  }
+  // Retirer le message vide
+  const empty = list.querySelector('.org-selected-empty');
+  if (empty) empty.remove();
+
+  const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
+  const gwp = item.imp.GWP != null ? item.imp.GWP.toFixed(2) : 'n.d.';
+  const bomTip = item.bom ? ` title="Composition : ${item.bom}"` : '';
+
+  const row = document.createElement('div');
+  row.className = 'org-sel-row';
+  row.dataset.itemId = itemId;
+  row.innerHTML = `
+    <span class="org-sel-tag" style="background:${meta.color}20;color:${meta.color}">${meta.icon} ${item.s}</span>
+    <div class="org-sel-info">
+      <span class="org-sel-name">${item.n}</span>
+      <span class="org-sel-uf">${item.uf}</span>
+      ${item.bom ? `<span class="org-sel-bom"${bomTip}>ℹ</span>` : ''}
+    </div>
+    <span class="org-sel-gwp">${gwp} kg CO₂</span>
+    <input type="number" class="org-sel-qty" min="0" step="1" placeholder="qté" value="1">
+    <button class="org-sel-remove" onclick="removeOrgItem(this)" title="Retirer">×</button>
+  `;
+  list.appendChild(row);
+  sel.value = '';
 }
 
 function removeOrgItem(btn) {
-  const row  = btn.closest('.org-sel-row');
-  const list = row.closest('.org-selected-list');
+  const row = btn.closest('.org-sel-row');
+  const list = document.getElementById('org-selected-list');
   row.remove();
+  if (!list.querySelector('.org-sel-row')) {
+    list.innerHTML = '<p class="org-selected-empty">Aucun poste ajouté. Utilisez le sélecteur ci-dessus.</p>';
+  }
 }
 
 function calcEntreprise() {
@@ -1463,10 +1468,12 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedI
   ].filter(Boolean).join(' · ');
 
   const inputLines = (selectedItems || []).map(({ item, qty }) => {
+    const gwpContrib = (item.imp.GWP || 0) * qty;
     const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
     return `<tr>
       <td>${item.n}</td>
       <td style="text-align:right">${qty.toLocaleString('fr-FR')} × ${item.uf}</td>
+      <td style="text-align:right;color:var(--climat)">${gwpContrib < 1 ? gwpContrib.toFixed(3) : gwpContrib.toFixed(1)} kg CO₂</td>
       <td><span style="font-size:0.72rem;color:${meta.color};font-weight:600">${meta.icon} ${item.s}</span></td>
     </tr>`;
   }).join('');
@@ -1544,7 +1551,7 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedI
           <h5>Données saisies et contributions CO₂</h5>
           <div style="overflow-x:auto">
             <table class="hyp-table">
-              <thead><tr><th>Poste d'activité</th><th>Quantité</th><th>Secteur</th></tr></thead>
+              <thead><tr><th>Poste d'activité</th><th>Quantité</th><th>CO₂ eq.</th><th>Catégorie</th></tr></thead>
               <tbody>${inputLines || '<tr><td colspan="4" style="text-align:center;color:var(--gray-400)">—</td></tr>'}</tbody>
             </table>
           </div>
