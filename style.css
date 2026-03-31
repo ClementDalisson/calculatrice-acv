@@ -2249,194 +2249,135 @@ nav {
    CATALOGUE ORGANISATION — Hiérarchique Secteur → Catégorie → Item
    ═══════════════════════════════════════════════════════════════════ */
 
-.org-catalog-header {
-  margin: 2rem 0 0.5rem;
+/* ── Sélecteur de postes ── */
+.org-adder-section {
+  margin: 1.5rem 0;
 }
-.org-catalog-header h3 {
-  font-size: 1.1rem;
+.org-adder-title {
+  font-size: 1rem;
   font-weight: 700;
   color: var(--navy);
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.6rem;
 }
-.org-catalog-hint {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin: 0;
+.org-adder-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
 }
+.org-adder-select {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy);
+}
+.org-adder-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: var(--eco);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.org-adder-btn:hover { opacity: 0.9; }
 
-/* ── Panneau secteur (accordion <details>) ── */
-.org-catalog {
+/* ── Liste des postes sélectionnés ── */
+.org-selected-list {
+  margin-top: 0.75rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  margin-bottom: 1.5rem;
+  gap: 0.4rem;
 }
-
-.org-secteur-panel {
-  border: 1px solid var(--gray-200);
-  border-radius: 10px;
-  overflow: hidden;
-  background: #fff;
-  transition: box-shadow 0.15s;
+.org-selected-empty {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+  padding: 0.5rem 0;
+  margin: 0;
 }
-.org-secteur-panel[open] {
-  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-}
-.org-secteur-panel summary { list-style: none; }
-.org-secteur-panel summary::-webkit-details-marker { display: none; }
-
-.org-secteur-header {
+.org-sel-row {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  padding: 0.75rem 1rem;
-  cursor: pointer;
-  user-select: none;
-  background: #fff;
-  border-left: 4px solid var(--sec-color, #718096);
-  transition: background 0.12s;
-}
-.org-secteur-header:hover {
+  padding: 0.5rem 0.75rem;
   background: var(--gray-50);
+  border: 1px solid var(--gray-200);
+  border-radius: 8px;
 }
-.org-secteur-panel[open] > .org-secteur-header {
-  background: color-mix(in srgb, var(--sec-color, #718096) 8%, white);
-  border-bottom: 1px solid var(--gray-200);
-}
-
-.org-sec-icon {
-  font-size: 1.1rem;
+.org-sel-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
+  border-radius: 20px;
+  white-space: nowrap;
   flex-shrink: 0;
 }
-.org-sec-name {
-  font-weight: 600;
-  font-size: 0.9rem;
-  color: var(--navy);
-  flex: 1;
-}
-.org-sec-count {
-  font-size: 0.72rem;
-  color: var(--text-muted);
-  background: var(--gray-100);
-  padding: 0.15rem 0.5rem;
-  border-radius: 20px;
-}
-.org-sec-chevron {
-  font-size: 1rem;
-  color: var(--text-muted);
-  transition: transform 0.2s;
-  display: inline-block;
-}
-.org-secteur-panel[open] .org-sec-chevron {
-  transform: rotate(90deg);
-}
-
-/* ── Corps du secteur ── */
-.org-secteur-body {
-  padding: 0.5rem 0;
-}
-
-/* ── Catégorie ── */
-.org-categorie-section {
-  padding: 0.4rem 1rem 0.2rem;
-}
-.org-categorie-section + .org-categorie-section {
-  border-top: 1px solid var(--gray-100);
-  margin-top: 0.25rem;
-  padding-top: 0.6rem;
-}
-.org-categorie-title {
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--text-muted);
-  padding: 0.25rem 0 0.4rem;
-}
-
-/* ── Ligne item ── */
-.org-item-row {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.35rem 0;
-  border-bottom: 1px solid var(--gray-100);
-}
-.org-item-row:last-child { border-bottom: none; }
-
-.org-item-info {
+.org-sel-info {
   flex: 1;
   min-width: 0;
   display: flex;
-  flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.25rem 0.5rem;
+  gap: 0.4rem;
+  flex-wrap: wrap;
 }
-.org-item-name {
-  font-size: 0.82rem;
+.org-sel-name {
+  font-size: 0.83rem;
   font-weight: 500;
   color: var(--navy);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 280px;
 }
-.org-item-uf {
+.org-sel-uf {
   font-size: 0.7rem;
   color: var(--text-muted);
   font-style: italic;
-  white-space: nowrap;
 }
-.org-item-bom-badge {
+.org-sel-bom {
   font-size: 0.68rem;
   color: var(--eco);
   cursor: help;
-  background: var(--gray-100);
+  background: var(--gray-200);
   border-radius: 50%;
-  width: 1.1rem;
-  height: 1.1rem;
+  width: 1rem;
+  height: 1rem;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
 }
-
-.org-item-right {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-.org-item-gwp {
-  font-size: 0.68rem;
-  color: var(--text-muted);
+.org-sel-gwp {
+  font-size: 0.72rem;
   font-family: monospace;
+  color: var(--text-muted);
   white-space: nowrap;
+  flex-shrink: 0;
 }
-.org-item-qty {
-  width: 72px;
+.org-sel-qty {
+  width: 68px;
   padding: 0.3rem 0.4rem;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   border: 1px solid var(--gray-300);
   border-radius: 6px;
   text-align: right;
-  color: var(--navy);
-  background: var(--gray-50);
-  transition: border-color 0.15s, background 0.15s;
-}
-.org-item-qty:focus {
-  outline: none;
-  border-color: var(--eco);
   background: #fff;
+  flex-shrink: 0;
 }
-.org-item-qty:not(:placeholder-shown) {
-  border-color: var(--eco);
-  background: #f0fdf4;
-  font-weight: 600;
+.org-sel-qty:focus { outline: none; border-color: var(--eco); }
+.org-sel-remove {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 0 0.2rem;
+  line-height: 1;
+  flex-shrink: 0;
 }
+.org-sel-remove:hover { color: #e53e3e; }
 
 @media (max-width: 640px) {
-  .org-item-name { max-width: 160px; }
-  .org-item-gwp { display: none; }
-  .org-item-qty { width: 60px; }
+  .org-sel-gwp { display: none; }
+  .org-adder-select { font-size: 0.78rem; }
 }
