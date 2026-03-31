@@ -2249,6 +2249,53 @@ nav {
    CATALOGUE ORGANISATION — Hiérarchique Secteur → Catégorie → Item
    ═══════════════════════════════════════════════════════════════════ */
 
+/* ── En-tête catalogue ── */
+.org-catalog-header { margin: 1.5rem 0 0.5rem; }
+.org-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* ── Panneau secteur ── */
+.org-secteur-panel {
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+.org-secteur-panel[open] { box-shadow: 0 2px 12px rgba(0,0,0,0.08); }
+.org-secteur-panel summary { list-style: none; }
+.org-secteur-panel summary::-webkit-details-marker { display: none; }
+.org-secteur-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  border-left: 4px solid var(--sec-color, #718096);
+  transition: background 0.12s;
+}
+.org-secteur-header:hover { background: var(--gray-50); }
+.org-secteur-panel[open] > .org-secteur-header {
+  border-bottom: 1px solid var(--gray-200);
+  background: color-mix(in srgb, var(--sec-color, #718096) 6%, white);
+}
+.org-sec-icon { font-size: 1.1rem; flex-shrink: 0; }
+.org-sec-name { font-weight: 600; font-size: 0.9rem; color: var(--navy); flex: 1; }
+.org-sec-count {
+  font-size: 0.72rem; color: var(--text-muted);
+  background: var(--gray-100); padding: 0.15rem 0.5rem; border-radius: 20px;
+}
+.org-sec-chevron {
+  font-size: 1rem; color: var(--text-muted);
+  transition: transform 0.2s; display: inline-block;
+}
+.org-secteur-panel[open] .org-sec-chevron { transform: rotate(90deg); }
+.org-secteur-body { padding: 0.75rem 1rem; }
+
 /* ── Sélecteur de postes ── */
 .org-adder-section {
   margin: 1.5rem 0;

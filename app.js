@@ -1238,12 +1238,30 @@ function renderEntrepriseSection() {
     'Collectivité territoriale', 'Association & ONG', 'Autre',
   ];
 
-  // ── Sélecteur de postes (optgroups par secteur) ──────────────────────
-  const selectOptions = Object.entries(_orgTree).map(([secteur, cats]) => {
-    const meta = SECTEUR_META[secteur] || { icon: '📦' };
-    const opts = Object.values(cats).flat()
-      .map(it => `<option value="${it.id}">${it.n}</option>`).join('');
-    return `<optgroup label="${meta.icon} ${secteur}">${opts}</optgroup>`;
+  // ── Accordéons secteur + sélecteur catégorie à l'intérieur ──────────
+  const catalogHtml = Object.entries(_orgTree).map(([secteur, cats]) => {
+    const meta = SECTEUR_META[secteur] || { icon: '📦', color: '#718096' };
+    const totalItems = Object.values(cats).reduce((s, arr) => s + arr.length, 0);
+    const opts = Object.entries(cats).map(([cat, items]) =>
+      `<optgroup label="${cat}">${items.map(it => `<option value="${it.id}">${it.n}</option>`).join('')}</optgroup>`
+    ).join('');
+    return `<details class="org-secteur-panel">
+      <summary class="org-secteur-header" style="--sec-color:${meta.color}">
+        <span class="org-sec-icon">${meta.icon}</span>
+        <span class="org-sec-name">${secteur}</span>
+        <span class="org-sec-count">${totalItems} poste${totalItems > 1 ? 's' : ''}</span>
+        <span class="org-sec-chevron">›</span>
+      </summary>
+      <div class="org-secteur-body">
+        <div class="org-adder-row">
+          <select class="org-adder-select">
+            <option value="">— Choisir un poste —</option>${opts}
+          </select>
+          <button class="org-adder-btn" onclick="addOrgItem(this)">+ Ajouter</button>
+        </div>
+        <div class="org-selected-list"></div>
+      </div>
+    </details>`;
   }).join('');
 
   sec.innerHTML = `
@@ -1305,19 +1323,11 @@ function renderEntrepriseSection() {
         </div>
       </div>
 
-      <div class="org-adder-section">
+      <div class="org-catalog-header">
         <h3 class="org-adder-title">📋 Postes d'activité</h3>
-        <div class="org-adder-row">
-          <select id="org-item-select" class="org-adder-select">
-            <option value="">— Rechercher un poste (325 disponibles) —</option>
-            ${selectOptions}
-          </select>
-          <button class="org-adder-btn" onclick="addOrgItem()">+ Ajouter</button>
-        </div>
-        <div id="org-selected-list" class="org-selected-list">
-          <p class="org-selected-empty">Aucun poste ajouté. Utilisez le sélecteur ci-dessus.</p>
-        </div>
+        <p class="org-catalog-hint">Ouvrez un secteur · choisissez un poste dans le sélecteur · saisissez la quantité annuelle</p>
       </div>
+      <div class="org-catalog">${catalogHtml}</div>
 
       <button id="btn-calc-entreprise" onclick="calcEntreprise()">
         🔬 Calculer mon profil d'impact
@@ -1333,22 +1343,21 @@ function renderEntrepriseSection() {
   `;
 }
 
-function addOrgItem() {
-  const sel = document.getElementById('org-item-select');
+function addOrgItem(btn) {
+  const panel = btn.closest('.org-secteur-panel');
+  const sel   = panel.querySelector('.org-adder-select');
+  const list  = panel.querySelector('.org-selected-list');
   const itemId = sel.value;
   if (!itemId) return;
   const item = _orgById[itemId];
   if (!item) return;
 
-  const list = document.getElementById('org-selected-list');
-  // Éviter les doublons
+  // Éviter les doublons dans ce panel
   if (list.querySelector(`[data-item-id="${itemId}"]`)) {
     list.querySelector(`[data-item-id="${itemId}"] .org-sel-qty`).focus();
+    sel.value = '';
     return;
   }
-  // Retirer le message vide
-  const empty = list.querySelector('.org-selected-empty');
-  if (empty) empty.remove();
 
   const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
   const gwp = item.imp.GWP != null ? item.imp.GWP.toFixed(2) : 'n.d.';
@@ -1373,12 +1382,9 @@ function addOrgItem() {
 }
 
 function removeOrgItem(btn) {
-  const row = btn.closest('.org-sel-row');
-  const list = document.getElementById('org-selected-list');
+  const row  = btn.closest('.org-sel-row');
+  const list = row.closest('.org-selected-list');
   row.remove();
-  if (!list.querySelector('.org-sel-row')) {
-    list.innerHTML = '<p class="org-selected-empty">Aucun poste ajouté. Utilisez le sélecteur ci-dessus.</p>';
-  }
 }
 
 function calcEntreprise() {
