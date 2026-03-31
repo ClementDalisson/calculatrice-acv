@@ -1254,9 +1254,7 @@ function renderEntrepriseSection() {
       </summary>
       <div class="org-secteur-body">
         <div class="org-adder-row">
-          <select class="org-adder-select">
-            <option value="">— Choisir un poste —</option>${opts}
-          </select>
+          <select class="org-adder-select" multiple size="4">${opts}</select>
           <button class="org-adder-btn" onclick="addOrgItem(this)">+ Ajouter</button>
         </div>
         <div class="org-selected-list"></div>
@@ -1347,38 +1345,29 @@ function addOrgItem(btn) {
   const panel = btn.closest('.org-secteur-panel');
   const sel   = panel.querySelector('.org-adder-select');
   const list  = panel.querySelector('.org-selected-list');
-  const itemId = sel.value;
-  if (!itemId) return;
-  const item = _orgById[itemId];
-  if (!item) return;
+  const selected = Array.from(sel.selectedOptions).filter(o => o.value);
+  if (!selected.length) return;
 
-  // Éviter les doublons dans ce panel
-  if (list.querySelector(`[data-item-id="${itemId}"]`)) {
-    list.querySelector(`[data-item-id="${itemId}"] .org-sel-qty`).focus();
-    sel.value = '';
-    return;
-  }
-
-  const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
-  const gwp = item.imp.GWP != null ? item.imp.GWP.toFixed(2) : 'n.d.';
-  const bomTip = item.bom ? ` title="Composition : ${item.bom}"` : '';
-
-  const row = document.createElement('div');
-  row.className = 'org-sel-row';
-  row.dataset.itemId = itemId;
-  row.innerHTML = `
-    <span class="org-sel-tag" style="background:${meta.color}20;color:${meta.color}">${meta.icon} ${item.s}</span>
-    <div class="org-sel-info">
-      <span class="org-sel-name">${item.n}</span>
-      <span class="org-sel-uf">${item.uf}</span>
-      ${item.bom ? `<span class="org-sel-bom"${bomTip}>ℹ</span>` : ''}
-    </div>
-    <span class="org-sel-gwp">${gwp} kg CO₂</span>
-    <input type="number" class="org-sel-qty" min="0" step="1" placeholder="qté" value="1">
-    <button class="org-sel-remove" onclick="removeOrgItem(this)" title="Retirer">×</button>
-  `;
-  list.appendChild(row);
-  sel.value = '';
+  selected.forEach(opt => {
+    const item = _orgById[opt.value];
+    if (!item || list.querySelector(`[data-item-id="${item.id}"]`)) return;
+    const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
+    const row  = document.createElement('div');
+    row.className = 'org-sel-row';
+    row.dataset.itemId = item.id;
+    row.innerHTML = `
+      <span class="org-sel-tag" style="background:${meta.color}20;color:${meta.color}">${item.c}</span>
+      <div class="org-sel-info">
+        <span class="org-sel-name">${item.n}</span>
+        <span class="org-sel-uf">${item.uf}</span>
+        ${item.bom ? `<span class="org-sel-bom-text">${item.bom}</span>` : ''}
+      </div>
+      <input type="number" class="org-sel-qty" min="0" step="1" placeholder="qté" value="1">
+      <button class="org-sel-remove" onclick="removeOrgItem(this)" title="Retirer">×</button>
+    `;
+    list.appendChild(row);
+  });
+  Array.from(sel.options).forEach(o => { o.selected = false; });
 }
 
 function removeOrgItem(btn) {
@@ -1474,12 +1463,10 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedI
   ].filter(Boolean).join(' · ');
 
   const inputLines = (selectedItems || []).map(({ item, qty }) => {
-    const gwpContrib = (item.imp.GWP || 0) * qty;
     const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
     return `<tr>
       <td>${item.n}</td>
       <td style="text-align:right">${qty.toLocaleString('fr-FR')} × ${item.uf}</td>
-      <td style="text-align:right;color:var(--climat)">${gwpContrib < 1 ? gwpContrib.toFixed(3) : gwpContrib.toFixed(1)} kg CO₂</td>
       <td><span style="font-size:0.72rem;color:${meta.color};font-weight:600">${meta.icon} ${item.s}</span></td>
     </tr>`;
   }).join('');
@@ -1557,7 +1544,7 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedI
           <h5>Données saisies et contributions CO₂</h5>
           <div style="overflow-x:auto">
             <table class="hyp-table">
-              <thead><tr><th>Poste d'activité</th><th>Quantité</th><th>CO₂ eq.</th><th>Catégorie</th></tr></thead>
+              <thead><tr><th>Poste d'activité</th><th>Quantité</th><th>Secteur</th></tr></thead>
               <tbody>${inputLines || '<tr><td colspan="4" style="text-align:center;color:var(--gray-400)">—</td></tr>'}</tbody>
             </table>
           </div>
