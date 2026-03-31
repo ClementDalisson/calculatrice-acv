@@ -1050,8 +1050,47 @@ function _renderMethodeWeightBars() {
 // MODE ENTREPRISE — Analyse multi-critères EF3.1 pour organisations
 // ════════════════════════════════════════════════════════════════════
 
-// ── Facteurs d'émission entreprise (EF3.1, 16 indicateurs) ──────────
-const FE_ENTREPRISE = {
+const SECTEUR_META = {
+  'Mobilier':               { icon: '🪑', color: '#8B5E3C' },
+  'Informatique':           { icon: '💻', color: '#2563EB' },
+  'Téléphonie':             { icon: '📱', color: '#7C3AED' },
+  'Éclairage':              { icon: '💡', color: '#D97706' },
+  'Énergie':                { icon: '⚡', color: '#059669' },
+  'CVC':                    { icon: '🌡️', color: '#DC2626' },
+  'Déplacements':           { icon: '🚗', color: '#3B82F6' },
+  'Logistique':             { icon: '📦', color: '#6366F1' },
+  'Consommables bureau':    { icon: '📄', color: '#92400E' },
+  'Bâtiment':               { icon: '🏢', color: '#6B7280' },
+  'Hygiène & Entretien':    { icon: '🧹', color: '#0EA5E9' },
+  'Alimentation':           { icon: '🍽️', color: '#16A34A' },
+  'Communication':          { icon: '📡', color: '#9333EA' },
+  'Eau':                    { icon: '💧', color: '#0284C7' },
+  'Vêtements & EPI':        { icon: '👔', color: '#B45309' },
+  'Services':               { icon: '🤝', color: '#475569' },
+  'Affichage':              { icon: '🖼️', color: '#BE185D' },
+  'Espaces extérieurs':     { icon: '🌿', color: '#15803D' },
+  'Déchets':                { icon: '♻️', color: '#65A30D' },
+  'Électroménager':         { icon: '☕', color: '#C026D3' },
+  'Équipements sectoriels': { icon: '🔧', color: '#0F766E' },
+};
+
+// Index ORG_CATALOGUE par id (chargé depuis org_catalogue.js)
+const _orgById = {};
+(function() { ORG_CATALOGUE.forEach(it => { _orgById[it.id] = it; }); })();
+
+// Structure Secteur → Catégorie → [items] (calculée une fois)
+const _orgTree = {};
+(function() {
+  ORG_CATALOGUE.forEach(it => {
+    if (!_orgTree[it.s]) _orgTree[it.s] = {};
+    if (!_orgTree[it.s][it.c]) _orgTree[it.s][it.c] = [];
+    _orgTree[it.s][it.c].push(it);
+  });
+})();
+
+// ── Facteurs d'émission entreprise legacy (EF3.1, 16 indicateurs) ───
+// (conservé uniquement pour calcPEF_entreprise)
+const FE_ENTREPRISE_LEGACY = {
   // ÉNERGIE & CHAUFFAGE
   gaz_kwh: {
     label: "Gaz naturel", unit: "kWh PCI",
@@ -1170,22 +1209,7 @@ const FE_ENTREPRISE = {
   },
 };
 
-const FE_TO_GROUP = {
-  gaz_kwh: 'energie', fioul_L: 'energie', elec_kwh: 'energie', hfc134a_kg: 'energie',
-  diesel_100km: 'mobilite', ve_100km: 'mobilite', train_km: 'mobilite',
-  vol_court: 'mobilite', vol_lc: 'mobilite',
-  papier_ramette: 'achats', ecran_24: 'achats', serveur_1u: 'achats',
-  nettoyage_m2: 'services', it_services_k: 'services', conseil_k: 'services',
-  repas: 'alimentation',
-};
-
-const ACTIVITY_GROUPS = {
-  energie:      { icon: '⚡', label: 'Énergie & Chauffage',      color: '#E67E22' },
-  mobilite:     { icon: '🚗', label: 'Mobilité professionnelle', color: '#3498DB' },
-  achats:       { icon: '🛒', label: 'Achats & Équipements',     color: '#9B59B6' },
-  services:     { icon: '🏢', label: 'Services externalisés',    color: '#1ABC9C' },
-  alimentation: { icon: '🍽️', label: 'Alimentation',             color: '#27AE60' },
-};
+// (FE_TO_GROUP et ACTIVITY_GROUPS supprimés — remplacés par SECTEUR_META + ORG_CATALOGUE)
 
 // ── Calcul PEF score depuis impacts bruts ────────────────────────────
 function calcPEF_entreprise(impacts) {
@@ -1214,22 +1238,61 @@ function renderEntrepriseSection() {
     'Collectivité territoriale', 'Association & ONG', 'Autre',
   ];
 
+  // ── Catalogue hiérarchique Secteur → Catégorie → Items ──────────────
+  const catalogHtml = Object.entries(_orgTree).map(([secteur, cats]) => {
+    const meta = SECTEUR_META[secteur] || { icon: '📦', color: '#718096' };
+    const totalItems = Object.values(cats).reduce((s, arr) => s + arr.length, 0);
+
+    const catsHtml = Object.entries(cats).map(([cat, items]) => {
+      const itemsHtml = items.map(it => {
+        const gwp = it.imp.GWP != null ? (it.imp.GWP < 0.01 ? it.imp.GWP.toExponential(2) : it.imp.GWP.toFixed(2)) : 'n.d.';
+        const bomAttr = it.bom ? ` title="Composition : ${it.bom}"` : '';
+        return `<div class="org-item-row">
+          <div class="org-item-info">
+            <span class="org-item-name">${it.n}</span>
+            <span class="org-item-uf">${it.uf}</span>
+            ${it.bom ? `<span class="org-item-bom-badge"${bomAttr}>ℹ</span>` : ''}
+          </div>
+          <div class="org-item-right">
+            <span class="org-item-gwp" title="Impact climatique unitaire">${gwp} kg CO₂</span>
+            <input type="number" class="org-item-qty" data-item-id="${it.id}"
+                   min="0" step="1" placeholder="0">
+          </div>
+        </div>`;
+      }).join('');
+      return `<div class="org-categorie-section">
+        <div class="org-categorie-title">${cat}</div>
+        ${itemsHtml}
+      </div>`;
+    }).join('');
+
+    return `<details class="org-secteur-panel">
+      <summary class="org-secteur-header" style="--sec-color:${meta.color}">
+        <span class="org-sec-icon">${meta.icon}</span>
+        <span class="org-sec-name">${secteur}</span>
+        <span class="org-sec-count">${totalItems} poste${totalItems > 1 ? 's' : ''}</span>
+        <span class="org-sec-chevron">›</span>
+      </summary>
+      <div class="org-secteur-body">${catsHtml}</div>
+    </details>`;
+  }).join('');
+
   sec.innerHTML = `
     <div class="entreprise-wrapper">
       <div class="entreprise-hero">
         <h2>🏢 Profil d'impact de votre organisation</h2>
-        <p>Obtenez une <strong>cartographie multi-critères</strong> des impacts environnementaux de votre organisation selon les <strong>16 indicateurs EF3.1</strong> — bien au-delà du seul CO₂. Visualisez vos catégories de dommage dominantes : climat, santé, écosystèmes, ressources.</p>
+        <p>Cartographie multi-critères des impacts environnementaux selon les <strong>16 indicateurs EF3.1</strong>. Sélectionnez vos postes d'activité, saisissez les quantités annuelles, calculez.</p>
         <div class="entreprise-badges">
           <span class="badge badge-neutral">🌡️ Changement climatique</span>
           <span class="badge badge-neutral">🌿 Écosystèmes</span>
           <span class="badge badge-neutral">🏥 Santé humaine</span>
           <span class="badge badge-neutral">⛏️ Ressources</span>
+          <span class="badge badge-neutral">325 postes · EF3.1 · Base ACV Harmonisée</span>
         </div>
       </div>
 
       <div class="org-profile-section">
         <h3 class="org-profile-title">👤 Profil de l'organisation</h3>
-        <p class="org-profile-desc">Ces informations contextualisent votre profil d'impact. À terme, elles permettront une comparaison avec des organisations de même secteur et taille.</p>
         <div class="org-profile-grid">
           <div class="org-field">
             <label class="org-label">Nom de l'organisation</label>
@@ -1273,13 +1336,11 @@ function renderEntrepriseSection() {
         </div>
       </div>
 
-      <div class="entreprise-form-grid">
-        ${renderActivityGroup('energie', '⚡ Énergie & Chauffage', ['gaz_kwh','fioul_L','elec_kwh','hfc134a_kg'])}
-        ${renderActivityGroup('mobilite', '🚗 Mobilité professionnelle', ['diesel_100km','ve_100km','train_km','vol_court','vol_lc'])}
-        ${renderActivityGroup('achats', '🛒 Achats & Équipements', ['papier_ramette','ecran_24','serveur_1u'])}
-        ${renderActivityGroup('services', '🏢 Services externalisés', ['nettoyage_m2','it_services_k','conseil_k'])}
-        ${renderActivityGroup('alimentation', '🍽️ Alimentation', ['repas'])}
+      <div class="org-catalog-header">
+        <h3>📋 Postes d'activité</h3>
+        <p class="org-catalog-hint">Ouvrez les secteurs concernés · saisissez les quantités annuelles · l'info ℹ donne la composition du poste</p>
       </div>
+      <div class="org-catalog">${catalogHtml}</div>
 
       <button id="btn-calc-entreprise" onclick="calcEntreprise()">
         🔬 Calculer mon profil d'impact
@@ -1288,71 +1349,52 @@ function renderEntrepriseSection() {
       <div id="entreprise-results" style="display:none"></div>
 
       <div class="entreprise-disclaimer">
-        <strong>⚠️ Précision méthodologique</strong> — Les facteurs services (IT, conseil, nettoyage) proviennent de la méthode input-output EXIOBASE 3.9.4 (France 2019). Ils donnent des ordres de grandeur et ne remplacent pas des données fournisseurs primaires. Train : ADEME Base Carbone 2023.
-        <br>Outil développé par <a href="mailto:clement.dalisson@gmail.com">Clément Dalisson</a>, Ingénieur Environnement.
+        <strong>Sources</strong> — Base ACV Harmonisée EF3.1 (AGRIBALYSE v3.2, BASE-IMPACTS v3.0, Ecoinvent v3.12). Méthode EF3.1 Commission Européenne.
+        <br>Outil développé par <a href="mailto:clement.dalisson@gmail.com">Clément Dalisson</a>, Ingénieur Environnement (CentraleSupélec · Sciences Po · Bilan Carbone® BCM2).
       </div>
-    </div>
-  `;
-}
-
-function renderActivityGroup(groupKey, titre, keys) {
-  const rows = keys.map(key => {
-    const fe = FE_ENTREPRISE[key];
-    if (!fe) return '';
-    return `
-      <div class="fe-input-row">
-        <label class="fe-label">
-          <span class="fe-name">${fe.label}</span>
-          <span class="fe-unit">/ ${fe.unit}</span>
-        </label>
-        <input type="number" id="inp-${key}" class="fe-input"
-               placeholder="0" min="0" step="any"
-               onchange="updateEntreprisePreview()">
-      </div>
-    `;
-  }).join('');
-
-  return `
-    <div class="activity-card activity-${groupKey}">
-      <h3>${titre}</h3>
-      ${rows}
     </div>
   `;
 }
 
 function calcEntreprise() {
-  const totals = {};
-  const byGroup = {};
+  const inputs = document.querySelectorAll('.org-item-qty');
   const IND_KEYS = Object.keys(EF31);
+  const totals = {};
+  const bySecteur = {};
+  for (const k of IND_KEYS) totals[k] = 0;
 
-  Object.keys(ACTIVITY_GROUPS).forEach(g => { byGroup[g] = {}; });
-  for (const key of IND_KEYS) {
-    totals[key] = 0;
-    Object.keys(ACTIVITY_GROUPS).forEach(g => { byGroup[g][key] = 0; });
-  }
-
+  const selectedItems = [];
   let hasData = false;
-  for (const [feKey, fe] of Object.entries(FE_ENTREPRISE)) {
-    const input = document.getElementById(`inp-${feKey}`);
-    if (!input) continue;
-    const qty = parseFloat(input.value) || 0;
-    if (qty === 0) continue;
-    hasData = true;
 
-    const group = FE_TO_GROUP[feKey] || 'services';
-    for (const indKey of IND_KEYS) {
-      const val = fe[indKey];
-      if (val != null && !isNaN(val)) {
-        totals[indKey] += val * qty;
-        byGroup[group][indKey] += val * qty;
+  inputs.forEach(input => {
+    const qty = parseFloat(input.value) || 0;
+    if (qty === 0) return;
+    const itemId = input.dataset.itemId;
+    const item = _orgById[itemId];
+    if (!item) return;
+    hasData = true;
+    selectedItems.push({ item, qty });
+
+    if (!bySecteur[item.s]) {
+      bySecteur[item.s] = {};
+      for (const k of IND_KEYS) bySecteur[item.s][k] = 0;
+    }
+    for (const k of IND_KEYS) {
+      const v = item.imp[k];
+      if (v != null && !isNaN(v)) {
+        totals[k] += v * qty;
+        bySecteur[item.s][k] += v * qty;
       }
     }
-  }
+  });
 
   if (!hasData) {
-    alert('Veuillez saisir au moins une donnée d\'activité.');
+    alert('Veuillez saisir au moins une quantité.');
     return;
   }
+
+  const pefBySecteur = {};
+  Object.keys(bySecteur).forEach(s => { pefBySecteur[s] = calcPEF_entreprise(bySecteur[s]); });
 
   const profile = {
     nom: document.getElementById('org-nom')?.value?.trim() || '',
@@ -1363,17 +1405,14 @@ function calcEntreprise() {
     travail: document.getElementById('org-travail')?.value || '',
   };
 
-  const pefByGroup = {};
-  Object.keys(ACTIVITY_GROUPS).forEach(g => { pefByGroup[g] = calcPEF_entreprise(byGroup[g]); });
-
   const resultsDiv = document.getElementById('entreprise-results');
   resultsDiv.style.display = 'block';
-  resultsDiv.innerHTML = renderEntrepriseResults(totals, byGroup, pefByGroup, profile);
+  resultsDiv.innerHTML = renderEntrepriseResults(totals, bySecteur, pefBySecteur, profile, selectedItems);
   renderEntrepriseDonut(totals);
   resultsDiv.scrollIntoView({ behavior: 'smooth' });
 }
 
-function renderEntrepriseResults(totals, byGroup, pefByGroup, profile) {
+function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedItems) {
   const catData = Object.entries(DAMAGE_CATEGORIES).map(([key, cat]) => {
     const score = cat.indicators.reduce((sum, ind) => {
       const v = totals[ind];
@@ -1389,7 +1428,7 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile) {
   const gwpT = (totals.GWP || 0) / 1000;
   const gwpFlights = Math.round(gwpT / 0.7);
 
-  const groupTotal = Object.values(pefByGroup).reduce((s, p) => s + p.score, 0);
+  const groupTotal = Object.values(pefByGroup).reduce((s, p) => s + (p.score || 0), 0);
 
   const profileTitle = [
     profile.nom || null,
@@ -1403,32 +1442,27 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile) {
     profile.travail || null,
   ].filter(Boolean).join(' · ');
 
-  const inputLines = Object.entries(FE_ENTREPRISE)
-    .filter(([key]) => {
-      const inp = document.getElementById(`inp-${key}`);
-      return inp && parseFloat(inp.value) > 0;
-    })
-    .map(([key, fe]) => {
-      const qty = parseFloat(document.getElementById(`inp-${key}`).value);
-      const gwpContrib = (fe.GWP || 0) * qty;
-      const grp = ACTIVITY_GROUPS[FE_TO_GROUP[key]];
-      return `<tr>
-        <td>${fe.label}</td>
-        <td style="text-align:right">${qty.toLocaleString('fr-FR')} ${fe.unit}</td>
-        <td style="text-align:right;color:var(--climat)">${gwpContrib < 1 ? gwpContrib.toFixed(3) : gwpContrib.toFixed(1)} kg CO₂</td>
-        <td><span style="font-size:0.72rem;color:${grp?.color};font-weight:600">${grp?.icon} ${grp?.label || '—'}</span></td>
-      </tr>`;
-    }).join('');
+  const inputLines = (selectedItems || []).map(({ item, qty }) => {
+    const gwpContrib = (item.imp.GWP || 0) * qty;
+    const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
+    return `<tr>
+      <td>${item.n}</td>
+      <td style="text-align:right">${qty.toLocaleString('fr-FR')} × ${item.uf}</td>
+      <td style="text-align:right;color:var(--climat)">${gwpContrib < 1 ? gwpContrib.toFixed(3) : gwpContrib.toFixed(1)} kg CO₂</td>
+      <td><span style="font-size:0.72rem;color:${meta.color};font-weight:600">${meta.icon} ${item.s}</span></td>
+    </tr>`;
+  }).join('');
 
-  const groupBars = Object.entries(ACTIVITY_GROUPS)
-    .filter(([g]) => pefByGroup[g] && pefByGroup[g].score > 0)
-    .sort(([ga], [gb]) => (pefByGroup[gb]?.score || 0) - (pefByGroup[ga]?.score || 0))
-    .map(([g, grp]) => {
-      const pct = groupTotal > 0 ? Math.round(pefByGroup[g].score / groupTotal * 100) : 0;
+  const groupBars = Object.entries(pefByGroup)
+    .filter(([, p]) => p && p.score > 0)
+    .sort(([, pa], [, pb]) => pb.score - pa.score)
+    .map(([secteur, p]) => {
+      const meta = SECTEUR_META[secteur] || { icon: '📦', color: '#718096' };
+      const pct = groupTotal > 0 ? Math.round(p.score / groupTotal * 100) : 0;
       return `
         <div class="scope-bar-row">
-          <span class="scope-bar-label" style="color:${grp.color}">${grp.icon} ${grp.label}</span>
-          <div class="scope-bar-track"><div class="scope-bar-fill" style="width:${pct}%;background:${grp.color}"></div></div>
+          <span class="scope-bar-label" style="color:${meta.color}">${meta.icon} ${secteur}</span>
+          <div class="scope-bar-track"><div class="scope-bar-fill" style="width:${pct}%;background:${meta.color}"></div></div>
           <span class="scope-bar-val">${pct}%</span>
         </div>`;
     }).join('');
@@ -1469,7 +1503,7 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile) {
       </div>
 
       <div class="result-scope-section">
-        <h4>Contribution par poste d'activité</h4>
+        <h4>Contribution par secteur</h4>
         <div class="result-scope-bars">${groupBars}</div>
       </div>
 
@@ -1498,15 +1532,14 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile) {
           </div>
           <h5 style="margin-top:1rem">Sources des facteurs d'émission</h5>
           <ul class="hyp-sources">
-            <li><strong>Énergie & Chauffage</strong> (gaz, fioul, électricité) — Facteurs EF3.1 Commission Européenne 2021 · BASE-IMPACTS v3.0 (INRAE) · RTE 2023 (élec. France : 0,080 kg CO₂/kWh)</li>
-            <li><strong>Mobilité</strong> (véhicules thermiques &amp; électriques) — Ecoinvent 3.9 · EF3.1</li>
-            <li><strong>Train</strong> — ADEME Base Carbone 2023 (TGV France : 0,00385 kg CO₂/km·pass.) · Dérivé du mix électrique</li>
-            <li><strong>Transport aérien</strong> — ADEME Base Carbone 2023 · Sans forçage radiatif (×2 recommandé pour l'impact réel)</li>
-            <li><strong>Achats &amp; Équipements</strong> — Ecobalyse v8.5 (ADEME) · Ecoinvent 3.9</li>
-            <li><strong>Services externalisés</strong> — Méthode input-output EXIOBASE 3.9.4 (France 2019) · Ordres de grandeur, non certifiés</li>
+            <li><strong>Base ACV Harmonisée EF3.1</strong> — 10 542 entrées, 19 indicateurs EF3.1 par processus</li>
+            <li><strong>AGRIBALYSE v3.2</strong> — Produits alimentaires, agricoles et agroalimentaires (INRAE / ADEME)</li>
+            <li><strong>BASE-IMPACTS v3.0</strong> — Énergie, transport, bâtiment, matériaux (INRAE)</li>
+            <li><strong>Ecoinvent v3.12</strong> — Équipements électroniques, mobilier, matériaux industriels</li>
+            <li><strong>Méthode de calcul</strong> — Score = Σ(Quantité × FE_i / Normalisation_i × Poids_i) × 1000 mPt · EF3.1 Commission Européenne</li>
           </ul>
           <div class="hyp-warning">
-            ⚠️ Outil à visée pédagogique. Les facteurs services (IT, conseil, nettoyage) sont des estimations macro-économiques, non des données primaires fournisseurs. Pour un diagnostic certifié, des données spécifiques sont nécessaires.
+            ⚠️ Les impacts des items marqués BOM sont calculés par décomposition matériaux. Certains proxys introduisent des incertitudes (cuir : hors élevage amont ; Li-ion : proxy plomb-acide). Pour un diagnostic certifié, des données primaires fournisseurs sont nécessaires.
           </div>
         </div>
       </details>

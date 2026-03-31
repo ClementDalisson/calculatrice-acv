@@ -2244,3 +2244,199 @@ nav {
   .mse-bar-label { width: 110px; font-size: 0.75rem; }
   .mlevel-tab { padding: 0.5rem 0.9rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════
+   CATALOGUE ORGANISATION — Hiérarchique Secteur → Catégorie → Item
+   ═══════════════════════════════════════════════════════════════════ */
+
+.org-catalog-header {
+  margin: 2rem 0 0.5rem;
+}
+.org-catalog-header h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--navy);
+  margin-bottom: 0.25rem;
+}
+.org-catalog-hint {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ── Panneau secteur (accordion <details>) ── */
+.org-catalog {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.org-secteur-panel {
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+  transition: box-shadow 0.15s;
+}
+.org-secteur-panel[open] {
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+.org-secteur-panel summary { list-style: none; }
+.org-secteur-panel summary::-webkit-details-marker { display: none; }
+
+.org-secteur-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  user-select: none;
+  background: #fff;
+  border-left: 4px solid var(--sec-color, #718096);
+  transition: background 0.12s;
+}
+.org-secteur-header:hover {
+  background: var(--gray-50);
+}
+.org-secteur-panel[open] > .org-secteur-header {
+  background: color-mix(in srgb, var(--sec-color, #718096) 8%, white);
+  border-bottom: 1px solid var(--gray-200);
+}
+
+.org-sec-icon {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+}
+.org-sec-name {
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--navy);
+  flex: 1;
+}
+.org-sec-count {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  background: var(--gray-100);
+  padding: 0.15rem 0.5rem;
+  border-radius: 20px;
+}
+.org-sec-chevron {
+  font-size: 1rem;
+  color: var(--text-muted);
+  transition: transform 0.2s;
+  display: inline-block;
+}
+.org-secteur-panel[open] .org-sec-chevron {
+  transform: rotate(90deg);
+}
+
+/* ── Corps du secteur ── */
+.org-secteur-body {
+  padding: 0.5rem 0;
+}
+
+/* ── Catégorie ── */
+.org-categorie-section {
+  padding: 0.4rem 1rem 0.2rem;
+}
+.org-categorie-section + .org-categorie-section {
+  border-top: 1px solid var(--gray-100);
+  margin-top: 0.25rem;
+  padding-top: 0.6rem;
+}
+.org-categorie-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  padding: 0.25rem 0 0.4rem;
+}
+
+/* ── Ligne item ── */
+.org-item-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0;
+  border-bottom: 1px solid var(--gray-100);
+}
+.org-item-row:last-child { border-bottom: none; }
+
+.org-item-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+}
+.org-item-name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--navy);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 280px;
+}
+.org-item-uf {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-style: italic;
+  white-space: nowrap;
+}
+.org-item-bom-badge {
+  font-size: 0.68rem;
+  color: var(--eco);
+  cursor: help;
+  background: var(--gray-100);
+  border-radius: 50%;
+  width: 1.1rem;
+  height: 1.1rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.org-item-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+.org-item-gwp {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  white-space: nowrap;
+}
+.org-item-qty {
+  width: 72px;
+  padding: 0.3rem 0.4rem;
+  font-size: 0.82rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 6px;
+  text-align: right;
+  color: var(--navy);
+  background: var(--gray-50);
+  transition: border-color 0.15s, background 0.15s;
+}
+.org-item-qty:focus {
+  outline: none;
+  border-color: var(--eco);
+  background: #fff;
+}
+.org-item-qty:not(:placeholder-shown) {
+  border-color: var(--eco);
+  background: #f0fdf4;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .org-item-name { max-width: 160px; }
+  .org-item-gwp { display: none; }
+  .org-item-qty { width: 60px; }
+}
