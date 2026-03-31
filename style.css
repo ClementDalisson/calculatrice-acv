@@ -2417,3 +2417,206 @@ nav {
   .org-sel-gwp { display: none; }
   .org-adder-select { font-size: 0.78rem; }
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   CATALOGUE ORGANISATION — grille filtrée
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.org-catalogue-wrapper {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 1rem 0.75rem 2rem;
+}
+.org-catalogue-header { margin-bottom: 1.25rem; }
+.org-catalogue-header h2 { font-size: 1.35rem; color: var(--navy); margin-bottom: 0.3rem; }
+.org-catalogue-intro { font-size: 0.85rem; color: var(--text-muted); }
+
+/* ── Filtres ── */
+.org-cat-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.org-sector-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.org-sector-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: 1px solid var(--gray-300);
+  border-radius: 20px;
+  background: #fff;
+  color: var(--navy);
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s, color 0.12s;
+  white-space: nowrap;
+}
+.org-sector-chip:hover { background: var(--gray-100); border-color: var(--gray-400); }
+.org-sector-chip.active {
+  background: var(--navy);
+  border-color: var(--navy);
+  color: #fff;
+}
+.org-sector-count {
+  font-size: 0.7rem;
+  opacity: 0.7;
+}
+.org-search-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.org-search-input {
+  flex: 1;
+  max-width: 380px;
+  padding: 0.45rem 0.75rem;
+  font-size: 0.88rem;
+  border: 1px solid var(--gray-300);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--navy);
+}
+.org-search-input:focus { outline: none; border-color: var(--navy-light); }
+.org-results-count {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+/* ── Grille de cartes ── */
+.org-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 0.75rem;
+}
+
+/* ── Carte compacte ── */
+.org-cat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.75rem;
+  background: #fff;
+  border: 1px solid var(--gray-200);
+  border-radius: 10px;
+  transition: box-shadow 0.14s, border-color 0.14s;
+  position: relative;
+}
+.org-cat-card:hover {
+  box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+  border-color: var(--gray-300);
+}
+.org-cat-card.selected {
+  border-color: var(--eco);
+  background: color-mix(in srgb, var(--eco) 5%, white);
+}
+.org-cat-secteur-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.org-cat-cat-tag {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  margin-bottom: 0.1rem;
+}
+.org-cat-name {
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.25;
+}
+.org-cat-uf {
+  font-size: 0.69rem;
+  color: var(--text-muted);
+  font-style: italic;
+  margin-bottom: 0.35rem;
+}
+.org-cat-add-btn {
+  margin-top: auto;
+  padding: 0.35rem 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid var(--eco);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--eco);
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+  text-align: center;
+}
+.org-cat-add-btn:hover { background: var(--eco); color: #fff; }
+.org-cat-add-btn.added {
+  background: var(--eco);
+  color: #fff;
+  border-color: var(--eco);
+}
+
+/* ── Liste sélectionnée dans l'outil ── */
+.org-selected-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+}
+.org-items-count-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  background: var(--eco);
+  color: #fff;
+  border-radius: 20px;
+  margin-left: 0.4rem;
+  vertical-align: middle;
+}
+.org-link-btn {
+  background: none;
+  border: none;
+  color: var(--eco);
+  font-size: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+}
+.org-link-btn:hover { opacity: 0.8; }
+
+/* ── États vides ── */
+.org-empty-state,
+.org-analyse-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 3rem 1rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+.org-empty-icon {
+  font-size: 2.5rem;
+  opacity: 0.5;
+}
+.org-empty-state p,
+.org-analyse-empty p { font-size: 0.9rem; max-width: 380px; }
+.org-analyse-empty h3 { font-size: 1rem; color: var(--navy); }
+
+@media (max-width: 640px) {
+  .org-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.5rem; }
+  .org-catalogue-wrapper { padding: 0.75rem 0.5rem; }
+  .org-sector-chips { gap: 0.3rem; }
+  .org-sector-chip { font-size: 0.72rem; padding: 0.25rem 0.5rem; }
+  .org-search-input { max-width: 100%; }
+}

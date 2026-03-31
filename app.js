@@ -7,6 +7,14 @@ let state = {
   main: 'home',
   section: 'catalogue',
   subSection: 'catalogue',
+  // Organisation
+  orgSection: 'outil',
+  orgItemsMap: {},    // { itemId: { qty: number } }
+  orgProfile: { nom: '', secteur: '', salaries: '', surface: '', chauffage: '', travail: '' },
+  orgSectorFilter: 'all',
+  orgSearchQuery: '',
+  orgLastResults: null,  // { totals, bySecteur, pefBySecteur, profile, selectedItems }
+  // Perso
   entrepriseDonutChart: null,
   selectedIds: [],
   filterCat: 'all',
@@ -223,7 +231,9 @@ function goToMain(main) {
     document.getElementById('nav-tools-dropdown').classList.remove('open');
   }
   const subnav = document.getElementById('subnav');
+  const subnavOrg = document.getElementById('subnav-org');
   if (subnav) subnav.style.display = main === 'perso' ? '' : 'none';
+  if (subnavOrg) subnavOrg.style.display = main === 'organisation' ? '' : 'none';
 
   if (main === 'home') {
     showOnly('home');
@@ -231,7 +241,7 @@ function goToMain(main) {
     goTo(state.subSection || 'catalogue');
   } else if (main === 'organisation') {
     showOnly('entreprise');
-    renderEntrepriseSection();
+    goToOrg(state.orgSection || 'outil');
   } else if (main === 'contact') {
     showOnly('contact');
   } else if (main === 'methode') {
@@ -258,6 +268,22 @@ function updateNavBadge() {
   const badge = document.getElementById('compare-badge');
   badge.textContent = state.selectedIds.length;
   badge.style.display = state.selectedIds.length > 0 ? 'inline' : 'none';
+}
+
+function goToOrg(section) {
+  state.orgSection = section;
+  document.querySelectorAll('.subnav-org-link').forEach(l => {
+    l.classList.toggle('active', l.dataset.orgSection === section);
+  });
+  renderEntrepriseSection();
+}
+
+function updateOrgItemBadge() {
+  const badge = document.getElementById('org-items-badge');
+  if (!badge) return;
+  const count = Object.keys(state.orgItemsMap).length;
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'inline' : 'none';
 }
 
 /* ── Catalogue ── */
@@ -1224,11 +1250,147 @@ function calcPEF_entreprise(impacts) {
   return { score: Math.round(score * 1000) / 1000, completude: Math.round(counted / 16 * 100) };
 }
 
-// ── Rendu HTML du mode entreprise ────────────────────────────────────
+// ── Rendu HTML du mode entreprise — routeur ──────────────────────────
 function renderEntrepriseSection() {
   const sec = document.getElementById('sec-entreprise');
   if (!sec) return;
+  if (state.orgSection === 'catalogue') {
+    sec.innerHTML = renderOrgCatalogueSection();
+    renderOrgCatalogueGrid();
+  } else if (state.orgSection === 'outil') {
+    sec.innerHTML = renderOrgOutilSection();
+  } else if (state.orgSection === 'analyse') {
+    sec.innerHTML = renderOrgAnalyseSection();
+    if (state.orgLastResults) {
+      renderEntrepriseDonut(state.orgLastResults.totals);
+    }
+  }
+}
 
+// ── Onglet Catalogue ─────────────────────────────────────────────────
+function renderOrgCatalogueSection() {
+  const sectors = Object.keys(SECTEUR_META);
+  const sectorChips = [`<button class="org-sector-chip${state.orgSectorFilter === 'all' ? ' active' : ''}" data-sector="all" onclick="setOrgSector('all')">Tout <span class="org-sector-count">${ORG_CATALOGUE.length}</span></button>`]
+    .concat(sectors.map(s => {
+      const meta = SECTEUR_META[s];
+      const count = ORG_CATALOGUE.filter(it => it.s === s).length;
+      if (!count) return '';
+      const escapedS = s.replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+      return `<button class="org-sector-chip${state.orgSectorFilter === s ? ' active' : ''}" data-sector="${s}" onclick="setOrgSector('${escapedS}')">${meta.icon} ${s} <span class="org-sector-count">${count}</span></button>`;
+    })).join('');
+
+  return `
+    <div class="org-catalogue-wrapper">
+      <div class="org-catalogue-header">
+        <h2>📋 Catalogue des postes d'activité</h2>
+        <p class="org-catalogue-intro">325 postes · EF3.1 · Base ACV Harmonisée — Cliquez sur <strong>+ Ajouter</strong> pour sélectionner un poste</p>
+      </div>
+      <div class="org-cat-filters">
+        <div class="org-sector-chips">${sectorChips}</div>
+        <div class="org-search-row">
+          <input type="text" id="org-search" class="org-search-input"
+            placeholder="Rechercher un poste…" value="${state.orgSearchQuery}"
+            oninput="state.orgSearchQuery=this.value; renderOrgCatalogueGrid()">
+          <span id="org-results-count" class="org-results-count"></span>
+        </div>
+      </div>
+      <div id="org-cards-grid" class="org-cards-grid"></div>
+    </div>`;
+}
+
+function renderOrgTokenBars(item) {
+  const catEmoji = { climat: '🌡️', ecosystemes: '🌿', sante: '🏥', ressources: '⛏️' };
+  const catScores = Object.entries(DAMAGE_CATEGORIES).map(([dKey, dData]) => {
+    let score = 0;
+    dData.indicators.forEach(ind => {
+      const meta = EF31[ind];
+      const v = item.imp[ind];
+      if (v !== null && v !== undefined) score += (v / meta.norm) * (meta.weight / 100) * 1000;
+    });
+    return { dKey, dData, score: Math.max(0, score) };
+  });
+  const total = catScores.reduce((sum, c) => sum + c.score, 0);
+  if (total === 0) return '';
+  const bars = catScores.map(({ dKey, dData, score }) => {
+    const pctW   = Math.max(2, (score / total) * 100).toFixed(1);
+    const pctLbl = Math.round((score / total) * 100);
+    const emoji  = catEmoji[dKey] || '🔵';
+    return `<div class="tbr" title="${dData.label} : ${pctLbl}%">
+      <span class="tbr-emoji">${emoji}</span>
+      <div class="tbr-track"><div class="tbr-fill" style="width:${pctW}%;background:${dData.color}"></div></div>
+      <span class="tbr-val">${pctLbl}%</span>
+    </div>`;
+  }).join('');
+  const pef = calcPEF_entreprise(item.imp);
+  const scoreChip = pef.score > 0 ? `<div class="card-score-chip">📊 ${pef.score.toFixed(1)} mPt</div>` : '';
+  return `<div class="card-bars">${bars}${scoreChip}</div>`;
+}
+
+function renderOrgCatalogueGrid() {
+  const grid = document.getElementById('org-cards-grid');
+  if (!grid) return;
+  let items = ORG_CATALOGUE;
+  if (state.orgSectorFilter !== 'all') {
+    items = items.filter(it => it.s === state.orgSectorFilter);
+  }
+  if (state.orgSearchQuery.trim()) {
+    const q = state.orgSearchQuery.trim().toLowerCase();
+    items = items.filter(it =>
+      it.n.toLowerCase().includes(q) ||
+      it.c.toLowerCase().includes(q) ||
+      it.s.toLowerCase().includes(q)
+    );
+  }
+  const countEl = document.getElementById('org-results-count');
+  if (countEl) countEl.textContent = `${items.length} poste${items.length !== 1 ? 's' : ''}`;
+
+  grid.innerHTML = items.map(it => {
+    const meta = SECTEUR_META[it.s] || { icon: '📦', color: '#718096' };
+    const inMap = !!state.orgItemsMap[it.id];
+    return `
+      <div class="org-cat-card${inMap ? ' selected' : ''}" data-item-id="${it.id}">
+        <span class="org-cat-secteur-tag" style="color:${meta.color}">${meta.icon} ${it.s}</span>
+        <span class="org-cat-cat-tag">${it.c}</span>
+        <div class="org-cat-name">${it.n}</div>
+        <div class="org-cat-uf">${it.uf}</div>
+        ${renderOrgTokenBars(it)}
+        <button class="org-cat-add-btn${inMap ? ' added' : ''}" onclick="toggleOrgCatalogueItem('${it.id}')">
+          ${inMap ? '✓ Ajouté' : '+ Ajouter'}
+        </button>
+      </div>`;
+  }).join('');
+}
+
+function setOrgSector(sector) {
+  state.orgSectorFilter = sector;
+  document.querySelectorAll('.org-sector-chip').forEach(c => {
+    c.classList.toggle('active', c.dataset.sector === sector);
+  });
+  renderOrgCatalogueGrid();
+}
+
+function toggleOrgCatalogueItem(id) {
+  if (state.orgItemsMap[id]) {
+    delete state.orgItemsMap[id];
+  } else {
+    state.orgItemsMap[id] = { qty: 1 };
+  }
+  updateOrgItemBadge();
+  const card = document.querySelector(`.org-cat-card[data-item-id="${id}"]`);
+  if (card) {
+    const inMap = !!state.orgItemsMap[id];
+    card.classList.toggle('selected', inMap);
+    const btn = card.querySelector('.org-cat-add-btn');
+    if (btn) {
+      btn.textContent = inMap ? '✓ Ajouté' : '+ Ajouter';
+      btn.classList.toggle('added', inMap);
+    }
+  }
+}
+
+// ── Onglet Outil ─────────────────────────────────────────────────────
+function renderOrgOutilSection() {
+  const p = state.orgProfile;
   const SECTEURS = [
     '— Secteur d\'activité —', 'Services & Conseil', 'Numérique & Technologie',
     'Finance & Assurance', 'Santé & Social', 'Éducation & Recherche',
@@ -1237,42 +1399,36 @@ function renderEntrepriseSection() {
     'Énergie & Environnement', 'Hôtellerie & Tourisme', 'Médias & Communication',
     'Collectivité territoriale', 'Association & ONG', 'Autre',
   ];
+  const itemCount = Object.keys(state.orgItemsMap).length;
 
-  // ── Accordéons secteur + sélecteur catégorie à l'intérieur ──────────
-  const catalogHtml = Object.entries(_orgTree).map(([secteur, cats]) => {
-    const meta = SECTEUR_META[secteur] || { icon: '📦', color: '#718096' };
-    const totalItems = Object.values(cats).reduce((s, arr) => s + arr.length, 0);
-    const opts = Object.entries(cats).map(([cat, items]) =>
-      `<optgroup label="${cat}">${items.map(it => `<option value="${it.id}">${it.n}</option>`).join('')}</optgroup>`
-    ).join('');
-    return `<details class="org-secteur-panel">
-      <summary class="org-secteur-header" style="--sec-color:${meta.color}">
-        <span class="org-sec-icon">${meta.icon}</span>
-        <span class="org-sec-name">${secteur}</span>
-        <span class="org-sec-count">${totalItems} poste${totalItems > 1 ? 's' : ''}</span>
-        <span class="org-sec-chevron">›</span>
-      </summary>
-      <div class="org-secteur-body">
-        <div class="org-adder-row">
-          <select class="org-adder-select" multiple size="4">${opts}</select>
-          <button class="org-adder-btn" onclick="addOrgItem(this)">+ Ajouter</button>
-        </div>
-        <div class="org-selected-list"></div>
+  const itemsHtml = Object.entries(state.orgItemsMap).map(([id, { qty }]) => {
+    const item = _orgById[id];
+    if (!item) return '';
+    const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
+    return `<div class="org-sel-row" data-item-id="${id}">
+      <span class="org-sel-tag" style="background:${meta.color}20;color:${meta.color}">${item.c}</span>
+      <div class="org-sel-info">
+        <span class="org-sel-name">${item.n}</span>
+        <span class="org-sel-uf">${item.uf}</span>
+        ${item.bom ? `<span class="org-sel-bom-text">${item.bom}</span>` : ''}
       </div>
-    </details>`;
+      <input type="number" class="org-sel-qty" min="0" step="1" placeholder="qté" value="${qty}"
+        onchange="updateOrgItemQty('${id}', this.value)">
+      <button class="org-sel-remove" onclick="removeOrgItemFromOutil('${id}')" title="Retirer">×</button>
+    </div>`;
   }).join('');
 
-  sec.innerHTML = `
+  return `
     <div class="entreprise-wrapper">
       <div class="entreprise-hero">
         <h2>🏢 Profil d'impact de votre organisation</h2>
-        <p>Cartographie multi-critères des impacts environnementaux selon les <strong>16 indicateurs EF3.1</strong>. Sélectionnez vos postes d'activité, saisissez les quantités annuelles, calculez.</p>
+        <p>Saisissez les quantités annuelles pour les postes sélectionnés, puis lancez le calcul.</p>
         <div class="entreprise-badges">
           <span class="badge badge-neutral">🌡️ Changement climatique</span>
           <span class="badge badge-neutral">🌿 Écosystèmes</span>
           <span class="badge badge-neutral">🏥 Santé humaine</span>
           <span class="badge badge-neutral">⛏️ Ressources</span>
-          <span class="badge badge-neutral">325 postes · EF3.1 · Base ACV Harmonisée</span>
+          <span class="badge badge-neutral">325 postes · EF3.1</span>
         </div>
       </div>
 
@@ -1281,120 +1437,131 @@ function renderEntrepriseSection() {
         <div class="org-profile-grid">
           <div class="org-field">
             <label class="org-label">Nom de l'organisation</label>
-            <input type="text" id="org-nom" placeholder="Ex : Agence Martin & Associés" class="org-input">
+            <input type="text" id="org-nom" placeholder="Ex : Agence Martin & Associés" class="org-input" value="${p.nom}">
           </div>
           <div class="org-field">
             <label class="org-label">Secteur d'activité</label>
             <select id="org-secteur" class="org-input">
-              ${SECTEURS.map((s, i) => `<option value="${i === 0 ? '' : s}">${s}</option>`).join('')}
+              ${SECTEURS.map((s, i) => `<option value="${i === 0 ? '' : s}"${p.secteur === s ? ' selected' : ''}>${s}</option>`).join('')}
             </select>
           </div>
           <div class="org-field">
             <label class="org-label">Nombre de salariés (ETP)</label>
-            <input type="number" id="org-salaries" placeholder="Ex : 25" min="1" class="org-input">
+            <input type="number" id="org-salaries" placeholder="Ex : 25" min="1" class="org-input" value="${p.salaries || ''}">
           </div>
           <div class="org-field">
             <label class="org-label">Surface des locaux (m²)</label>
-            <input type="number" id="org-surface" placeholder="Ex : 500" min="0" class="org-input">
+            <input type="number" id="org-surface" placeholder="Ex : 500" min="0" class="org-input" value="${p.surface || ''}">
           </div>
           <div class="org-field">
             <label class="org-label">Type de chauffage principal</label>
             <select id="org-chauffage" class="org-input">
               <option value="">— Choisir —</option>
-              <option value="Gaz naturel">Gaz naturel</option>
-              <option value="Fioul domestique">Fioul domestique</option>
-              <option value="Électricité / PAC">Électricité / PAC</option>
-              <option value="Bois / Biomasse">Bois / Biomasse</option>
-              <option value="Réseau de chaleur">Réseau de chaleur</option>
-              <option value="Autre">Autre / Non concerné</option>
+              ${['Gaz naturel','Fioul domestique','Électricité / PAC','Bois / Biomasse','Réseau de chaleur','Autre / Non concerné'].map(v => `<option value="${v}"${p.chauffage === v ? ' selected' : ''}>${v}</option>`).join('')}
             </select>
           </div>
           <div class="org-field">
             <label class="org-label">Mode de travail dominant</label>
             <select id="org-travail" class="org-input">
               <option value="">— Choisir —</option>
-              <option value="100% présentiel">100 % présentiel</option>
-              <option value="Hybride">Hybride (2–3 j bureau / semaine)</option>
-              <option value="Télétravail majoritaire">Télétravail majoritaire</option>
+              ${['100% présentiel','Hybride (2–3 j bureau / semaine)','Télétravail majoritaire'].map(v => `<option value="${v}"${p.travail === v ? ' selected' : ''}>${v}</option>`).join('')}
             </select>
           </div>
         </div>
       </div>
 
       <div class="org-catalog-header">
-        <h3 class="org-adder-title">📋 Postes d'activité</h3>
-        <p class="org-catalog-hint">Ouvrez un secteur · choisissez un poste dans le sélecteur · saisissez la quantité annuelle</p>
+        <h3 class="org-adder-title">📋 Postes sélectionnés
+          ${itemCount > 0 ? `<span class="org-items-count-badge">${itemCount}</span>` : ''}
+        </h3>
+        <p class="org-catalog-hint">
+          ${itemCount === 0
+            ? `Aucun poste — <button class="org-link-btn" onclick="goToOrg('catalogue')">parcourez le catalogue</button> pour en ajouter.`
+            : `Saisissez les quantités annuelles pour chaque poste.`}
+        </p>
       </div>
-      <div class="org-catalog">${catalogHtml}</div>
 
-      <button id="btn-calc-entreprise" onclick="calcEntreprise()">
-        🔬 Calculer mon profil d'impact
-      </button>
-
-      <div id="entreprise-results" style="display:none"></div>
+      ${itemCount > 0 ? `
+        <div class="org-selected-items-list">${itemsHtml}</div>
+        <button id="btn-calc-entreprise" onclick="calcEntreprise()">🔬 Calculer mon profil d'impact</button>
+      ` : `
+        <div class="org-empty-state">
+          <div class="org-empty-icon">📋</div>
+          <p>Ajoutez des postes depuis le catalogue pour commencer votre analyse.</p>
+          <button class="btn" onclick="goToOrg('catalogue')">Parcourir le catalogue →</button>
+        </div>
+      `}
 
       <div class="entreprise-disclaimer">
         <strong>Sources</strong> — Base ACV Harmonisée EF3.1 (AGRIBALYSE v3.2, BASE-IMPACTS v3.0, Ecoinvent v3.12). Méthode EF3.1 Commission Européenne.
         <br>Outil développé par <a href="mailto:clement.dalisson@gmail.com">Clément Dalisson</a>, Ingénieur Environnement (CentraleSupélec · Sciences Po · Bilan Carbone® BCM2).
       </div>
-    </div>
-  `;
+    </div>`;
 }
 
-function addOrgItem(btn) {
-  const panel = btn.closest('.org-secteur-panel');
-  const sel   = panel.querySelector('.org-adder-select');
-  const list  = panel.querySelector('.org-selected-list');
-  const selected = Array.from(sel.selectedOptions).filter(o => o.value);
-  if (!selected.length) return;
-
-  selected.forEach(opt => {
-    const item = _orgById[opt.value];
-    if (!item || list.querySelector(`[data-item-id="${item.id}"]`)) return;
-    const meta = SECTEUR_META[item.s] || { icon: '📦', color: '#718096' };
-    const row  = document.createElement('div');
-    row.className = 'org-sel-row';
-    row.dataset.itemId = item.id;
-    row.innerHTML = `
-      <span class="org-sel-tag" style="background:${meta.color}20;color:${meta.color}">${item.c}</span>
-      <div class="org-sel-info">
-        <span class="org-sel-name">${item.n}</span>
-        <span class="org-sel-uf">${item.uf}</span>
-        ${item.bom ? `<span class="org-sel-bom-text">${item.bom}</span>` : ''}
-      </div>
-      <input type="number" class="org-sel-qty" min="0" step="1" placeholder="qté" value="1">
-      <button class="org-sel-remove" onclick="removeOrgItem(this)" title="Retirer">×</button>
-    `;
-    list.appendChild(row);
-  });
-  Array.from(sel.options).forEach(o => { o.selected = false; });
+function updateOrgItemQty(id, value) {
+  if (state.orgItemsMap[id]) {
+    state.orgItemsMap[id].qty = parseFloat(value) || 0;
+  }
 }
 
-function removeOrgItem(btn) {
-  const row  = btn.closest('.org-sel-row');
-  const list = row.closest('.org-selected-list');
-  row.remove();
+function removeOrgItemFromOutil(id) {
+  delete state.orgItemsMap[id];
+  updateOrgItemBadge();
+  const row = document.querySelector(`.org-sel-row[data-item-id="${id}"]`);
+  if (row) row.remove();
+  if (Object.keys(state.orgItemsMap).length === 0) {
+    renderEntrepriseSection();
+  }
+}
+
+// ── Onglet Analyse ───────────────────────────────────────────────────
+function renderOrgAnalyseSection() {
+  if (!state.orgLastResults) {
+    return `
+      <div class="org-analyse-empty">
+        <div class="org-empty-icon">📊</div>
+        <h3>Aucune analyse disponible</h3>
+        <p>Sélectionnez des postes dans le <button class="org-link-btn" onclick="goToOrg('catalogue')">catalogue</button>,
+          saisissez vos quantités dans l'<button class="org-link-btn" onclick="goToOrg('outil')">outil</button>,
+          puis lancez le calcul.</p>
+      </div>`;
+  }
+  const { totals, bySecteur, pefBySecteur, profile, selectedItems } = state.orgLastResults;
+  return `<div class="entreprise-wrapper">${renderEntrepriseResults(totals, bySecteur, pefBySecteur, profile, selectedItems)}</div>`;
 }
 
 function calcEntreprise() {
-  const inputs = document.querySelectorAll('.org-sel-qty');
+  // Sauvegarde profil depuis le DOM
+  state.orgProfile = {
+    nom: document.getElementById('org-nom')?.value?.trim() || '',
+    secteur: document.getElementById('org-secteur')?.value || '',
+    salaries: parseInt(document.getElementById('org-salaries')?.value) || null,
+    surface: parseInt(document.getElementById('org-surface')?.value) || null,
+    chauffage: document.getElementById('org-chauffage')?.value || '',
+    travail: document.getElementById('org-travail')?.value || '',
+  };
+  // Mise à jour des quantités depuis le DOM
+  document.querySelectorAll('.org-sel-qty').forEach(input => {
+    const id = input.closest('.org-sel-row')?.dataset.itemId;
+    if (id && state.orgItemsMap[id]) {
+      state.orgItemsMap[id].qty = parseFloat(input.value) || 0;
+    }
+  });
+
   const IND_KEYS = Object.keys(EF31);
   const totals = {};
   const bySecteur = {};
   for (const k of IND_KEYS) totals[k] = 0;
-
   const selectedItems = [];
   let hasData = false;
 
-  inputs.forEach(input => {
-    const qty = parseFloat(input.value) || 0;
-    if (qty === 0) return;
-    const itemId = input.closest('.org-sel-row')?.dataset.itemId;
-    const item = _orgById[itemId];
+  Object.entries(state.orgItemsMap).forEach(([id, { qty }]) => {
+    if (!qty) return;
+    const item = _orgById[id];
     if (!item) return;
     hasData = true;
     selectedItems.push({ item, qty });
-
     if (!bySecteur[item.s]) {
       bySecteur[item.s] = {};
       for (const k of IND_KEYS) bySecteur[item.s][k] = 0;
@@ -1416,20 +1583,13 @@ function calcEntreprise() {
   const pefBySecteur = {};
   Object.keys(bySecteur).forEach(s => { pefBySecteur[s] = calcPEF_entreprise(bySecteur[s]); });
 
-  const profile = {
-    nom: document.getElementById('org-nom')?.value?.trim() || '',
-    secteur: document.getElementById('org-secteur')?.value || '',
-    salaries: parseInt(document.getElementById('org-salaries')?.value) || null,
-    surface: parseInt(document.getElementById('org-surface')?.value) || null,
-    chauffage: document.getElementById('org-chauffage')?.value || '',
-    travail: document.getElementById('org-travail')?.value || '',
+  state.orgLastResults = {
+    totals, bySecteur, pefBySecteur,
+    profile: state.orgProfile,
+    selectedItems,
   };
 
-  const resultsDiv = document.getElementById('entreprise-results');
-  resultsDiv.style.display = 'block';
-  resultsDiv.innerHTML = renderEntrepriseResults(totals, bySecteur, pefBySecteur, profile, selectedItems);
-  renderEntrepriseDonut(totals);
-  resultsDiv.scrollIntoView({ behavior: 'smooth' });
+  goToOrg('analyse');
 }
 
 function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedItems) {
@@ -1659,9 +1819,14 @@ document.addEventListener('DOMContentLoaded', () => {
     l.addEventListener('click', () => goToMain(l.dataset.main));
   });
 
-  // Sub-nav
+  // Sub-nav perso
   document.querySelectorAll('.subnav-link').forEach(l => {
     l.addEventListener('click', () => goTo(l.dataset.section));
+  });
+
+  // Sub-nav organisation
+  document.querySelectorAll('.subnav-org-link').forEach(l => {
+    l.addEventListener('click', () => goToOrg(l.dataset.orgSection));
   });
 
   // Filter buttons
@@ -1713,6 +1878,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderCatalogue();
   renderNews();
   updateNavBadge();
+  updateOrgItemBadge();
   goToMain('home');
 
   // Article modal close
