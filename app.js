@@ -36,6 +36,172 @@ function createFocusTrap(containerEl) {
   };
 }
 
+/* ── Supabase ── */
+const _supabase = window.supabase.createClient(
+  'https://nudqonjkkgcahlbvukag.supabase.co',
+  'sb_publishable_omw143FPjiWppaqokvT2Ww_GX9XuRvA'
+);
+
+/* ── Sauvegarde automatique (debounce 1.5s) ── */
+let _saveTimer = null;
+function scheduleSave() {
+  if (!state.authUser) return;
+  clearTimeout(_saveTimer);
+  _saveTimer = setTimeout(saveOrgData, 1500);
+}
+
+/* ── Auth — ouverture/fermeture modale ── */
+let _authMode = 'login'; // 'login' | 'signup'
+
+function openAuthModal() {
+  _authMode = 'login';
+  _syncAuthForm();
+  const overlay = document.getElementById('auth-overlay');
+  state._authOpener = document.activeElement;
+  overlay.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('auth-email').focus();
+  state._authTrap = createFocusTrap(overlay);
+  document.addEventListener('keydown', state._authTrap);
+}
+
+function closeAuthModal() {
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  if (state._authTrap) { document.removeEventListener('keydown', state._authTrap); state._authTrap = null; }
+  document.getElementById('auth-form').reset();
+  document.getElementById('auth-error').style.display = 'none';
+  if (state._authOpener) { state._authOpener.focus(); state._authOpener = null; }
+}
+
+function switchAuthMode() {
+  _authMode = _authMode === 'login' ? 'signup' : 'login';
+  _syncAuthForm();
+}
+
+function _syncAuthForm() {
+  const title   = document.getElementById('auth-title');
+  const submit  = document.querySelector('.auth-submit-btn');
+  const switchBtn = document.querySelector('.auth-switch-btn');
+  const switchTxt = document.querySelector('.auth-switch');
+  if (_authMode === 'login') {
+    title.textContent  = 'Connexion';
+    submit.textContent = 'Se connecter';
+    switchTxt.childNodes[0].textContent = 'Pas encore de compte ? ';
+    switchBtn.textContent = 'Créer un compte';
+  } else {
+    title.textContent  = 'Créer un compte';
+    submit.textContent = 'Créer mon compte';
+    switchTxt.childNodes[0].textContent = 'Déjà un compte ? ';
+    switchBtn.textContent = 'Se connecter';
+  }
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+/* ── Auth — soumission ── */
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const email    = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const errorEl  = document.getElementById('auth-error');
+  const submitBtn = document.querySelector('.auth-submit-btn');
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = '…';
+  errorEl.style.display = 'none';
+
+  try {
+    let result;
+    if (_authMode === 'login') {
+      result = await _supabase.auth.signInWithPassword({ email, password });
+    } else {
+      result = await _supabase.auth.signUp({ email, password });
+    }
+    if (result.error) throw result.error;
+
+    if (_authMode === 'signup' && !result.data.session) {
+      closeAuthModal();
+      showToast('Vérifiez votre email pour confirmer votre compte.', 'info');
+      return;
+    }
+
+    state.authUser = result.data.user;
+    closeAuthModal();
+    updateNavAuth();
+    await loadOrgData();
+    showToast('Connecté en tant que ' + email, 'info');
+  } catch (err) {
+    errorEl.textContent = _translateAuthError(err.message);
+    errorEl.style.display = 'block';
+  } finally {
+    _syncAuthForm();
+    document.querySelector('.auth-submit-btn').disabled = false;
+  }
+}
+
+function _translateAuthError(msg) {
+  if (msg.includes('Invalid login credentials')) return 'Email ou mot de passe incorrect.';
+  if (msg.includes('Email not confirmed'))       return 'Veuillez confirmer votre email.';
+  if (msg.includes('User already registered'))   return 'Cet email est déjà utilisé.';
+  if (msg.includes('Password should be'))        return 'Le mot de passe doit faire au moins 6 caractères.';
+  return msg;
+}
+
+/* ── Auth — déconnexion ── */
+async function logout() {
+  await _supabase.auth.signOut();
+  state.authUser = null;
+  state.orgProfile = { nom: '', secteur: '', salaries: '', surface: '', chauffage: '', travail: '' };
+  state.orgItemsMap = {};
+  state.orgLastResults = null;
+  updateNavAuth();
+  renderEntrepriseSection();
+  showToast('Déconnecté.', 'info');
+}
+
+function updateNavAuth() {
+  const btn = document.getElementById('nav-auth-btn');
+  if (!btn) return;
+  if (state.authUser) {
+    const label = state.authUser.email.split('@')[0];
+    btn.textContent = '👤 ' + label;
+    btn.title = state.authUser.email;
+    btn.classList.add('connected');
+    btn.onclick = logout;
+  } else {
+    btn.textContent = '🔐 Connexion';
+    btn.title = '';
+    btn.classList.remove('connected');
+    btn.onclick = openAuthModal;
+  }
+}
+
+/* ── Sauvegarde & chargement Supabase ── */
+async function saveOrgData() {
+  if (!state.authUser) return;
+  await _supabase.from('org_data').upsert({
+    user_id:    state.authUser.id,
+    profile:    state.orgProfile,
+    items_map:  state.orgItemsMap,
+    updated_at: new Date().toISOString(),
+  });
+}
+
+async function loadOrgData() {
+  if (!state.authUser) return;
+  const { data } = await _supabase
+    .from('org_data')
+    .select('profile, items_map')
+    .eq('user_id', state.authUser.id)
+    .single();
+  if (data) {
+    state.orgProfile  = data.profile  || state.orgProfile;
+    state.orgItemsMap = data.items_map || {};
+    updateOrgItemBadge();
+    if (state.main === 'organisation') renderEntrepriseSection();
+  }
+}
+
 /* ── State ── */
 let state = {
   main: 'home',
@@ -48,6 +214,7 @@ let state = {
   orgSectorFilter: 'all',
   orgSearchQuery: '',
   orgLastResults: null,  // { totals, bySecteur, pefBySecteur, profile, selectedItems }
+  authUser: null,
   // Perso
   entrepriseDonutChart: null,
   selectedIds: [],
@@ -1611,11 +1778,13 @@ function updateOrgItemQty(id, value) {
   } else {
     if (input) input.classList.remove('org-sel-qty--error');
     state.orgItemsMap[id].qty = num;
+    scheduleSave();
   }
 }
 
 function removeOrgItemFromOutil(id) {
   delete state.orgItemsMap[id];
+  scheduleSave();
   updateOrgItemBadge();
   const row = document.querySelector(`.org-sel-row[data-item-id="${id}"]`);
   if (row) row.remove();
@@ -1676,6 +1845,7 @@ function calcEntreprise() {
     chauffage: document.getElementById('org-chauffage')?.value || '',
     travail: document.getElementById('org-travail')?.value || '',
   };
+  scheduleSave();
   // Mise à jour des quantités depuis le DOM
   document.querySelectorAll('.org-sel-qty').forEach(input => {
     const id = input.closest('.org-sel-row')?.dataset.itemId;
@@ -1981,6 +2151,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key !== 'Escape') return;
     if (document.getElementById('detail-overlay').classList.contains('open')) closeDetail();
     else if (document.getElementById('article-overlay').classList.contains('open')) closeArticle();
+    else if (document.getElementById('auth-overlay').classList.contains('open')) closeAuthModal();
   });
 
   // Brand → home
@@ -2011,6 +2182,22 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === e.currentTarget) closeArticle();
   });
   document.getElementById('article-modal-close').addEventListener('click', closeArticle);
+
+  // Auth modal
+  document.getElementById('auth-overlay').addEventListener('click', e => {
+    if (e.target === e.currentTarget) closeAuthModal();
+  });
+  document.getElementById('auth-close-btn').addEventListener('click', closeAuthModal);
+  document.getElementById('auth-form').addEventListener('submit', handleAuthSubmit);
+
+  // Vérifier session existante au démarrage
+  _supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      state.authUser = data.session.user;
+      updateNavAuth();
+      loadOrgData();
+    }
+  });
 });
 
 /* ── Actualités ── */
