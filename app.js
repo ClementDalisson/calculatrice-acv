@@ -18,6 +18,24 @@ function showToast(message, type = 'warning') {
   }, 3500);
 }
 
+/* ── Focus trap ── */
+const FOCUSABLE = 'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+function createFocusTrap(containerEl) {
+  return function handler(e) {
+    if (e.key !== 'Tab') return;
+    const focusable = Array.from(containerEl.querySelectorAll(FOCUSABLE));
+    if (!focusable.length) return;
+    const first = focusable[0];
+    const last  = focusable[focusable.length - 1];
+    if (e.shiftKey) {
+      if (document.activeElement === first) { e.preventDefault(); last.focus(); }
+    } else {
+      if (document.activeElement === last)  { e.preventDefault(); first.focus(); }
+    }
+  };
+}
+
 /* ── State ── */
 let state = {
   main: 'home',
@@ -366,6 +384,8 @@ function openDetail(id) {
   const overlay = document.getElementById('detail-overlay');
   overlay.classList.add('open');
   document.getElementById('detail-close-btn').focus();
+  state._detailTrap = createFocusTrap(overlay);
+  document.addEventListener('keydown', state._detailTrap);
 
   document.getElementById('detail-title').textContent = obj.emoji + ' ' + obj.nom;
   document.getElementById('detail-uf').textContent = obj.uf;
@@ -436,6 +456,7 @@ function openDetail(id) {
 function closeDetail() {
   document.getElementById('detail-overlay').classList.remove('open');
   if (state.detailChart) { state.detailChart.destroy(); state.detailChart = null; }
+  if (state._detailTrap) { document.removeEventListener('keydown', state._detailTrap); state._detailTrap = null; }
   if (state._detailOpener) { state._detailOpener.focus(); state._detailOpener = null; }
 }
 
@@ -1972,13 +1993,17 @@ function openArticle(id) {
     contenu += `<div class="article-sources-block"><strong>Sources</strong><ul>${items}</ul></div>`;
   }
   document.getElementById('article-modal-contenu').innerHTML = contenu;
-  document.getElementById('article-overlay').classList.add('open');
+  const articleOverlay = document.getElementById('article-overlay');
+  articleOverlay.classList.add('open');
   document.body.style.overflow = 'hidden';
   document.getElementById('article-modal-close').focus();
+  state._articleTrap = createFocusTrap(articleOverlay);
+  document.addEventListener('keydown', state._articleTrap);
 }
 
 function closeArticle() {
   document.getElementById('article-overlay').classList.remove('open');
   document.body.style.overflow = '';
+  if (state._articleTrap) { document.removeEventListener('keydown', state._articleTrap); state._articleTrap = null; }
   if (state._articleOpener) { state._articleOpener.focus(); state._articleOpener = null; }
 }
