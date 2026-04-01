@@ -1140,6 +1140,72 @@ const SECTEUR_META = {
   'Équipements sectoriels': { icon: '🔧', color: '#0F766E' },
 };
 
+const CATEGORIE_EMOJI = {
+  'Bureau & plan de travail':       '🗂️',
+  'Sièges':                         '🪑',
+  'Rangement':                      '🗄️',
+  'Cloisons & aménagement':         '🧱',
+  'Accueil & espaces communs':      '🛋️',
+  'Postes de travail':              '💻',
+  'Impression':                     '🖨️',
+  'Réseau & serveurs':              '📡',
+  'Stockage & périphériques':       '💾',
+  'Logiciels & abonnements':        '🔑',
+  'Téléphonie fixe':                '☎️',
+  'Téléphonie mobile':              '📱',
+  'Visioconférence':                '📹',
+  'Projection & affichage':         '📽️',
+  'Papier & supports':              '📄',
+  'Classement & rangement papier':  '📁',
+  'Écriture & dessin':              '✏️',
+  'Accessoires & petits matériels': '📎',
+  'Cuisine & cafétéria':            '☕',
+  'Confort & bien-être':            '🌡️',
+  'Éclairage intérieur':            '💡',
+  'Éclairage extérieur':            '🔦',
+  'Gestion de l\'éclairage':        '🎛️',
+  'Chauffage':                      '🔥',
+  'Climatisation':                  '❄️',
+  'Ventilation':                    '🌬️',
+  'Régulation':                     '⚙️',
+  'Électricité':                    '⚡',
+  'Gaz':                            '💨',
+  'Fioul':                          '🛢️',
+  'Énergies renouvelables':         '☀️',
+  'Carburants':                     '⛽',
+  'Eau potable':                    '💧',
+  'Gestion des eaux':               '🚿',
+  'Véhicules de flotte':            '🚗',
+  'Infrastructure mobilité':        '🚲',
+  'Transports en commun & partagés':'🚌',
+  'Hébergement':                    '🏨',
+  'Structure & enveloppe':          '🏗️',
+  'Sécurité & contrôle d\'accès':   '🔐',
+  'Sécurité incendie':              '🧯',
+  'Ascenseurs & circulations':      '🛗',
+  'Produits de nettoyage':          '🧴',
+  'Matériel de nettoyage':          '🧹',
+  'Consommables hygiène':           '🧻',
+  'Déchets courants':               '♻️',
+  'Déchets de chantier':            '🗑️',
+  'Tenues de travail':              '👔',
+  'Protection individuelle':        '🦺',
+  'Emballages':                     '📦',
+  'Matériel de manutention':        '🏋️',
+  'Services de livraison':          '🚚',
+  'Supports imprimés':              '📰',
+  'Supports numériques':            '📲',
+  'Goodies & cadeaux d\'affaires':  '🎁',
+  'Sécurité':                       '🔒',
+  'Numérique & informatique':       '🖥️',
+  'Boissons & pauses':              '🥤',
+  'Conditionnement':                '🥡',
+  'Matériel':                       '🌳',
+  'Santé & social':                 '🏥',
+  'Production & industrie':         '🏭',
+  'Collectivités':                  '🏛️',
+};
+
 // Index ORG_CATALOGUE par id (chargé depuis org_catalogue.js)
 const _orgById = {};
 (function() { ORG_CATALOGUE.forEach(it => { _orgById[it.id] = it; }); })();
@@ -1386,16 +1452,20 @@ function renderOrgCatalogueGrid() {
 
   grid.innerHTML = items.map(it => {
     const meta = SECTEUR_META[it.s] || { icon: '📦', color: '#718096' };
+    const emoji = CATEGORIE_EMOJI[it.c] || meta.icon;
     const inMap = !!state.orgItemsMap[it.id];
     return `
-      <div class="org-cat-card${inMap ? ' selected' : ''}" data-item-id="${it.id}">
-        <span class="org-cat-secteur-tag" style="color:${meta.color}">${meta.icon} ${it.s}</span>
-        <span class="org-cat-cat-tag">${it.c}</span>
-        <div class="org-cat-name">${it.n}</div>
-        <div class="org-cat-uf">${it.uf}</div>
-        ${renderOrgTokenBars(it)}
-        <button class="org-cat-add-btn${inMap ? ' added' : ''}" onclick="toggleOrgCatalogueItem('${it.id}')">
-          ${inMap ? '✓ Ajouté' : '+ Ajouter'}
+      <div class="card${inMap ? ' selected' : ''}" data-item-id="${it.id}"
+           style="border-left: 4px solid ${meta.color}">
+        <span class="card-cat-tag">${it.s}</span>
+        <div class="card-emoji">${emoji}</div>
+        <div class="card-body">
+          <div class="card-name">${it.n}</div>
+          <div class="card-uf">${it.uf}</div>
+          ${renderOrgTokenBars(it)}
+        </div>
+        <button class="card-select-btn" onclick="toggleOrgCatalogueItem('${it.id}')">
+          ${inMap ? '✓' : '+'}
         </button>
       </div>`;
   }).join('');
@@ -1416,15 +1486,12 @@ function toggleOrgCatalogueItem(id) {
     state.orgItemsMap[id] = { qty: 1 };
   }
   updateOrgItemBadge();
-  const card = document.querySelector(`.org-cat-card[data-item-id="${id}"]`);
+  const card = document.querySelector(`.card[data-item-id="${id}"]`);
   if (card) {
     const inMap = !!state.orgItemsMap[id];
     card.classList.toggle('selected', inMap);
-    const btn = card.querySelector('.org-cat-add-btn');
-    if (btn) {
-      btn.textContent = inMap ? '✓ Ajouté' : '+ Ajouter';
-      btn.classList.toggle('added', inMap);
-    }
+    const btn = card.querySelector('.card-select-btn');
+    if (btn) btn.textContent = inMap ? '✓' : '+';
   }
 }
 

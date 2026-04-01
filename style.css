@@ -2524,8 +2524,8 @@ nav {
 /* ── Grille de cartes ── */
 .org-cards-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
 }
 
 /* ── Carte compacte ── */
@@ -2645,7 +2645,7 @@ nav {
 .org-analyse-empty h3 { font-size: 1rem; color: var(--navy); }
 
 @media (max-width: 640px) {
-  .org-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.5rem; }
+  .org-cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; }
   .org-catalogue-wrapper { padding: 0.75rem 0.5rem; }
   .org-sector-chips { gap: 0.3rem; }
   .org-sector-chip { font-size: 0.72rem; padding: 0.25rem 0.5rem; }
