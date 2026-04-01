@@ -359,11 +359,13 @@ function toggleSelect(e, id) {
 /* ── Detail panel ── */
 function openDetail(id) {
   state.detailId = id;
+  state._detailOpener = document.activeElement;
   const obj = getObj(id);
   if (!obj) return;
 
   const overlay = document.getElementById('detail-overlay');
   overlay.classList.add('open');
+  document.getElementById('detail-close-btn').focus();
 
   document.getElementById('detail-title').textContent = obj.emoji + ' ' + obj.nom;
   document.getElementById('detail-uf').textContent = obj.uf;
@@ -434,6 +436,7 @@ function openDetail(id) {
 function closeDetail() {
   document.getElementById('detail-overlay').classList.remove('open');
   if (state.detailChart) { state.detailChart.destroy(); state.detailChart = null; }
+  if (state._detailOpener) { state._detailOpener.focus(); state._detailOpener = null; }
 }
 
 function renderDetailChart(obj) {
@@ -1891,9 +1894,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Clear compare
   document.getElementById('compare-clear-btn').addEventListener('click', clearCompare);
 
-  // Keyboard
+  // Keyboard — Escape ferme la modale active
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeDetail();
+    if (e.key !== 'Escape') return;
+    if (document.getElementById('detail-overlay').classList.contains('open')) closeDetail();
+    else if (document.getElementById('article-overlay').classList.contains('open')) closeArticle();
   });
 
   // Brand → home
@@ -1934,9 +1939,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.target === e.currentTarget) closeArticle();
   });
   document.getElementById('article-modal-close').addEventListener('click', closeArticle);
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeArticle();
-  });
 });
 
 /* ── Actualités ── */
@@ -1959,6 +1961,7 @@ function renderNews() {
 function openArticle(id) {
   const a = ARTICLES.find(x => x.id === id);
   if (!a) return;
+  state._articleOpener = document.activeElement;
   document.getElementById('article-modal-date').textContent = a.date;
   document.getElementById('article-modal-titre').textContent = a.titre;
   document.getElementById('article-modal-img').src = a.image;
@@ -1971,9 +1974,11 @@ function openArticle(id) {
   document.getElementById('article-modal-contenu').innerHTML = contenu;
   document.getElementById('article-overlay').classList.add('open');
   document.body.style.overflow = 'hidden';
+  document.getElementById('article-modal-close').focus();
 }
 
 function closeArticle() {
   document.getElementById('article-overlay').classList.remove('open');
   document.body.style.overflow = '';
+  if (state._articleOpener) { state._articleOpener.focus(); state._articleOpener = null; }
 }

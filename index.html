@@ -814,14 +814,14 @@
 </div><!-- /main -->
 
 <!-- ── Detail Overlay ─────────────────────────────────────────────────────── -->
-<div id="detail-overlay" class="detail-overlay">
+<div id="detail-overlay" class="detail-overlay" role="dialog" aria-modal="true" aria-labelledby="detail-title">
   <div class="detail-panel">
     <div class="detail-header">
       <div>
         <div id="detail-title" class="detail-title">—</div>
         <div id="detail-uf" class="detail-uf">—</div>
       </div>
-      <button id="detail-close-btn" class="detail-close">✕</button>
+      <button id="detail-close-btn" class="detail-close" aria-label="Fermer">✕</button>
     </div>
     <div class="detail-body">
       <div class="detail-section">
@@ -870,14 +870,14 @@
 </div>
 
 <!-- ── Article Modal ─────────────────────────────────────────────────────── -->
-<div id="article-overlay" class="article-overlay">
+<div id="article-overlay" class="article-overlay" role="dialog" aria-modal="true" aria-labelledby="article-modal-titre">
   <div class="article-modal">
     <div class="article-modal-header">
       <div>
         <div id="article-modal-date" class="article-modal-date"></div>
         <div id="article-modal-titre" class="article-modal-titre"></div>
       </div>
-      <button id="article-modal-close" class="article-modal-close">✕</button>
+      <button id="article-modal-close" class="article-modal-close" aria-label="Fermer">✕</button>
     </div>
     <div class="article-modal-body">
       <img id="article-modal-img" class="article-modal-img" src="" alt="">
