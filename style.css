@@ -1097,18 +1097,22 @@ nav {
   z-index: 90;
   box-shadow: 0 1px 4px rgba(0,0,0,0.05);
 }
-.subnav-link {
+.subnav-link,
+.subnav-org-link {
   background: none;
   border: none;
   color: var(--text-muted);
   cursor: pointer;
   font-size: 0.85rem;
+  font-family: inherit;
   padding: 0.35rem 0.9rem;
   border-radius: 6px;
   transition: var(--transition);
 }
-.subnav-link:hover { background: var(--gray-100); color: var(--text); }
-.subnav-link.active {
+.subnav-link:hover,
+.subnav-org-link:hover { background: var(--gray-100); color: var(--text); }
+.subnav-link.active,
+.subnav-org-link.active {
   background: var(--eco-light);
   color: var(--eco);
   font-weight: 600;
