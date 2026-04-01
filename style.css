@@ -1443,6 +1443,7 @@ nav {
   font-family: inherit;
 }
 .org-input:focus { outline: none; border-color: var(--navy-light); }
+.org-input--error { border-color: var(--climat) !important; background: var(--climat-light); }
 
 /* ── Activity cards ── */
 .activity-card {
@@ -2426,6 +2427,7 @@ nav {
   flex-shrink: 0;
 }
 .org-sel-qty:focus { outline: none; border-color: var(--eco); }
+.org-sel-qty--error { border-color: var(--climat) !important; background: var(--climat-light); }
 .org-sel-remove {
   background: none;
   border: none;

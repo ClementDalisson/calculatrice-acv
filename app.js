@@ -1516,8 +1516,16 @@ function renderOrgOutilSection() {
 }
 
 function updateOrgItemQty(id, value) {
-  if (state.orgItemsMap[id]) {
-    state.orgItemsMap[id].qty = parseFloat(value) || 0;
+  if (!state.orgItemsMap[id]) return;
+  const num = parseFloat(value);
+  const input = document.querySelector(`.org-sel-row[data-item-id="${id}"] .org-sel-qty`);
+  if (isNaN(num) || num < 0) {
+    if (input) input.classList.add('org-sel-qty--error');
+    showToast('La quantité doit être un nombre positif.');
+    state.orgItemsMap[id].qty = 0;
+  } else {
+    if (input) input.classList.remove('org-sel-qty--error');
+    state.orgItemsMap[id].qty = num;
   }
 }
 
@@ -1549,11 +1557,37 @@ function renderOrgAnalyseSection() {
 
 function calcEntreprise() {
   // Sauvegarde profil depuis le DOM
+  const salariesRaw = parseInt(document.getElementById('org-salaries')?.value);
+  const surfaceRaw  = parseInt(document.getElementById('org-surface')?.value);
+
+  const salariesEl = document.getElementById('org-salaries');
+  const surfaceEl  = document.getElementById('org-surface');
+
+  let profileValid = true;
+
+  if (salariesEl && salariesEl.value !== '' && (isNaN(salariesRaw) || salariesRaw <= 0)) {
+    salariesEl.classList.add('org-input--error');
+    showToast('Le nombre de salariés doit être un entier supérieur à 0.');
+    profileValid = false;
+  } else if (salariesEl) {
+    salariesEl.classList.remove('org-input--error');
+  }
+
+  if (surfaceEl && surfaceEl.value !== '' && (isNaN(surfaceRaw) || surfaceRaw < 0)) {
+    surfaceEl.classList.add('org-input--error');
+    showToast('La surface doit être un nombre positif.');
+    profileValid = false;
+  } else if (surfaceEl) {
+    surfaceEl.classList.remove('org-input--error');
+  }
+
+  if (!profileValid) return;
+
   state.orgProfile = {
     nom: document.getElementById('org-nom')?.value?.trim() || '',
     secteur: document.getElementById('org-secteur')?.value || '',
-    salaries: parseInt(document.getElementById('org-salaries')?.value) || null,
-    surface: parseInt(document.getElementById('org-surface')?.value) || null,
+    salaries: isNaN(salariesRaw) ? null : salariesRaw,
+    surface:  isNaN(surfaceRaw)  ? null : surfaceRaw,
     chauffage: document.getElementById('org-chauffage')?.value || '',
     travail: document.getElementById('org-travail')?.value || '',
   };
@@ -1825,8 +1859,6 @@ function toggleEntrepriseDetail() {
   view.style.display = open ? 'block' : 'none';
   label.textContent = open ? '📋 Masquer le détail des 16 indicateurs' : '📋 Voir le détail des 16 indicateurs EF3.1';
 }
-
-function updateEntreprisePreview() {}
 
 /* ── Init ── */
 document.addEventListener('DOMContentLoaded', () => {
