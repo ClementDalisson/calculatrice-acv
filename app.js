@@ -2,6 +2,22 @@
 // app.js — Logique calculatrice ACV Grand Public
 // ─────────────────────────────────────────────────────────────────────────────
 
+/* ── Toast notification ── */
+function showToast(message, type = 'warning') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast toast--${type}`;
+  toast.textContent = message;
+  container.appendChild(toast);
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => toast.classList.add('toast--visible'));
+  });
+  setTimeout(() => {
+    toast.classList.remove('toast--visible');
+    toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+  }, 3500);
+}
+
 /* ── State ── */
 let state = {
   main: 'home',
@@ -331,7 +347,7 @@ function toggleSelect(e, id) {
     state.selectedIds = state.selectedIds.filter(x => x !== id);
   } else {
     if (state.selectedIds.length >= 5) {
-      alert('Maximum 5 objets en comparaison simultanée.');
+      showToast('Maximum 5 objets en comparaison simultanée.');
       return;
     }
     state.selectedIds.push(id);
@@ -1576,7 +1592,7 @@ function calcEntreprise() {
   });
 
   if (!hasData) {
-    alert('Veuillez saisir au moins une quantité.');
+    showToast('Veuillez saisir au moins une quantité.');
     return;
   }
 
