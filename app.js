@@ -258,12 +258,6 @@ function goToMain(main) {
   document.querySelectorAll('.nav-link[data-main]').forEach(l => {
     l.classList.toggle('active', l.dataset.main === main);
   });
-  // Dropdown Outils : active si une calculatrice est sélectionnée
-  const navToolsBtn = document.getElementById('nav-tools-btn');
-  if (navToolsBtn) {
-    navToolsBtn.classList.toggle('active', main === 'perso' || main === 'organisation');
-    document.getElementById('nav-tools-dropdown').classList.remove('open');
-  }
   const subnav = document.getElementById('subnav');
   const subnavOrg = document.getElementById('subnav-org');
   if (subnav) subnav.style.display = main === 'perso' ? '' : 'none';
@@ -2005,16 +1999,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Dropdown Outils
-  const navToolsBtn = document.getElementById('nav-tools-btn');
-  const navToolsDropdown = document.getElementById('nav-tools-dropdown');
-  if (navToolsBtn && navToolsDropdown) {
-    navToolsBtn.addEventListener('click', e => {
-      e.stopPropagation();
-      navToolsDropdown.classList.toggle('open');
-    });
-    document.addEventListener('click', () => navToolsDropdown.classList.remove('open'));
-  }
 
   renderCatalogue();
   renderNews();
