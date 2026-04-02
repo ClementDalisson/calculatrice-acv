@@ -1,2 +1,4 @@
-# Credentials et config locale
-.claude/
+# Credentials et config locale — exclure tout sauf hooks et settings publics
+.claude/*
+!.claude/hooks/
+!.claude/settings.json
