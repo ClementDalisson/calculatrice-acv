@@ -2221,15 +2221,30 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('auth-close-btn').addEventListener('click', closeAuthModal);
   document.getElementById('auth-form').addEventListener('submit', handleAuthSubmit);
 
-  // Vérifier session existante au démarrage
-  _supabase.auth.getSession().then(({ data }) => {
-    if (data.session) {
-      state.authUser = data.session.user;
-      updateNavAuth();
-      loadOrgData();
-    }
-    // Détecter un lien de réinitialisation de mot de passe
-    if (window.location.hash.includes('type=recovery')) {
+  // Sauvegarde automatique du profil organisation quand un champ change
+  function _syncAndSaveProfile() {
+    const salariesRaw = parseInt(document.getElementById('org-salaries')?.value);
+    const surfaceRaw  = parseInt(document.getElementById('org-surface')?.value);
+    state.orgProfile = {
+      nom:      document.getElementById('org-nom')?.value?.trim() || '',
+      secteur:  document.getElementById('org-secteur')?.value || '',
+      salaries: isNaN(salariesRaw) ? null : salariesRaw,
+      surface:  isNaN(surfaceRaw)  ? null : surfaceRaw,
+      chauffage: document.getElementById('org-chauffage')?.value || '',
+      travail:  document.getElementById('org-travail')?.value || '',
+    };
+    scheduleSave();
+  }
+  document.getElementById('sec-entreprise').addEventListener('input', e => {
+    if (e.target.matches('.org-input')) _syncAndSaveProfile();
+  });
+  document.getElementById('sec-entreprise').addEventListener('change', e => {
+    if (e.target.matches('.org-input')) _syncAndSaveProfile();
+  });
+
+  // Écouter les changements d'état auth (inclut PASSWORD_RECOVERY)
+  _supabase.auth.onAuthStateChange((event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
       _authMode = 'reset';
       _syncAuthForm();
       const overlay = document.getElementById('auth-overlay');
@@ -2238,6 +2253,22 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('auth-password').focus();
       state._authTrap = createFocusTrap(overlay);
       document.addEventListener('keydown', state._authTrap);
+    } else if (event === 'SIGNED_IN' && session) {
+      state.authUser = session.user;
+      updateNavAuth();
+      loadOrgData();
+    } else if (event === 'SIGNED_OUT') {
+      state.authUser = null;
+      updateNavAuth();
+    }
+  });
+
+  // Vérifier session existante au démarrage
+  _supabase.auth.getSession().then(({ data }) => {
+    if (data.session) {
+      state.authUser = data.session.user;
+      updateNavAuth();
+      loadOrgData();
     }
   });
 });
