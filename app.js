@@ -51,7 +51,7 @@ function scheduleSave() {
 }
 
 /* ── Auth — ouverture/fermeture modale ── */
-let _authMode = 'login'; // 'login' | 'signup'
+let _authMode = 'login'; // 'login' | 'signup' | 'reset'
 
 function openAuthModal() {
   _authMode = 'login';
@@ -72,6 +72,10 @@ function closeAuthModal() {
   document.getElementById('auth-form').reset();
   document.getElementById('auth-error').style.display = 'none';
   if (state._authOpener) { state._authOpener.focus(); state._authOpener = null; }
+  // Nettoyer le hash de l'URL après réinitialisation
+  if (window.location.hash.includes('type=recovery')) {
+    history.replaceState(null, '', window.location.pathname);
+  }
 }
 
 function switchAuthMode() {
@@ -80,20 +84,38 @@ function switchAuthMode() {
 }
 
 function _syncAuthForm() {
-  const title   = document.getElementById('auth-title');
-  const submit  = document.querySelector('.auth-submit-btn');
-  const switchBtn = document.querySelector('.auth-switch-btn');
-  const switchTxt = document.querySelector('.auth-switch');
-  if (_authMode === 'login') {
-    title.textContent  = 'Connexion';
-    submit.textContent = 'Se connecter';
-    switchTxt.childNodes[0].textContent = 'Pas encore de compte ? ';
-    switchBtn.textContent = 'Créer un compte';
+  const title     = document.getElementById('auth-title');
+  const submit    = document.querySelector('.auth-submit-btn');
+  const switchEl  = document.querySelector('.auth-switch');
+  const emailField = document.getElementById('auth-email')?.closest('.auth-field');
+  const passField  = document.getElementById('auth-password')?.closest('.auth-field');
+  const passLabel  = passField?.querySelector('.auth-label');
+
+  if (_authMode === 'reset') {
+    title.textContent   = 'Nouveau mot de passe';
+    submit.textContent  = 'Enregistrer le mot de passe';
+    if (emailField) emailField.style.display = 'none';
+    if (passLabel)  passLabel.textContent = 'Nouveau mot de passe';
+    if (switchEl)   switchEl.style.display = 'none';
+    document.getElementById('auth-password').autocomplete = 'new-password';
+  } else if (_authMode === 'login') {
+    title.textContent   = 'Connexion';
+    submit.textContent  = 'Se connecter';
+    if (emailField) emailField.style.display = '';
+    if (passLabel)  passLabel.textContent = 'Mot de passe';
+    if (switchEl)   switchEl.style.display = '';
+    document.querySelector('.auth-switch-btn').textContent = 'Créer un compte';
+    switchEl.childNodes[0].textContent = 'Pas encore de compte ? ';
+    document.getElementById('auth-password').autocomplete = 'current-password';
   } else {
-    title.textContent  = 'Créer un compte';
-    submit.textContent = 'Créer mon compte';
-    switchTxt.childNodes[0].textContent = 'Déjà un compte ? ';
-    switchBtn.textContent = 'Se connecter';
+    title.textContent   = 'Créer un compte';
+    submit.textContent  = 'Créer mon compte';
+    if (emailField) emailField.style.display = '';
+    if (passLabel)  passLabel.textContent = 'Mot de passe';
+    if (switchEl)   switchEl.style.display = '';
+    document.querySelector('.auth-switch-btn').textContent = 'Se connecter';
+    switchEl.childNodes[0].textContent = 'Déjà un compte ? ';
+    document.getElementById('auth-password').autocomplete = 'new-password';
   }
   document.getElementById('auth-error').style.display = 'none';
 }
@@ -112,7 +134,16 @@ async function handleAuthSubmit(e) {
 
   try {
     let result;
-    if (_authMode === 'login') {
+    if (_authMode === 'reset') {
+      result = await _supabase.auth.updateUser({ password });
+      if (result.error) throw result.error;
+      closeAuthModal();
+      showToast('Mot de passe mis à jour. Vous êtes connecté.', 'info');
+      state.authUser = result.data.user;
+      updateNavAuth();
+      await loadOrgData();
+      return;
+    } else if (_authMode === 'login') {
       result = await _supabase.auth.signInWithPassword({ email, password });
     } else {
       result = await _supabase.auth.signUp({ email, password });
@@ -2196,6 +2227,17 @@ document.addEventListener('DOMContentLoaded', () => {
       state.authUser = data.session.user;
       updateNavAuth();
       loadOrgData();
+    }
+    // Détecter un lien de réinitialisation de mot de passe
+    if (window.location.hash.includes('type=recovery')) {
+      _authMode = 'reset';
+      _syncAuthForm();
+      const overlay = document.getElementById('auth-overlay');
+      overlay.classList.add('open');
+      document.body.style.overflow = 'hidden';
+      document.getElementById('auth-password').focus();
+      state._authTrap = createFocusTrap(overlay);
+      document.addEventListener('keydown', state._authTrap);
     }
   });
 });
