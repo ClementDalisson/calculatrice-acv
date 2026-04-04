@@ -1943,6 +1943,9 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedI
   const dominant = catData.reduce((a, b) => a.score > b.score ? a : b);
   const gwpT = (totals.GWP || 0) / 1000;
   const gwpFlights = Math.round(gwpT / 0.7);
+  const gwpPerEmployee = (profile.salaries > 0) ? gwpT / profile.salaries : null;
+
+  const pefTotal = catTotal; // en milli-points (mPt)
 
   const groupTotal = Object.values(pefByGroup).reduce((s, p) => s + (p.score || 0), 0);
 
@@ -2008,10 +2011,16 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedI
             <div class="dominant-value" style="color:${dominant.cat.color}">${dominant.cat.label}</div>
             <div class="dominant-pct">${dominant.pct}% du profil d'impact</div>
           </div>
+          <div class="result-pef-block">
+            <div class="gwp-label">🌿 SCORE ENVIRONNEMENTAL TOTAL</div>
+            <div class="result-pef-value">${pefTotal.toFixed(1)} <span class="result-pef-unit">mPt EF3.1</span></div>
+            <div class="gwp-analogy">Score agrégé sur 16 indicateurs EF3.1</div>
+          </div>
           <div class="result-gwp-block">
             <div class="gwp-label">🌡️ ÉQUIVALENT CARBONE TOTAL</div>
             <div class="gwp-value">${gwpT < 1 ? (gwpT * 1000).toFixed(0) + ' kg' : gwpT.toFixed(1) + ' t'} CO₂ eq.</div>
             ${gwpFlights > 0 ? `<div class="gwp-analogy">≈ ${gwpFlights} vol${gwpFlights > 1 ? 's' : ''} Paris–New York</div>` : ''}
+            ${gwpPerEmployee !== null ? `<div class="gwp-analogy" style="margin-top:0.25rem;font-weight:600;color:var(--climat)">≈ ${gwpPerEmployee < 1 ? (gwpPerEmployee * 1000).toFixed(0) + ' kg' : gwpPerEmployee.toFixed(1) + ' t'} CO₂ / salarié / an</div>` : ''}
           </div>
         </div>
       </div>

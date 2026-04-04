@@ -1359,6 +1359,13 @@ nav {
 .dominant-value { font-size: 1rem; font-weight: 800; }
 .dominant-pct { font-size: 0.78rem; color: var(--text-muted); }
 
+.result-pef-block {
+  background: var(--eco-light); border-radius: var(--radius-sm); padding: 0.8rem 1rem;
+  border: 1px solid var(--eco-mid);
+}
+.result-pef-value { font-size: 1.4rem; font-weight: 800; color: var(--eco); margin: 0.15rem 0; }
+.result-pef-unit { font-size: 0.8rem; font-weight: 500; color: var(--eco); }
+
 .result-gwp-block {
   background: var(--color-surface); border-radius: var(--radius-sm); padding: 0.8rem 1rem;
   border: 1px solid var(--gray-200);
