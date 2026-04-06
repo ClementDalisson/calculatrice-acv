@@ -5,6 +5,25 @@
 //                      renderMethodologie, renderEntrepriseSection  (app.js)
 // ─────────────────────────────────────────────────────────────────────────────
 
+const _SITE = 'Dalisson Environnement';
+const _MAIN_TITLES = {
+  home:         _SITE,
+  perso:        'Calculatrice personnelle — ' + _SITE,
+  organisation: 'Bilan organisation — ' + _SITE,
+  contact:      'Contact — ' + _SITE,
+  methode:      'Méthode EF3.1 — ' + _SITE,
+};
+const _SUB_TITLES = {
+  catalogue: 'Catalogue — ' + _SITE,
+  compare:   'Comparaison — ' + _SITE,
+  empreinte: 'Empreinte annuelle — ' + _SITE,
+};
+const _ORG_TITLES = {
+  catalogue: 'Catalogue organisation — ' + _SITE,
+  outil:     'Saisie des données — ' + _SITE,
+  analyse:   'Résultats organisation — ' + _SITE,
+};
+
 function showOnly(section) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('sec-' + section);
@@ -13,6 +32,7 @@ function showOnly(section) {
 
 function goToMain(main) {
   state.main = main;
+  document.title = _MAIN_TITLES[main] || _SITE;
   document.querySelectorAll('.nav-link[data-main]').forEach(l => {
     l.classList.toggle('active', l.dataset.main === main);
   });
@@ -40,6 +60,7 @@ function goTo(section) {
   state.section = section;
   if (['catalogue', 'compare', 'empreinte'].includes(section)) {
     state.subSection = section;
+    document.title = _SUB_TITLES[section] || _MAIN_TITLES.perso;
   }
   showOnly(section);
   document.querySelectorAll('.subnav-link').forEach(l => {
@@ -58,6 +79,7 @@ function updateNavBadge() {
 
 function goToOrg(section) {
   state.orgSection = section;
+  document.title = _ORG_TITLES[section] || _MAIN_TITLES.organisation;
   document.querySelectorAll('.subnav-org-link').forEach(l => {
     l.classList.toggle('active', l.dataset.orgSection === section);
   });

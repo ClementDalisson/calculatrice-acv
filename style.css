@@ -59,6 +59,19 @@
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
+/* ── Focus visible — accessibilité clavier & mobile ── */
+:focus { outline: none; }
+:focus-visible {
+  outline: 3px solid var(--navy-light);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+/* Contrastes renforcés sur fonds sombres */
+.nav-bar :focus-visible,
+.auth-modal :focus-visible {
+  outline-color: var(--eco-mid);
+}
+
 body {
   font-family: var(--font-main);
   background: var(--color-bg);

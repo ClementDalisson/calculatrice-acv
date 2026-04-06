@@ -1568,6 +1568,12 @@ function renderEntrepriseResults(totals, byGroup, pefByGroup, profile, selectedI
             <div class="gwp-label">🌿 SCORE ENVIRONNEMENTAL TOTAL</div>
             <div class="result-pef-value">${pefTotal.toFixed(1)} <span class="result-pef-unit">mPt EF3.1</span></div>
             <div class="gwp-analogy">Score agrégé sur 16 indicateurs EF3.1</div>
+            ${profile.salaries > 0 ? (() => {
+              const pefPerEmp = pefTotal / profile.salaries;
+              const pct = Math.round(pefPerEmp / 150 * 100);
+              const color = pct <= 100 ? 'var(--eco)' : pct <= 200 ? '#D69E2E' : 'var(--climat)';
+              return `<div class="pef-per-emp" style="margin-top:0.5rem;font-size:0.82rem;font-weight:600;color:${color}">≈ ${pefPerEmp.toFixed(1)} mPt / salarié · ${pct}% de la cible 2050 (150 mPt / pers.)</div>`;
+            })() : `<div style="margin-top:0.4rem;font-size:0.78rem;color:var(--text-muted)">Renseignez le nombre de salariés pour voir l'impact par personne</div>`}
           </div>
           <div class="result-gwp-block">
             <div class="gwp-label">🌡️ ÉQUIVALENT CARBONE TOTAL</div>
