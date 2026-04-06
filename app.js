@@ -1263,7 +1263,6 @@ function renderOrgOutilSection() {
       <div class="org-sel-info">
         <span class="org-sel-name">${item.n}</span>
         <span class="org-sel-uf">${item.uf}</span>
-        ${item.bom ? `<span class="org-sel-bom-text">${item.bom}</span>` : ''}
       </div>
       <input type="number" class="org-sel-qty" min="0" step="1" placeholder="qté" value="${qty}"
         onchange="updateOrgItemQty('${id}', this.value)">
