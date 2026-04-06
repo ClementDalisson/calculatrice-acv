@@ -887,7 +887,7 @@
 <!-- ── Footer ────────────────────────────────────────────────────────────── -->
 <footer id="footer-pro" style="background:#1A2E3C;color:#fff;padding:2rem 1.5rem;margin-top:3rem;text-align:center">
   <div style="max-width:900px;margin:0 auto;font-size:0.78rem;color:#718096">
-    Dalisson Environnement · Méthode EF3.1 Commission Européenne 2021 · Données : Ecobalyse v8.5, BASE-IMPACTS v3.0<br>
+    Dalisson Environnement · Méthode EF3.1 Commission Européenne 2021<br>
     <a href="mailto:clement.dalisson@gmail.com" style="color:#68D391">clement.dalisson@gmail.com</a>
   </div>
 </footer>
@@ -908,6 +908,7 @@
         <div class="auth-field">
           <label class="auth-label" for="auth-password">Mot de passe</label>
           <input type="password" id="auth-password" class="org-input" placeholder="••••••••" autocomplete="current-password">
+          <button type="button" id="auth-forgot-btn" class="auth-forgot-btn" onclick="handleForgotPassword()">Mot de passe oublié ?</button>
         </div>
         <div id="auth-error" class="auth-error" style="display:none"></div>
         <button type="submit" class="btn auth-submit-btn">Se connecter</button>

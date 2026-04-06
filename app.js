@@ -84,9 +84,10 @@ function switchAuthMode() {
 }
 
 function _syncAuthForm() {
-  const title     = document.getElementById('auth-title');
-  const submit    = document.querySelector('.auth-submit-btn');
-  const switchEl  = document.querySelector('.auth-switch');
+  const title      = document.getElementById('auth-title');
+  const submit     = document.querySelector('.auth-submit-btn');
+  const switchEl   = document.querySelector('.auth-switch');
+  const forgotBtn  = document.getElementById('auth-forgot-btn');
   const emailField = document.getElementById('auth-email')?.closest('.auth-field');
   const passField  = document.getElementById('auth-password')?.closest('.auth-field');
   const passLabel  = passField?.querySelector('.auth-label');
@@ -97,6 +98,7 @@ function _syncAuthForm() {
     if (emailField) emailField.style.display = 'none';
     if (passLabel)  passLabel.textContent = 'Nouveau mot de passe';
     if (switchEl)   switchEl.style.display = 'none';
+    if (forgotBtn)  forgotBtn.style.display = 'none';
     document.getElementById('auth-password').autocomplete = 'new-password';
   } else if (_authMode === 'login') {
     title.textContent   = 'Connexion';
@@ -104,6 +106,7 @@ function _syncAuthForm() {
     if (emailField) emailField.style.display = '';
     if (passLabel)  passLabel.textContent = 'Mot de passe';
     if (switchEl)   switchEl.style.display = '';
+    if (forgotBtn)  forgotBtn.style.display = '';
     document.querySelector('.auth-switch-btn').textContent = 'Créer un compte';
     switchEl.childNodes[0].textContent = 'Pas encore de compte ? ';
     document.getElementById('auth-password').autocomplete = 'current-password';
@@ -113,6 +116,7 @@ function _syncAuthForm() {
     if (emailField) emailField.style.display = '';
     if (passLabel)  passLabel.textContent = 'Mot de passe';
     if (switchEl)   switchEl.style.display = '';
+    if (forgotBtn)  forgotBtn.style.display = 'none';
     document.querySelector('.auth-switch-btn').textContent = 'Se connecter';
     switchEl.childNodes[0].textContent = 'Déjà un compte ? ';
     document.getElementById('auth-password').autocomplete = 'new-password';
@@ -207,29 +211,69 @@ function updateNavAuth() {
   }
 }
 
+/* ── Mot de passe oublié ── */
+async function handleForgotPassword() {
+  const email = document.getElementById('auth-email').value.trim();
+  const errorEl = document.getElementById('auth-error');
+  if (!email) {
+    errorEl.textContent = 'Saisissez votre email ci-dessus.';
+    errorEl.style.display = 'block';
+    document.getElementById('auth-email').focus();
+    return;
+  }
+  const btn = document.getElementById('auth-forgot-btn');
+  btn.disabled = true;
+  const { error } = await _supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://clementdalisson.github.io/calculatrice-acv/',
+  });
+  btn.disabled = false;
+  if (error) {
+    errorEl.textContent = 'Erreur : ' + error.message;
+    errorEl.style.display = 'block';
+  } else {
+    closeAuthModal();
+    showToast('Email de réinitialisation envoyé à ' + email, 'info');
+  }
+}
+
 /* ── Sauvegarde & chargement Supabase ── */
 async function saveOrgData() {
   if (!state.authUser) return;
-  await _supabase.from('org_data').upsert({
-    user_id:    state.authUser.id,
-    profile:    state.orgProfile,
-    items_map:  state.orgItemsMap,
-    updated_at: new Date().toISOString(),
-  });
+  try {
+    const { error } = await _supabase.from('org_data').upsert({
+      user_id:    state.authUser.id,
+      profile:    state.orgProfile,
+      items_map:  state.orgItemsMap,
+      updated_at: new Date().toISOString(),
+    });
+    if (error) throw error;
+  } catch {
+    showToast('Sauvegarde impossible — vérifiez votre connexion.', 'warning');
+  }
 }
 
 async function loadOrgData() {
   if (!state.authUser) return;
-  const { data } = await _supabase
-    .from('org_data')
-    .select('profile, items_map')
-    .eq('user_id', state.authUser.id)
-    .single();
-  if (data) {
-    state.orgProfile  = data.profile  || state.orgProfile;
-    state.orgItemsMap = data.items_map || {};
-    updateOrgItemBadge();
-    if (state.main === 'organisation') renderEntrepriseSection();
+  const btn = document.getElementById('nav-auth-btn');
+  if (btn) { btn.textContent = '⏳ Chargement…'; btn.disabled = true; }
+  try {
+    const { data, error } = await _supabase
+      .from('org_data')
+      .select('profile, items_map')
+      .eq('user_id', state.authUser.id)
+      .single();
+    if (error && error.code !== 'PGRST116') throw error;
+    if (data) {
+      state.orgProfile  = data.profile  || state.orgProfile;
+      state.orgItemsMap = data.items_map || {};
+      updateOrgItemBadge();
+      if (state.main === 'organisation') renderEntrepriseSection();
+    }
+  } catch {
+    showToast('Chargement impossible — vérifiez votre connexion.', 'warning');
+  } finally {
+    updateNavAuth();
+    if (btn) btn.disabled = false;
   }
 }
 

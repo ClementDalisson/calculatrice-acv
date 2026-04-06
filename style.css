@@ -1124,6 +1124,11 @@ nav {
   padding: 0.35rem 0.9rem;
   border-radius: 6px;
   transition: var(--transition);
+  touch-action: manipulation;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }
 .subnav-link:hover,
 .subnav-org-link:hover { background: var(--gray-100); color: var(--text); }
@@ -2713,6 +2718,10 @@ nav {
   background: var(--sante);
   border-left: 4px solid var(--sante-mid);
 }
+.toast.toast--info {
+  background: var(--navy);
+  border-left: 4px solid var(--eco-mid);
+}
 
 /* ── Auth Modal ─────────────────────────────────────────────────────────── */
 .auth-overlay {
@@ -2779,6 +2788,18 @@ nav {
   border-radius: 6px;
   margin-bottom: 0.75rem;
 }
+.auth-forgot-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  cursor: pointer;
+  padding: 0.2rem 0;
+  margin-top: 0.3rem;
+  display: block;
+  text-decoration: underline;
+}
+.auth-forgot-btn:hover { color: var(--navy); }
 .auth-submit-btn { width: 100%; margin-top: 0.5rem; }
 .auth-switch {
   text-align: center;
