@@ -4,8 +4,10 @@
   "dateISO": "2026-04-07",
   "date": "7 avril 2026",
   "resume": "Résumé court affiché sur la carte d'actualité (2-3 phrases maximum). Doit donner envie de lire.",
-  "image": "https://url-de-limage.jpg",
+
+  "image": "content/articles/images/nom-du-fichier.jpg",
   "imageAlt": "Description de l'image pour l'accessibilité",
+
   "contenu": "<p>Premier paragraphe d'introduction.</p>\n<h3>Premier sous-titre</h3>\n<p>Contenu de cette section.</p>\n<h3>Deuxième sous-titre</h3>\n<p>Contenu de cette section. Vous pouvez utiliser <strong>gras</strong>, <em>italique</em>, et des <a href=\"https://example.com\">liens</a>.</p>\n<p>Dernier paragraphe de conclusion.</p>",
   "sources": [
     "Source 1 — Auteur ou organisme, année",
