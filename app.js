@@ -1715,7 +1715,7 @@ function toggleEntrepriseDetail() {
 }
 
 /* ── Init ── */
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   // Main nav
   document.querySelectorAll('.nav-link[data-main]').forEach(l => {
     l.addEventListener('click', () => goToMain(l.dataset.main));
@@ -1771,10 +1771,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   renderCatalogue();
-  loadArticles(); // async — met à jour la liste dès que l'index est chargé
   updateNavBadge();
   updateOrgItemBadge();
-  goToMain('home');
+  // Initialisation : lire le hash pour restaurer l'état (lien direct, etc.)
+  await loadArticles();
+  await navigateFromHash(window.location.hash || '#home');
 
   // Article modal close
   document.getElementById('article-overlay').addEventListener('click', e => {
@@ -1879,7 +1880,7 @@ function renderNews() {
   `).join('');
 }
 
-function openArticle(id) {
+function openArticle(id, { pushHash = true } = {}) {
   const a = _articles.find(x => x.id === id);
   if (!a) return;
   state._articleOpener = document.activeElement;
@@ -1899,6 +1900,7 @@ function openArticle(id) {
   document.getElementById('article-modal-close').focus();
   state._articleTrap = createFocusTrap(articleOverlay);
   document.addEventListener('keydown', state._articleTrap);
+  if (pushHash) _setHash('#articles/' + id);
 }
 
 function closeArticle() {
@@ -1906,4 +1908,6 @@ function closeArticle() {
   document.body.style.overflow = '';
   if (state._articleTrap) { document.removeEventListener('keydown', state._articleTrap); state._articleTrap = null; }
   if (state._articleOpener) { state._articleOpener.focus(); state._articleOpener = null; }
+  // Revenir au hash #home si on était sur un article
+  if (window.location.hash.startsWith('#articles/')) _setHash('#home');
 }
