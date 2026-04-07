@@ -1,0 +1,33 @@
+name: Build articles index
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'content/articles/*.json'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Générer content/articles/index.json
+        run: node scripts/build-articles.js
+
+      - name: Commit et push si l'index a changé
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add content/articles/index.json
+          git diff --staged --quiet && echo "Aucun changement." || (
+            git commit -m "Auto: mise à jour index des articles" &&
+            git push
+          )

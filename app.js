@@ -1771,7 +1771,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
   renderCatalogue();
-  renderNews();
+  loadArticles(); // async — met à jour la liste dès que l'index est chargé
   updateNavBadge();
   updateOrgItemBadge();
   goToMain('home');
@@ -1842,24 +1842,45 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 /* ── Actualités ── */
+let _articles = [];
+
+async function loadArticles() {
+  const list = document.getElementById('home-news-list');
+  if (list) list.innerHTML = '<p style="color:var(--text-muted);padding:1rem">Chargement…</p>';
+  try {
+    const res = await fetch('content/articles/index.json');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    _articles = await res.json();
+  } catch {
+    _articles = [];
+    if (list) list.innerHTML = '<p style="color:var(--text-muted);padding:1rem">Actualités indisponibles.</p>';
+    return;
+  }
+  renderNews();
+}
+
 function renderNews() {
   const list = document.getElementById('home-news-list');
   if (!list) return;
-  list.innerHTML = ARTICLES.map(a => `
+  if (!_articles.length) {
+    list.innerHTML = '<p style="color:var(--text-muted);padding:1rem">Aucun article disponible.</p>';
+    return;
+  }
+  list.innerHTML = _articles.map(a => `
     <article class="news-card">
-      <img class="news-card-img" src="${a.image}" alt="${a.imageAlt}" loading="lazy">
+      <img class="news-card-img" src="${a.image || ''}" alt="${a.imageAlt || ''}" loading="lazy">
       <div class="news-card-body">
         <div class="news-card-date">${a.date}</div>
-        <div class="news-card-titre" onclick="openArticle(${a.id})">${a.titre}</div>
+        <div class="news-card-titre" onclick="openArticle('${a.id}')">${a.titre}</div>
         <p class="news-card-resume">${a.resume}</p>
-        <button class="news-card-btn" onclick="openArticle(${a.id})">Lire l'article →</button>
+        <button class="news-card-btn" onclick="openArticle('${a.id}')">Lire l'article →</button>
       </div>
     </article>
   `).join('');
 }
 
 function openArticle(id) {
-  const a = ARTICLES.find(x => x.id === id);
+  const a = _articles.find(x => x.id === id);
   if (!a) return;
   state._articleOpener = document.activeElement;
   document.getElementById('article-modal-date').textContent = a.date;
