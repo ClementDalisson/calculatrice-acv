@@ -15,6 +15,7 @@ echo "=== Session start : calculatrice-acv ==="
 echo "Node : $(node --version 2>/dev/null || echo 'non disponible')"
 echo "Python : $(python3 --version 2>/dev/null || echo 'non disponible')"
 echo "Git branch : $(git branch --show-current 2>/dev/null || echo 'inconnu')"
-echo "Fichiers projet : $(ls index.html app.js style.css data.js 2>/dev/null | tr '\n' ' ')"
+echo "Fichiers JS : $(ls app.js ui-perso.js ui-org.js calc.js router.js auth.js data.js 2>/dev/null | tr '\n' ' ')"
+echo "Guide : CLAUDE.md (lire en priorité)"
 
 echo "=== Environnement prêt ==="
