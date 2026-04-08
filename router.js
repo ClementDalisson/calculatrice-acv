@@ -5,6 +5,8 @@
 //                      renderMethodologie, renderEntrepriseSection  (app.js)
 // ─────────────────────────────────────────────────────────────────────────────
 
+if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+
 const _SITE = 'Dalisson Environnement';
 const _MAIN_TITLES = {
   home:         _SITE,
@@ -28,6 +30,7 @@ function showOnly(section) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   const el = document.getElementById('sec-' + section);
   if (el) el.classList.add('active');
+  window.scrollTo(0, 0);
 }
 
 /* ── Hash helpers ── */
