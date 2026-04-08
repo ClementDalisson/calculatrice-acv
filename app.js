@@ -1775,6 +1775,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   updateOrgItemBadge();
   // Initialisation : lire le hash pour restaurer l'état (lien direct, etc.)
   await loadArticles();
+  hideEmptyHomeSections();
   await navigateFromHash(window.location.hash || '#home');
 
   // Article modal close
@@ -1842,6 +1843,17 @@ document.addEventListener('DOMContentLoaded', async () => {
   });
 });
 
+/* ── Masquer les rubriques vides de la page d'accueil ── */
+function hideEmptyHomeSections() {
+  document.querySelectorAll('#sec-home .home-section').forEach(section => {
+    // Sélectionner toutes les cartes de contenu (pas le titre)
+    const cards = section.querySelectorAll('.home-ref-card, .home-tool-card, .home-expertise-card, .home-about-profile, .home-placeholder-card');
+    if (cards.length === 0) return;
+    const allPlaceholders = Array.from(cards).every(c => c.classList.contains('home-placeholder-card'));
+    if (allPlaceholders) section.style.display = 'none';
+  });
+}
+
 /* ── Actualités ── */
 let _articles = [];
 
@@ -1854,7 +1866,10 @@ async function loadArticles() {
     _articles = await res.json();
   } catch {
     _articles = [];
-    if (list) list.innerHTML = '<p style="color:var(--text-muted);padding:1rem">Actualités indisponibles.</p>';
+    if (list) {
+      const section = list.closest('.home-section');
+      if (section) section.style.display = 'none';
+    }
     return;
   }
   renderNews();
@@ -1863,10 +1878,12 @@ async function loadArticles() {
 function renderNews() {
   const list = document.getElementById('home-news-list');
   if (!list) return;
+  const section = list.closest('.home-section');
   if (!_articles.length) {
-    list.innerHTML = '<p style="color:var(--text-muted);padding:1rem">Aucun article disponible.</p>';
+    if (section) section.style.display = 'none';
     return;
   }
+  if (section) section.style.display = '';
   list.innerHTML = _articles.map(a => `
     <article class="news-card">
       <img class="news-card-img" src="${a.image || ''}" alt="${a.imageAlt || ''}" loading="lazy">
