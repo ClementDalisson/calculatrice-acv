@@ -9,6 +9,7 @@
   <meta name="author" content="Clément Dalisson">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://clementdalisson.github.io/calculatrice-acv/">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌿</text></svg>">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://clementdalisson.github.io/calculatrice-acv/">
   <meta property="og:title" content="Dalisson Environnement — Bilan environnemental multi-critères">
@@ -118,12 +119,22 @@
           <h3>Calculatrice organisation</h3>
           <p>Cartographiez les impacts environnementaux de votre organisation selon les 16 indicateurs EF3.1 — énergie, mobilité, achats, services, alimentation.</p>
           <div class="htc-stats">
-            <span>325 postes d'activité</span>
+            <span>Outil en bêta</span>
             <span>16 indicateurs EF3.1</span>
             <span>4 catégories de dommage</span>
           </div>
           <span class="htc-link">Accéder →</span>
         </div>
+      </div>
+    </section>
+
+    <!-- Teaser Méthode -->
+    <section class="home-section">
+      <div class="home-methode-teaser" onclick="goToMain('methode')">
+        <div class="hmt-eyebrow">Méthode EF3.1</div>
+        <h2 class="hmt-title">Pourquoi vos décisions RSE basées sur le CO₂ seul sont peut-être fausses</h2>
+        <p class="hmt-desc">Le changement climatique ne représente que 21 % de l'impact environnemental total. Les 79 % restants — eau, sols, biodiversité, toxicité, ressources — restent invisibles dans un bilan carbone classique.</p>
+        <span class="hmt-link">Comprendre la méthode →</span>
       </div>
     </section>
 
@@ -781,9 +792,9 @@
       <div class="methode-section">
         <h3 class="methode-section-title">Références bibliographiques</h3>
         <div class="methode-refs">
-          <div class="mref-item">Pizzol M. et al. (2017) — <em>Weighting in LCA</em> — International Journal of Life Cycle Assessment</div>
-          <div class="mref-item">Sala S. et al. (2017) — Construction des poids EF — JRC Technical Report</div>
-          <div class="mref-item">Huijbregts M.A.J. et al. (2017) — <em>ReCiPe 2016: a harmonised life cycle impact assessment method</em></div>
+          <div class="mref-item">Pizzol M. et al. (2017) — <em>Weighting in LCA</em> — International Journal of Life Cycle Assessment — <a href="https://doi.org/10.1007/s11367-017-1302-1" target="_blank" rel="noopener">DOI 10.1007/s11367-017-1302-1</a></div>
+          <div class="mref-item">Sala S. et al. (2017) — Construction des poids EF — JRC Technical Report — <a href="https://doi.org/10.2760/215868" target="_blank" rel="noopener">DOI 10.2760/215868</a></div>
+          <div class="mref-item">Huijbregts M.A.J. et al. (2017) — <em>ReCiPe 2016: a harmonised life cycle impact assessment method</em> — <a href="https://doi.org/10.1007/s11367-016-1246-y" target="_blank" rel="noopener">DOI 10.1007/s11367-016-1246-y</a></div>
           <div class="mref-item">Ryberg M. et al. (2018) — <em>Absolute Environmental Sustainability Assessment</em> — Ecological Indicators</div>
           <div class="mref-item">Commission Européenne (2021) — <em>Technical Report EF 3.1</em> — JRC, Ispra</div>
         </div>
@@ -889,6 +900,7 @@
       <button id="auth-close-btn" class="auth-modal-close" aria-label="Fermer">✕</button>
     </div>
     <div class="auth-modal-body">
+      <p class="auth-explain">Un compte vous permet de sauvegarder votre bilan organisation et d'y revenir à tout moment.</p>
       <form id="auth-form" novalidate>
         <div class="auth-field">
           <label class="auth-label" for="auth-email">Email</label>
