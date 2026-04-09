@@ -1351,6 +1351,48 @@ nav {
 .home-refs-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
 .home-ref-card { min-height: 120px; }
 
+/* Secteurs prioritaires */
+.home-sectors-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; }
+.home-sector-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: 12px;
+  padding: 1.2rem;
+  text-align: center;
+  transition: box-shadow var(--transition);
+}
+.home-sector-card:hover { box-shadow: var(--shadow-lg); }
+.sector-icon { font-size: 1.8rem; margin-bottom: 0.5rem; }
+.home-sector-card h4 { font-size: 0.88rem; font-weight: 700; color: var(--navy); margin-bottom: 0.4rem; }
+.home-sector-card p { font-size: 0.75rem; color: var(--text-muted); line-height: 1.5; }
+
+/* Service detail */
+.service-detail {
+  font-size: 0.75rem;
+  color: var(--eco);
+  font-weight: 600;
+  line-height: 1.5;
+  margin-top: 0.5rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--gray-100);
+}
+
+/* Hero CTA accent */
+.home-cta-accent {
+  background: #fff;
+  color: var(--navy);
+  border: 2px solid #fff;
+  padding: 0.8rem 1.8rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+  transition: all 0.2s;
+}
+.home-cta-accent:hover { background: var(--eco-light); color: var(--eco); border-color: var(--eco-light); }
+
 /* ── SOUS-NAV REDESIGN ───────────────────────────────────────────── */
 .nav-brand {
   background: none;
@@ -1573,6 +1615,7 @@ nav {
   .home-about-grid { grid-template-columns: 1fr; }
   .home-expertise-grid { grid-template-columns: 1fr 1fr; }
   .home-refs-grid { grid-template-columns: 1fr 1fr; }
+  .home-sectors-grid { grid-template-columns: 1fr 1fr; }
 
   /* Cards catalogue */
   .cards-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
